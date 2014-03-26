@@ -4,19 +4,14 @@
 #include <vector>
 using namespace std;
  
-void sort(vector<int>& vec){
-
-  for (int i=vec.size()-1; i>=0; i--)
-  {
-    for (int j=0; j<i; j++)
-    {
-      if (vec[j] > vec[j+1])
-      {
-        int tmp = vec[j];
-        vec[j] = vec[j+1];
-        vec[j+1] = tmp;
-      }
-    }
+void sort(vector<vector<int> >& vec) {	
+	for (int k=0; k<vec.size(); k++) {
+	for (int i=vec[k].size()-1; i>0; i--) {
+    	for (int j=0; j<i; j++) {	  		
+      		if (vec[j][k] > vec[j+1][k]) 
+        		swap( vec[j][k], vec[j+1][k]);
+    	}
+  	}
   }
 }
 
@@ -55,9 +50,8 @@ int main(void){
 	print(matrix);
 	cout<<"----\n";
 
-	for (int i=0;i<n;i++){
-		sort(matrix[n]);
-	}
+	sort(matrix);
+	
 	print(matrix);
 
 }
