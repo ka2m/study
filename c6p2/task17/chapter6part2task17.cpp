@@ -55,17 +55,38 @@ int main(void){
 	print(matrix);
 	cout<<"----\n";
 
-	for (int i=0;i<matrix.size();i++){
-		vector<int*> underDiagonal;
+	
+		
+	int k=1;
+	int p=matrix.size()/2-1;	
+	for (;k<matrix.size(), p>=0 ;k++, p--) {
 		vector<int*> aboveDiagonal;
-		for (int j=0;j<i;j++)
-			underDiagonal.push_back(&matrix[i][j]);				
-		for (int j=i+1;j<matrix.size();j++)
-			aboveDiagonal.push_back(&matrix[i][j]);				
-		sort(underDiagonal, true);
-		sort(aboveDiagonal, false); 
-	} 
-	print(matrix);
+		vector<int*> underDiagonal;
+
+	 for (int i = 0; i < matrix.size(); i++)
+  		{
+  		for (int j = 0; j < matrix.size(); j++)
+   		{
+      		if (i==j-k)
+         		aboveDiagonal.push_back(&matrix[i][j]);
+         	if (i==j+p)
+         		underDiagonal.push_back(&matrix[i][j]);
+   		}	
+
+  		}
+  			sort(aboveDiagonal, false);	
+  			sort(underDiagonal, true);
+  	}
+
+  	print(matrix);
+	
+
+		//for (int j=i+1;j<matrix.size();j++)
+		//	aboveDiagonal.push_back(&matrix[i][j]);				
+		//sort(underDiagonal, true);
+		//sort(aboveDiagonal, false); 
+	
+	//print(matrix);
 		
 
 }
