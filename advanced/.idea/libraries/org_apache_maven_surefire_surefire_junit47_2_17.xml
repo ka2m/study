@@ -1,0 +1,19 @@
+<component name="libraryTable">
+  <library name="org.apache.maven.surefire:surefire-junit47:2.17" type="repository">
+    <properties maven-id="org.apache.maven.surefire:surefire-junit47:2.17" />
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/apache/maven/surefire/surefire-junit47/2.17/surefire-junit47-2.17.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/junit/junit/4.8.1/junit-4.8.1.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/apache/maven/surefire/surefire-api/2.17/surefire-api-2.17.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/apache/maven/surefire/common-junit48/2.17/common-junit48-2.17.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/apache/maven/surefire/common-junit4/2.17/common-junit4-2.17.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/apache/maven/surefire/common-junit3/2.17/common-junit3-2.17.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/apache/maven/surefire/common-java5/2.17/common-java5-2.17.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/apache/maven/shared/maven-shared-utils/0.4/maven-shared-utils-0.4.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/com/google/code/findbugs/jsr305/2.0.1/jsr305-2.0.1.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/apache/maven/surefire/surefire-grouper/2.17/surefire-grouper-2.17.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
