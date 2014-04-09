@@ -16,12 +16,14 @@
 
 package org.faulensky.test;
 
+import org.faulensky.linkedlist.LinkedList;
 import org.faulensky.queue.Queue;
 import org.faulensky.stack.Stack;
 import org.junit.Assert;
 import org.junit.Test;
 public class MyTest {
-    @Test
+
+
     public void sMaxDeletion() {
         System.out.println("===============================");
         Stack<Integer> myStack = new Stack<>();
@@ -59,7 +61,7 @@ public class MyTest {
         Assert.assertEquals(7, max);
     }
 
-     @Test
+
      public void qMaxDeletion() {
          System.out.println("===============================");
          Queue<Integer> myQ = new Queue<>();
@@ -94,7 +96,35 @@ public class MyTest {
          System.out.println("===============================");
      }
 
+    @Test
+    public void llMaxDeletion() {
+        System.out.println("===============================");
+        System.out.println("testing linkedlist");
+        LinkedList<Integer> myLL = new LinkedList<>();
+        myLL.add(45);
+        myLL.add(2);
+        myLL.add(6);
+        myLL.add(12);
 
+        System.out.println("now in myLL:");
+        System.out.println(myLL.toString());
+
+        Integer max = myLL.get(0);
+
+
+        for (int i=1;i<myLL.size();i++) {
+            if (myLL.get(i)>max) {
+                max = myLL.get(i);
+            }
+        }
+        System.out.println(max);
+
+        myLL.removeElement(max);
+        System.out.println(myLL.toString());
+
+
+
+    }
 
     }
 
