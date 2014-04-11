@@ -16,21 +16,23 @@
 
 package org.faulensky.test;
 
+import org.faulensky.binarytree.BinaryTree;
 import org.faulensky.linkedlist.LinkedList;
 import org.faulensky.queue.Queue;
 import org.faulensky.stack.Stack;
 import org.junit.Assert;
 import org.junit.Test;
+
 public class MyTest {
 
 
     public void sMaxDeletion() {
         System.out.println("===============================");
         Stack<Integer> myStack = new Stack<>();
-        int[] ints = {1,2,7,4,5,6,3};
-        for (int i: ints)
+        int[] ints = {1, 2, 7, 4, 5, 6, 3};
+        for (int i : ints)
             myStack.push(i);
-        System.out.println("myStack: "+myStack.toString());
+        System.out.println("myStack: " + myStack.toString());
 
 
         int max = myStack.pop();
@@ -39,70 +41,70 @@ public class MyTest {
         tempStack.push(max);
 
 
-        while (!myStack.isEmpty()){
-                if (myStack.front()>max)
-                    max = myStack.front();
-            System.out.println("pop from myStack: "+myStack.front());
-                tempStack.push(myStack.pop());
+        while (!myStack.isEmpty()) {
+            if (myStack.front() > max)
+                max = myStack.front();
+            System.out.println("pop from myStack: " + myStack.front());
+            tempStack.push(myStack.pop());
 
-            }
-        System.out.println("tempStack now: "+tempStack.toString());
-        System.out.println("max is: "+max);
+        }
+        System.out.println("tempStack now: " + tempStack.toString());
+        System.out.println("max is: " + max);
         while (!tempStack.isEmpty()) {
             int t = tempStack.pop();
-            if (t!=max) {
-                System.out.println("push to myStack: "+t);
+            if (t != max) {
+                System.out.println("push to myStack: " + t);
                 myStack.push(t);
             }
         }
 
-        System.out.println("my stack after deletion: "+myStack.toString());
+        System.out.println("my stack after deletion: " + myStack.toString());
         System.out.println("===============================");
         Assert.assertEquals(7, max);
     }
 
 
-     public void qMaxDeletion() {
-         System.out.println("===============================");
-         Queue<Integer> myQ = new Queue<>();
-         int[] ints = {1, 2, 7, 4, 5, 6, 3};
-         for (int i : ints)
-             myQ.add(i);
-         System.out.println("myQueue now: " + myQ.toString());
+    public void qMaxDeletion() {
+        System.out.println("===============================");
+        Queue<Integer> myQ = new Queue<>();
+        int[] ints = {1, 2, 7, 4, 5, 6, 3};
+        for (int i : ints)
+            myQ.add(i);
+        System.out.println("myQueue now: " + myQ.toString());
 
 
-         int max = myQ.peek();
+        int max = myQ.peek();
 
-         Queue<Integer> tempQ = new Queue<>();
-         tempQ.add(max);
+        Queue<Integer> tempQ = new Queue<>();
+        tempQ.add(max);
 
-         while (!myQ.isEmpty()) {
-             if (myQ.head() > max)
-                 max = myQ.head();
-             System.out.println("peek from myQ: " + myQ.head());
-             tempQ.add(myQ.peek());
+        while (!myQ.isEmpty()) {
+            if (myQ.head() > max)
+                max = myQ.head();
+            System.out.println("peek from myQ: " + myQ.head());
+            tempQ.add(myQ.peek());
 
-         }
-         System.out.println("tempQ now: " + tempQ.toString());
-         System.out.println("max is: " + max);
-         while (!tempQ.isEmpty()) {
-             int t = tempQ.peek();
-             if (t != max) {
-                 System.out.println("add to myQ: " + t);
-                 myQ.add(t);
-             }
-         }
-         System.out.println("my queue after deletion: "+ myQ.toString());
-         System.out.println("===============================");
-     }
+        }
+        System.out.println("tempQ now: " + tempQ.toString());
+        System.out.println("max is: " + max);
+        while (!tempQ.isEmpty()) {
+            int t = tempQ.peek();
+            if (t != max) {
+                System.out.println("add to myQ: " + t);
+                myQ.add(t);
+            }
+        }
+        System.out.println("my queue after deletion: " + myQ.toString());
+        System.out.println("===============================");
+    }
 
-    @Test
+
     public void llMaxDeletion() {
         System.out.println("===============================");
         System.out.println("testing linkedlist");
         LinkedList<Integer> myLL = new LinkedList<>();
         myLL.add(45);
-        myLL.add(2);
+        myLL.add(46);
         myLL.add(6);
         myLL.add(12);
 
@@ -112,8 +114,8 @@ public class MyTest {
         Integer max = myLL.get(0);
 
 
-        for (int i=1;i<myLL.size();i++) {
-            if (myLL.get(i)>max) {
+        for (int i = 1; i < myLL.size(); i++) {
+            if (myLL.get(i) > max) {
                 max = myLL.get(i);
             }
         }
@@ -122,9 +124,23 @@ public class MyTest {
         myLL.removeElement(max);
         System.out.println(myLL.toString());
 
-
-
     }
 
+    @Test
+    public void bst() {
+        BinaryTree<Integer> bst = new BinaryTree<>();
+        bst.insert(2);
+        bst.insert(1);
+        bst.insert(3);
+        bst.insert(7);
+        bst.insert(0);
+
+        System.out.println("is element \"3\" exist in tree? " + bst.lookup(3));
+        System.out.println("is element \"-1\" exist in tree? " + bst.lookup(-1));
+        System.out.println("size: " + bst.size());
+
+        bst.printTree();
     }
+
+}
 
