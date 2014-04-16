@@ -16,7 +16,7 @@
 
 package org.faulensky.test;
 
-import org.faulensky.binarytree.BinaryTree;
+import org.faulensky.balancedbst.SBBSTree;
 import org.faulensky.linkedlist.LinkedList;
 import org.faulensky.queue.Queue;
 import org.faulensky.stack.Stack;
@@ -128,16 +128,16 @@ public class MyTest {
 
     @Test
     public void bst() {
-        BinaryTree<Integer> bst = new BinaryTree<>();
-        bst.insert(2);
-        bst.insert(1);
-        bst.insert(3);
-        bst.insert(7);
+        SBBSTree bst = new SBBSTree();
+        bst.insert(5);
+        bst.insert(12);
+        bst.insert(24);
+        bst.insert(8);
         bst.insert(0);
 
-        System.out.println("is element \"3\" exist in tree? " + bst.lookup(3));
-        System.out.println("is element \"-1\" exist in tree? " + bst.lookup(-1));
-        System.out.println("size: " + bst.size());
+        System.out.println("is element \"3\" exist in tree? " + bst.search(3));
+        System.out.println("is element \"12\" exist in tree? " + bst.search(12));
+        System.out.println("size: " + bst.countNodes());
 
         bst.printTree();
     }
