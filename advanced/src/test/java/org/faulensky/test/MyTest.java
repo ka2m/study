@@ -23,6 +23,10 @@ import org.faulensky.stack.Stack;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public class MyTest {
 
 
@@ -129,17 +133,13 @@ public class MyTest {
     @Test
     public void bst() {
         SBBSTree bst = new SBBSTree();
-        bst.insert(5);
-        bst.insert(12);
-        bst.insert(24);
-        bst.insert(8);
-        bst.insert(0);
 
-        System.out.println("is element \"3\" exist in tree? " + bst.search(3));
-        System.out.println("is element \"12\" exist in tree? " + bst.search(12));
-        System.out.println("size: " + bst.countNodes());
+        int[] testCase = {5, 3, 4, 2, 1};
 
-        bst.printTree();
+        for (int i: testCase) {
+            bst.insert(i);
+            bst.displayTree();
+        }
     }
 
 }

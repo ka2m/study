@@ -16,214 +16,123 @@
 
 package org.faulensky.balancedbst;
 
+
 import java.util.Stack;
 
-public class SBBSTree {
-    private SBBSTNode root;
-
-    private class SBBSTNode {
-        SBBSTNode left, right;
-        int data;
-        int height;
-
-        public SBBSTNode() {
-            left = null;
-            right = null;
-            data = 0;
-            height = 0;
-        }
-
-        public SBBSTNode(int n) {
-            left = null;
-            right = null;
-            data = n;
-            height = 0;
-        }
-    }
+public class SBBSTree<T extends Comparable<T>> {
+    Node<T> root;
 
     public SBBSTree() {
         root = null;
     }
 
-    public boolean isEmpty() {
-        return root == null;
-    }
-
-    public void clear() {
-        root = null;
-    }
-
-    public int countNodes() {
-        return countNodes(root);
-    }
-
-
-    public void insert(int data) {
-        root = insert(data, root);
-    }
-
-    /* Function for inorder traversal */
-    public void inorder() {
-        inorder(root);
-    }
-
-    public boolean search(int val) {
-        return search(root, val);
-    }
-
-    public void postorder() {
-        postorder(root);
-    }
-
-    public void preorder() {
-        preorder(root);
-    }
-
-    public void printTree() {
-        displayTree();
-        System.out.println();
-
-    }
-
-    private int height(SBBSTNode t) {
-        return t == null ? -1 : t.height;
-    }
-
-    private int max(int lhs, int rhs) {
-        return lhs > rhs ? lhs : rhs;
-    }
-
-    private SBBSTNode insert(int x, SBBSTNode t) {
-        if (t == null)
-            t = new SBBSTNode(x);
-        else if (x < t.data) {
-            t.left = insert(x, t.left);
-            if (height(t.left) - height(t.right) == 2)
-                if (x < t.left.data)
-                    t = rotateWithLeftChild(t);
-                else
-                    t = doubleWithLeftChild(t);
-        } else if (x > t.data) {
-            t.right = insert(x, t.right);
-            if (height(t.right) - height(t.left) == 2)
-                if (x > t.right.data)
-                    t = rotateWithRightChild(t);
-                else
-                    t = doubleWithRightChild(t);
-        } else
-              // Duplicate; do nothing
-        t.height = max(height(t.left), height(t.right)) + 1;
-        return t;
-    }
-
-    // Rotate binary tree node with left child
-    private SBBSTNode rotateWithLeftChild(SBBSTNode k2) {
-        SBBSTNode k1 = k2.left;
-        k2.left = k1.right;
-        k1.right = k2;
-        k2.height = max(height(k2.left), height(k2.right)) + 1;
-        k1.height = max(height(k1.left), k2.height) + 1;
-        return k1;
-    }
-
-    // Rotate binary tree node with right child
-    private SBBSTNode rotateWithRightChild(SBBSTNode k1) {
-        SBBSTNode k2 = k1.right;
-        k1.right = k2.left;
-        k2.left = k1;
-        k1.height = max(height(k1.left), height(k1.right)) + 1;
-        k2.height = max(height(k2.right), k1.height) + 1;
-        return k2;
-    }
-
-    /**
-     * Double rotate binary tree node: first left child
-     * with its right child; then node k3 with new left child
-     */
-    private SBBSTNode doubleWithLeftChild(SBBSTNode k3) {
-        k3.left = rotateWithRightChild(k3.left);
-        return rotateWithLeftChild(k3);
-    }
-
-    /**
-     * Double rotate binary tree node: first right child
-     * with its left child; then node k1 with new right child
-     */
-    private SBBSTNode doubleWithRightChild(SBBSTNode k1) {
-        k1.right = rotateWithLeftChild(k1.right);
-        return rotateWithRightChild(k1);
-    }
-
-    private int countNodes(SBBSTNode r) {
-        if (r == null)
+    private int depth(Node<T> node) {
+        if (node == null) {
             return 0;
-        else {
-            int l = 1;
-            l += countNodes(r.left);
-            l += countNodes(r.right);
-            return l;
         }
+
+        return node.getDepth();
     }
 
-    private boolean search(SBBSTNode r, int val) {
-        boolean found = false;
-        while ((r != null) && !found) {
-            int rval = r.data;
-            if (val < rval)
-                r = r.left;
-            else if (val > rval)
-                r = r.right;
-            else {
-                found = true;
+    public Node<T> insert(T data) {
+        root = insert(root, data);
+
+        switch (balanceNumber(root)) {
+            case 1:
+                root = rotateLeft(root);
                 break;
-            }
-            found = search(r, val);
+            case -1:
+                root = rotateRight(root);
+                break;
+            default:
+                break;
         }
-        return found;
+        return root;
     }
 
-    private void inorder(SBBSTNode r) {
-        if (r != null) {
-            inorder(r.left);
-            System.out.print(r.data + " ");
-            inorder(r.right);
+    public Node<T> insert(Node<T> node, T data) {
+        if (node == null) {
+            return new Node<>(data);
         }
+
+        if (node.getData().compareTo(data) > 0) {
+            node = new Node<>(node.getData(), insert(node.getLeft(), data), node.getRight());
+        } else if (node.getData().compareTo(data) < 0) {
+            node = new Node<>(node.getData(), node.getLeft(), insert(node.getRight(), data));
+        }
+
+        switch (balanceNumber(node)) {
+            case 1:
+                node = rotateLeft(node);
+                break;
+            case -1:
+                node = rotateRight(node);
+                break;
+            default:
+                return node;
+        }
+        return node;
     }
 
-    private void preorder(SBBSTNode r) {
-        if (r != null) {
-            System.out.print(r.data + " ");
-            preorder(r.left);
-            preorder(r.right);
-        }
+    private int balanceNumber(Node<T> node) {
+        int L = depth(node.getLeft());
+        int R = depth(node.getRight());
+
+        if (L - R >= 2)
+            return -1;
+        else if (L - R <= -2)
+            return 1;
+        return 0;
     }
 
-    private void postorder(SBBSTNode r) {
-        if (r != null) {
-            postorder(r.left);
-            postorder(r.right);
-            System.out.print(r.data + " ");
-        }
+    private Node<T> rotateLeft(Node<T> node) {
+        Node<T> q = node;
+        Node<T> p = q.getRight();
+        Node<T> c = q.getLeft();
+        Node<T> a = p.getLeft();
+        Node<T> b = p.getRight();
+
+        q = new Node<>(q.getData(), c, a);
+        p = new Node<>(p.getData(), q, b);
+
+        return p;
     }
 
-    private void displayTree() {
-        Stack<SBBSTNode> globalStack = new Stack<>();
+    private Node<T> rotateRight(Node<T> node) {
+        Node<T> q = node;
+        Node<T> p = q.getLeft();
+        Node<T> c = q.getRight();
+        Node<T> a = p.getLeft();
+        Node<T> b = p.getRight();
+
+        q = new Node<>(q.getData(), b, c);
+        p = new Node<>(p.getData(), a, q);
+
+        return p;
+    }
+
+    public String toString() {
+        return root.toString();
+    }
+
+    public void displayTree() {
+        Stack<Node> globalStack = new Stack<>();
         globalStack.push(root);
         int emptyLeaf = 32;
         boolean isRowEmpty = false;
         System.out.println("****......................................................****");
         while (!isRowEmpty) {
-            Stack<SBBSTNode> localStack = new Stack<>();
+            Stack<Node> localStack = new Stack<>();
             isRowEmpty = true;
             for (int j = 0; j < emptyLeaf; j++)
                 System.out.print(' ');
             while (!globalStack.isEmpty()) {
-                SBBSTNode temp = globalStack.pop();
+                Node temp = globalStack.pop();
                 if (temp != null) {
-                    System.out.print(temp.data);
-                    localStack.push(temp.left);
-                    localStack.push(temp.right);
-                    if (temp.left != null || temp.right != null)
+                    System.out.print(temp.getData());
+                    localStack.push(temp.getLeft());
+                    localStack.push(temp.getRight());
+                    if (temp.getLeft() != null || temp.getRight() != null)
                         isRowEmpty = false;
                 } else {
                     System.out.print("--");
@@ -239,6 +148,7 @@ public class SBBSTree {
                 globalStack.push(localStack.pop());
         }
         System.out.println("****......................................................****");
+        System.out.println();
     }
 }
 
