@@ -116,16 +116,14 @@ int main(void) {
     map<point, int> finish_to_start = bfs(end);
     printf("f->s ways:\n");
     print_maps(finish_to_start);
-
    
-
-   for (map<point, int>::iterator it=start_to_finish.begin(); it != start_to_finish.end(); ++it) {        
+    print_maze();   
+    for (map<point, int>::iterator it=start_to_finish.begin(); it != start_to_finish.end(); ++it) {        
             if (it->second + finish_to_start.find(it->first)->second == start_to_finish[end])
                 maze[it->first.x][it->first.y] = 'x';
         
-   }
-   print_maze();   
-
-  
-
+    }
+    for (int i=0;i<m;i++) printf("-");
+    printf("\n"); 
+    print_maze();   
 }
