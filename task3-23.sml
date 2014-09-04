@@ -1,14 +1,15 @@
 (* N - целочисленный параметр *)
-load "Math";
+
 fun y N =
   let
+    open Math;
     val rN = real N
 	
     (* Внутренний цикл (сумма): подсчет i-го множителя
      * сложение с j-ым слогаемым результата slag *)
     fun jIter (i, j, slag) =
       if j > rN then slag
-      else jIter (i, j + 1.0, slag + (((Math.exp)^i) / Math.lg (j)));
+      else jIter (i, j + 1.0, slag + pow (Math.e, i) / Math.ln (j));
 
     (* Внешний цикл (сумма):
      * добавление i-го слагаемого (при i<=N) к результату rez *)
