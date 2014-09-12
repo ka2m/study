@@ -38,3 +38,8 @@ def swap(A, x, y):
     tmp = A[x]
     A[x] = A[y]
     A[y] = tmp
+
+l = [23, 55, 12, 16, 934, 100]
+print(l)
+heapsort(l)
+print(l)
