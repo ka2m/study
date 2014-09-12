@@ -39,7 +39,12 @@ def swap(A, x, y):
     A[x] = A[y]
     A[y] = tmp
 
-l = [23, 55, 12, 16, 934, 100]
-print(l)
-heapsort(l)
-print(l)
+with open('rex') as f:
+    array = []
+    for line in f:
+        p = [int(x) for x in line.split()]
+        array = array + p
+    print array
+    heapsort(array)
+    print('--'*80)
+    print array

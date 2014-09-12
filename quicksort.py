@@ -6,7 +6,12 @@ def qsort(arr):
             [arr[0]] + \
             qsort([x for x in arr[1:] if x >= arr[0]])
 
-l = [23, 55, 12, 16, 934, 100]
-print(l)
-l = qsort(l)
-print(l)
+with open('rex') as f:
+    array = []
+    for line in f:
+        p = [int(x) for x in line.split()]
+        array = array + p
+    print array
+    array = qsort(array)
+    print('--'*80)
+    print array
