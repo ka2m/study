@@ -1,4 +1,3 @@
 study
 =====
 
-CPP stuff
