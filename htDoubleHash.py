@@ -6,6 +6,9 @@ class Item:
         self.key = aKey
         self.value = aValue
 
+    def __str__(self):
+        return ('(%d, %s)' % (self.key, self.value))
+
 
 class MyHashTable:
     def __init__(self, size):
@@ -49,6 +52,9 @@ class MyHashTable:
         size = len(self.table)
         self.table.extend(None)
 
+    def printout(self):
+        print("[" + ", ".join(map(str, self.table[0:])) + "]")
+
 
 table = MyHashTable(8)
 it = Item(0, "Vasya")
@@ -59,5 +65,5 @@ it = Item(2, "Igor")
 table.add(it)
 it = Item(8, "Vlad")
 table.add(it)
-print(table.search(9).value)
-print(str(table.table))
+print(table.search(8).value)
+table.printout()

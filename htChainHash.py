@@ -50,7 +50,8 @@ class MyHashTable:
     def printout(self):
         for item in self.table:
             try:
-                print('[', item[0], ', '.join(map(str, item[1:])), ']')
+                print('chain #%d: ' % self.table.index(item) +
+                      '[', item[0], ', '.join(map(str, item[1:])) + ']')
             except IndexError:
                 pass
 
