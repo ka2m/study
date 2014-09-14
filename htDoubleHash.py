@@ -10,46 +10,30 @@ class Item:
 class MyHashTable:
     def __init__(self, size):
         self.table = [None] * size
-        self.deleted = [True] * size
 
     def add(self, item):
         x = self.hash1(item.key)
         y = self.hash2(item.key)
         size = len(self.table)
         for i in range(0, size - 1):
-            if x >= size - 1:
-                self.table.extend(None for i in range(0, size - x + 1))
-                self.deleted.extend(True for i in range(0, size - x + 1))
-                size = len(self.table)
-            if self.table[x] is None or self.deleted[x]:
+            if self.table[x] is None:
                 self.table[x] = item
-                self.deleted[x] = False
                 print("Add item with key: %d, value: %s to %d" % (item.key,
                                                                   item.value,
                                                                   x))
                 return
             x = (x + y) % size
+        self.resize()
 
     def search(self, key):
         x = self.hash1(key)
         y = self.hash2(key)
         size = len(self.table)
         for i in range(0, size - 1):
-            if self.table[x].key == key and not self.deleted[x]:
+            if self.table[x] is not None and self.table[x].key == key:
                 return self.table[x]
             x = (x + y) % size
-        return None
-
-    def delete(self, key):
-        x = self.hash1(key)
-        y = self.hash2(key)
-        for i in range(len(self.table)):
-            if table[x] is not None:
-                if table[x].key == key:
-                    self.deleted[x] = True
-                else:
-                    return
-            x = (x + y) % len(self.table)
+        return Item(None, None)
 
     def hash1(self, key):
         key = key**2
@@ -61,15 +45,19 @@ class MyHashTable:
         f = f - int(f)
         return int(701*f)
 
+    def resize(self):
+        size = len(self.table)
+        self.table.extend(None)
 
-table = MyHashTable(13)
+
+table = MyHashTable(8)
 it = Item(0, "Vasya")
 table.add(it)
 it = Item(1, "Petya")
 table.add(it)
 it = Item(2, "Igor")
 table.add(it)
-it = Item(8, "Yoba")
+it = Item(8, "Vlad")
 table.add(it)
-print(table.search(2).value)
+print(table.search(9).value)
 print(str(table.table))
