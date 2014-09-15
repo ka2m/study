@@ -52,6 +52,17 @@ fun first []     = raise Match
 fun getFromList (SL, searchCriteria) =
   first (clipList (SL, searchCriteria))
 
+ fun quicksort lt lst =
+  let 
+    val rec sort =
+      fn [] => []
+      | (x::xs) =>
+        let
+          val (left,right) = List.partition (fn y => lt (y, x)) xs
+        in sort left @ x :: sort right
+        end
+  in sort lst
+end
 (*****************************************************************************
                                 Bus stop entity
  ****************************************************************************)
@@ -104,6 +115,18 @@ fun getTravelTime SL =
   in
     getTravelTime' (SL, 0)
   end
+
+fun stopNamesLessThan (S1, S2) =
+  stopName S1 < stopName S2
+
+fun stopIntervalsLessThan (S1, S2) =
+  stopNextTime S1 < stopNextTime S2
+
+fun sortStopsByName SL =
+  quicksort stopNamesLessThan SL
+
+fun sortStopsByInterval SL =
+  quicksort stopIntervalsLessThan SL
 
 (*****************************************************************************
                                 Bus route entity
@@ -196,19 +219,19 @@ fun changeRouteInterval newInterval R =
 fun isRouteNum routeN R = routeNumber R = routeN
 
 (* comparative predicates *)
-fun routeNumberLessThan R1 R2 = 
+fun routeNumberLessThan (R1, R2) = 
   routeNumber R1 < routeNumber R2
 
-fun routeBeginTimeLessThan R1 R2 =
+fun routeBeginTimeLessThan (R1, R2) =
   routeBeginTime R1 < routeBeginTime R2
 
-fun routeEndTimeLessThan R1 R2 = 
+fun routeEndTimeLessThan (R1, R2) = 
   routeEndTime R1 < routeEndTime R2
 
-fun routeIntervalLessThan R1 R2 =
+fun routeIntervalLessThan (R1, R2) =
   routeInterval R1 < routeEndTime R2
 
-fun routeCountStationsLessThan SL1 SL2 =
+fun routeCountStationsLessThan (SL1, SL2) =
   let
     fun count ([], res) = res
     |   count ( _ :: XS, res ) = count ( XS, res + 1 )
@@ -216,8 +239,29 @@ fun routeCountStationsLessThan SL1 SL2 =
     count (SL1, 0) < count (SL2, 0)
   end
 
-fun routeCountTimeTravelLessThan SL1 SL2 =
+fun routeCountTimeTravelLessThan (SL1, SL2) =
   getTravelTime SL1 < getTravelTime SL2
+
+(* sorting *)
+
+fun sortRoutesByName RL =
+  quicksort routeNumberLessThan RL
+
+fun sortRoutesByBeginTime RL =
+  quicksort routeBeginTimeLessThan RL
+
+fun sortRoutesByEndTime RL =
+  quicksort routeEndTimeLessThan RL
+
+fun sortRoutesByInterval RL =
+  quicksort routeIntervalLessThan RL 
+
+fun sortRoutesByStopCount RL =
+  quicksort routeCountStationsLessThan RL
+
+fun sortRoutesByTravelTime RL =
+  quicksort routeCountTimeTravelLessThan RL
+
 
 (*****************************************************************************
                                 Functions
@@ -259,7 +303,6 @@ fun stopTimes R currentTime isFwd =
                         stopTimes' ( [currentTime], listByDirection ) )
     else []    
   end
-
 
 (*****************************************************************************
                                 Example
@@ -352,3 +395,4 @@ val bStopList = reverseBack(bStopList, [])
 
 val R3 = makeRoute (3, fStopList, bStopList, 480, 1440, 8)
 
+val routes = [R5, R3, R15, R10];
