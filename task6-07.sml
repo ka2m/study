@@ -12,12 +12,12 @@ fun op :- (TrueExpression x, _) = x
   | op :- (FalseExpression, y)  = y
 infix 6 :-;
 
-fun reverseBack ([], l) = l
+fun reverseBack ([], l)      = l
 |   reverseBack (x :: xs, l) = reverseBack (xs, x :: l)
 
 fun removeFromList (SL, removeCriteria) =
   let
-    fun remove ([], SL') = reverseBack (SL', [])
+    fun remove ([], SL')         = reverseBack (SL', [])
     |   remove (S' :: SL'', SL') =
           if removeCriteria S'
           then reverseBack (SL', SL'')
@@ -26,50 +26,34 @@ fun removeFromList (SL, removeCriteria) =
     remove (SL, [])
   end
 
-(* function to strip list from elements,
- * which don't match searchCriteria *)
-fun clipList (SL, searchCriteria) =
-  let
-    fun search [] = []
-    |   search (S' :: SL') =
-          if searchCriteria S'
-          then S' :: SL'
-          else search SL'
-  in
-    search SL
-  end
-
-fun foundInList (SL, searchCriteria) =
-  not (null (clipList (SL, searchCriteria)))
-
 fun member ( x, [] )        = false
 |   member ( x, (y :: ys) ) = (x = y) ? true :- member ( x, ys )
 
-fun first []     = raise Match
-|   first (x::_) = x
-
-(* get first element, which matches searchCriteria *)
-fun getFromList (SL, searchCriteria) =
-  first (clipList (SL, searchCriteria))
-
- fun quicksort lt lst =
+fun quicksort lt L =
   let 
     val rec sort =
-      fn [] => []
-      | (x::xs) =>
-        let
-          val (left,right) = List.partition (fn y => lt (y, x)) xs
+      fn []       => []
+      | (x :: xs) =>
+        let val (left,right) = List.partition (fn y => lt (y, x)) xs
         in sort left @ x :: sort right
         end
-  in sort lst
+  in sort L
 end
+
+fun searchListByCriteria ( [], res, criteria )      = reverseBack (res, [])
+|   searchListByCriteria ( R :: RL, res, criteria ) =
+      searchListByCriteria ( RL
+                              , if criteria R then R :: res else res
+                              , criteria
+                              )
+
 (*****************************************************************************
                                 Bus stop entity
  ****************************************************************************)
 
 (* As stops for bus route are stored in a linked list, we can precisely
    determine, which stop comes first and which comes next. That's why I placed
-   trael times between two stops inside this type *)
+   travel times between two stops inside this type *)
 type stop = { name : string  (* stop name *)
             , nextTime: int   (* travel time between stops *)
             }
@@ -94,7 +78,10 @@ fun changeStopNextTime newNextTime S =
 fun isStopName stopN S = stopName S = stopN
 
 fun removeStopByName (SL, stopN) =
-  removeFromList (SL, isStopName stopN)
+  removeFromList ( SL, isStopName stopN )
+
+fun hasRouteStop stopName SL =
+  not (null (searchListByCriteria ( SL, [], isStopName stopName )))
 
 (* function that gets only the names from the stops list *)
 fun getStopNames SL =
@@ -109,7 +96,7 @@ fun getStopNames SL =
 (* function to count travel time (used in sorting) *)
 fun getTravelTime SL =
   let 
-    fun getTravelTime' ([], res) = res
+    fun getTravelTime' ([], res)        = res
     |   getTravelTime' (S' :: SL', res) =
           getTravelTime' (SL', res + (stopNextTime S'))
   in
@@ -217,6 +204,11 @@ fun changeRouteInterval newInterval R =
 
 (* identifying predicate *)
 fun isRouteNum routeN R = routeNumber R = routeN
+fun isRouteFWSList fws R = routeFWSList R = fws
+fun isRouteBWSList bws R = routeBWSList R = bws
+fun isRouteBeginTime bTime R = routeBeginTime R = bTime
+fun isRouteEndTime eTime R = routeEndTime R = eTime
+fun isRouteInterval it R = routeInterval R = it
 
 (* comparative predicates *)
 fun routeNumberLessThan (R1, R2) = 
@@ -233,7 +225,7 @@ fun routeIntervalLessThan (R1, R2) =
 
 fun routeCountStationsLessThan (SL1, SL2) =
   let
-    fun count ([], res) = res
+    fun count ([], res)        = res
     |   count ( _ :: XS, res ) = count ( XS, res + 1 )
   in
     count (SL1, 0) < count (SL2, 0)
@@ -262,13 +254,60 @@ fun sortRoutesByStopCount RL =
 fun sortRoutesByTravelTime RL =
   quicksort routeCountTimeTravelLessThan RL
 
+(* searching *)
+
+fun selectRouteByNumber RL number =
+  let
+    fun search []          = false
+    |   search (R' :: RL') =
+          isRouteNum number R' orelse search (RL')          
+  in
+    search (RL)
+  end
+
+fun findStopByName SL sName =
+  let
+    fun search []         = false
+    |   search (S :: SL') =
+      isStopName sName S orelse search (SL')
+  in
+    search (SL)
+  end
+
+fun selectRoutesWithStop RL sName =
+  let
+    fun search ([], res)       = reverseBack (res, [])
+    |   search (R :: RL', res) =
+          search (RL', if findStopByName (routeFWSList R) sName 
+                          orelse findStopByName (routeBWSList R) sName 
+                          then R :: res
+                          else res)
+  in
+    search (RL, [])      
+  end
+
+fun selectRoutesWithBeginTime RL bTime =
+  searchListByCriteria (RL, [], isRouteBeginTime bTime)
+
+fun selectRoutesWithEndTime RL eTime =
+  searchListByCriteria (RL, [], isRouteEndTime eTime)
+
+fun selectRoutesWithFWSList RL fws =
+  searchListByCriteria (RL, [], isRouteFWSList fws)
+
+fun selectRoutesWithFWSList RL bws =
+  searchListByCriteria (RL, [], isRouteBWSList bws)
+
+fun selectRoutesInterval RL iT =
+  searchListByCriteria (RL, [], isRouteInterval iT)
+
 
 (*****************************************************************************
                                 Functions
                       Functions are taken from Dublin Bus App. 
  ****************************************************************************)
 
-(* closes list of bus stops with its first station *)
+(* helping function: closes list of bus stops with its first station *)
 fun makeCircularSNamesList SL =  
   let    
     val stopNames = getStopNames SL
@@ -393,6 +432,6 @@ val bStopList = makeStop("Quebec", 16) :: bStopList
 val bStopList = makeStop("Papa", 8) :: bStopList
 val bStopList = reverseBack(bStopList, [])
 
-val R3 = makeRoute (3, fStopList, bStopList, 480, 1440, 8)
+val R3 = makeRoute (3, fStopList, bStopList, 180, 1440, 8)
 
 val routes = [R5, R3, R15, R10];
