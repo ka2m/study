@@ -26,6 +26,9 @@ fun removeFromList (SL, removeCriteria) =
     remove (SL, [])
   end
 
+fun count ([], res)        = res
+|   count ( _ :: XS, res ) = count ( XS, res + 1 )
+
 fun member ( x, [] )        = false
 |   member ( x, (y :: ys) ) = (x = y) ? true :- member ( x, ys )
 
@@ -93,7 +96,7 @@ fun getStopNames SL =
     getStopNames' (SL, [])
   end
 
-(* function to count travel time (used in sorting) *)
+(* function to count travel time (used in route sorting) *)
 fun getTravelTime SL =
   let 
     fun getTravelTime' ([], res)        = res
@@ -109,6 +112,7 @@ fun stopNamesLessThan (S1, S2) =
 fun stopIntervalsLessThan (S1, S2) =
   stopNextTime S1 < stopNextTime S2
 
+(* sorting *)
 fun sortStopsByName SL =
   quicksort stopNamesLessThan SL
 
@@ -120,8 +124,8 @@ fun sortStopsByInterval SL =
  ****************************************************************************)
 
 type route = {  number : int      (* route name *)
-              , fwStopList: stop list
-              , bwStopList: stop list
+              , fwStopList: stop list (* bus stops in one direction *)
+              , bwStopList: stop list (* bus stops in opposite direction *)
               , beginTime: int    (* opeartion start from midnight in mins *)
               , endTime: int      (* opeartion end from midnight in mins *)
               , interval: int     (* opeartion interval in mins: how often does
@@ -214,6 +218,30 @@ fun isRouteInterval it R = routeInterval R = it
 fun routeNumberLessThan (R1, R2) = 
   routeNumber R1 < routeNumber R2
 
+fun routeCountStationsLessThan (SL1, SL2) =
+    count (SL1, 0) < count (SL2, 0)
+
+fun routeCountTravelTimeForwardLessThan (R1, R2) =
+  getTravelTime (routeFWSList R1) < getTravelTime (routeFWSList R2)
+
+fun routeCountTravelTimeBackwardsLessThan (R1, R2) =
+  getTravelTime (routeBWSList R1) < getTravelTime (routeBWSList R2)
+
+fun routeCountTravelTimeBothLessThan (R1, R2) =
+  getTravelTime (routeFWSList R1) + getTravelTime (routeBWSList R1) < 
+  getTravelTime (routeFWSList R2) + getTravelTime (routeBWSList R2)
+
+fun routeCountStationsForwardLessThan (R1, R2) =
+  routeCountStationsLessThan ( (routeFWSList R1), (routeFWSList R2) )
+
+fun routeCountStationsBackwardsLessThan (R1, R2) =
+  routeCountStationsLessThan ( (routeBWSList R1), (routeBWSList R2) )
+
+fun routeCountStationsBothLessThan (R1, R2) =
+  count ( (routeFWSList R1), 0 ) + count( (routeBWSList R1), 0 ) <
+  count ( (routeFWSList R2), 0 ) + count ( (routeBWSList R2), 0 )
+
+
 fun routeBeginTimeLessThan (R1, R2) =
   routeBeginTime R1 < routeBeginTime R2
 
@@ -222,17 +250,6 @@ fun routeEndTimeLessThan (R1, R2) =
 
 fun routeIntervalLessThan (R1, R2) =
   routeInterval R1 < routeEndTime R2
-
-fun routeCountStationsLessThan (SL1, SL2) =
-  let
-    fun count ([], res)        = res
-    |   count ( _ :: XS, res ) = count ( XS, res + 1 )
-  in
-    count (SL1, 0) < count (SL2, 0)
-  end
-
-fun routeCountTimeTravelLessThan (SL1, SL2) =
-  getTravelTime SL1 < getTravelTime SL2
 
 (* sorting *)
 
@@ -248,11 +265,20 @@ fun sortRoutesByEndTime RL =
 fun sortRoutesByInterval RL =
   quicksort routeIntervalLessThan RL 
 
-fun sortRoutesByStopCount RL =
-  quicksort routeCountStationsLessThan RL
+fun sortRoutesByStopCount RL direction =
+  quicksort routeCountStationsBothLessThan RL
+|   sortRoutesByStopCount RL 2         =
+      quicksort routeCountStationsBackwardsLessThan RL
+|   sortRoutesByStopCount RL 1         =
+      quicksort routeCountStationsForwardLessThan RL
 
-fun sortRoutesByTravelTime RL =
-  quicksort routeCountTimeTravelLessThan RL
+fun sortRoutesByTravelTime RL direction  = 
+      quicksort routeCountTravelTimeBothLessThan RL
+|   sortRoutesByTravelTime RL 2          = 
+      quicksort routeCountTravelTimeBackwardsLessThan RL
+|   sortRoutesByTravelTime RL 1          =
+      quicksort routeCountTravelTimeForwardLessThan RL
+  
 
 (* searching *)
 
@@ -295,7 +321,7 @@ fun selectRoutesWithEndTime RL eTime =
 fun selectRoutesWithFWSList RL fws =
   searchListByCriteria (RL, [], isRouteFWSList fws)
 
-fun selectRoutesWithFWSList RL bws =
+fun selectRoutesWithBWSList RL bws =
   searchListByCriteria (RL, [], isRouteBWSList bws)
 
 fun selectRoutesInterval RL iT =
@@ -303,8 +329,7 @@ fun selectRoutesInterval RL iT =
 
 
 (*****************************************************************************
-                                Functions
-                      Functions are taken from Dublin Bus App. 
+                            Extra Functions                      
  ****************************************************************************)
 
 (* helping function: closes list of bus stops with its first station *)
