@@ -32,6 +32,10 @@ fun count ([], res)        = res
 fun member ( x, [] )        = false
 |   member ( x, (y :: ys) ) = (x = y) ? true :- member ( x, ys )
 
+fun first (x:string, y:int) = x
+
+fun second (x:string, y:int) = y
+
 fun quicksort lt L =
   let 
     val rec sort =
@@ -356,17 +360,34 @@ fun stopTimes R currentTime isFwd =
     |   stopTimes' (res, S :: SL) =
           stopTimes' ( (hd res) + stopNextTime S :: res, SL )      
 
-    fun intervals (res, [])      = reverseBack (res, [])
-    |   intervals (res, _ :: SL) = 
-          intervals ( (hd res) + routeInterval R :: res, SL )      
-    
+    fun intervals res = 
+          if (hd res) + (routeInterval R) <= (routeEndTime R)
+          then intervals ((hd res) + routeInterval R :: res)      
+          else reverseBack(res, [])  
+
     val listByDirection = (isFwd = true) ? routeFWSList R :- routeBWSList R    
   in
-    if member (currentTime, intervals( [routeBeginTime R], listByDirection ) ) 
+    if member (currentTime, intervals( [routeBeginTime R] ) ) 
     then ListPair.zip ( makeCircularSNamesList listByDirection, 
                         stopTimes' ( [currentTime], listByDirection ) )
     else []    
   end
+
+(* function that prints time matrix, sorted by beginTimes + n * routeInterval 
+ * with stop names, determening at what time bus arrives to the each stop *)
+fun routeStopTimeMatrix R isFwd = 
+  let    
+    fun intervals res = 
+          if (hd res) + (routeInterval R) <= (routeEndTime R)
+          then intervals ((hd res) + routeInterval R :: res)      
+          else reverseBack(res, [])  
+
+    fun row (res, [])      = reverseBack (res, [])
+    |   row (res, t :: ts) = row ( (stopTimes R t isFwd) :: res, ts )
+  in
+    row ( [], intervals [routeBeginTime R] )
+  end
+
 
 (*****************************************************************************
                                 Example
