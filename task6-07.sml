@@ -378,7 +378,7 @@ fun stopTimes R currentTime isFwd =
 
 (* function that prints time matrix, sorted by beginTimes + n * routeInterval 
  * with stop names, determening at what time bus arrives to the each stop *)
-fun routeStopTimeMatrix R isFwd = 
+fun routeStopMatrix R isFwd = 
   let    
     fun intervals res = 
           if (hd res) + (routeInterval R) <= (routeEndTime R)
@@ -391,6 +391,50 @@ fun routeStopTimeMatrix R isFwd =
     row ( [], intervals [routeBeginTime R] )
   end
 
+fun routeSearchByPoints route departure arrival currentTime =
+  let 
+    fun sortOutDeparture S =
+       (first S) = departure andalso currentTime - 30 <= (second S)
+       andalso currentTime + 30 >= (second S)
+    
+    fun findTimesInList ([], res) = res
+    |   findTimesInList (L, res)  =
+        let 
+          val suitableTimes =
+            List.filter (fn y => sortOutDeparture y) L
+        in
+          findTimesInList ( (tl (tl L)), suitableTimes @ res )
+        end
+
+    fun findSuitableTimes ([], res)      = res
+    |   findSuitableTimes (y :: ys, res) =
+          findSuitableTimes ( ys, findTimesInList (y, []) @ res )
+  
+
+    fun findArrivalsInList ([], res) = res
+    |   findArrivalsInList (L, res)  =
+        let 
+          val arrivals =
+            List.filter (fn y => (first y) = arrival) L
+        in
+          findArrivalsInList ( tl L), arrivals :: res )
+        end
+
+    fun findArrivals ([], res)      = res
+    |   findArrivals (y :: ys, res) =
+          findArrivals ( ys, findArrivalsInList (y, []) @ res )
+  
+    (*fun correlate *)
+
+
+
+    
+    val stops = (routeStopMatrix route true) @ (routeStopMatrix route false)
+    val suitableDeparture =  findSuitableTimes ( stops, [] )       
+    val foundArrivals = reverseBack ( findArrivals (stops, []), [] )
+  in 
+    (suitableDeparture, foundArrivals)
+  end
 
 (*****************************************************************************
                                 Example
@@ -484,3 +528,5 @@ val bStopList = reverseBack(bStopList, [])
 val R3 = makeRoute (3, fStopList, bStopList, 180, 1440, 8)
 
 val routes = [R5, R3, R15, R10];
+
+routeSearchByPoints R3 "Uniform" "Romeo" 200
