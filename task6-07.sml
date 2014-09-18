@@ -36,16 +36,19 @@ fun first (x:string, y:int) = x
 
 fun second (x:string, y:int) = y
 
-fun quicksort lt L =
-  let 
-    val rec sort =
-      fn []       => []
-      | (x :: xs) =>
-        let val (left,right) = List.partition (fn y => lt (y, x)) xs
-        in sort left @ x :: sort right
-        end
-  in sort L
-end
+fun quicksort lt xs =
+  let
+    fun qsort []  k = k []
+      | qsort [x] k = k [x]
+      | qsort (p::xs) k =
+    let
+      val (left, right) = List.partition (fn x => lt (x, p)) xs
+    in
+      qsort left ( fn L => qsort right (fn L' => k (L @ [p] @ L')) )
+    end
+  in
+    qsort xs (fn x => x)
+  end
 
 fun searchListByCriteria ( [], res, criteria )      = reverseBack (res, [])
 |   searchListByCriteria ( R :: RL, res, criteria ) =
