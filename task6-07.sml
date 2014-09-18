@@ -57,6 +57,12 @@ fun searchListByCriteria ( [], res, criteria )      = reverseBack (res, [])
                               , criteria
                               )
 
+fun setify []      = []
+  | setify (x::xs) =
+    let val xs' = setify xs in
+        if (member (x, xs')) then xs' else (x :: xs')
+    end
+
 (*****************************************************************************
                                 Bus stop entity
  ****************************************************************************)
@@ -397,43 +403,46 @@ fun routeSearchByPoints route departure arrival currentTime =
        (first S) = departure andalso currentTime - 30 <= (second S)
        andalso currentTime + 30 >= (second S)
     
-    fun findTimesInList ([], res) = res
-    |   findTimesInList (L, res)  =
-        let 
-          val suitableTimes =
-            List.filter (fn y => sortOutDeparture y) L
-        in
-          findTimesInList ( (tl (tl L)), suitableTimes @ res )
-        end
-
     fun findSuitableTimes ([], res)      = res
     |   findSuitableTimes (y :: ys, res) =
-          findSuitableTimes ( ys, findTimesInList (y, []) @ res )
-  
-
-    fun findArrivalsInList ([], res) = res
-    |   findArrivalsInList (L, res)  =
-        let 
-          val arrivals =
-            List.filter (fn y => (first y) = arrival) L
-        in
-          findArrivalsInList ( tl L), arrivals :: res )
-        end
+          findSuitableTimes ( ys, 
+                            (List.filter (fn x => sortOutDeparture x)) y @ res )
+    
 
     fun findArrivals ([], res)      = res
     |   findArrivals (y :: ys, res) =
-          findArrivals ( ys, findArrivalsInList (y, []) @ res )
-  
-    (*fun correlate *)
-
-
-
+          findArrivals ( ys, 
+                       (List.filter (fn x => (first x) = arrival) y) @ res )
     
-    val stops = (routeStopMatrix route true) @ (routeStopMatrix route false)
-    val suitableDeparture =  findSuitableTimes ( stops, [] )       
+    (* all avaiable stops *)
+    val stops = (routeStopMatrix route true) @ (routeStopMatrix route false) 
+    val suitableDeparture =  reverseBack ( findSuitableTimes (stops, []), [] )      
     val foundArrivals = reverseBack ( findArrivals (stops, []), [] )
-  in 
-    (suitableDeparture, foundArrivals)
+  in
+    (* setify to remove dublicates for starting station for both forward and
+     * backward list *) 
+    ( (routeNumber route) ,
+      ListPair.zip( setify(suitableDeparture), setify(foundArrivals) ) )
+    
+  end
+
+fun routeListSearchByPoints RL departure arrival currentTime = 
+  let
+    fun first' (x, _) = x
+    fun second' (_, y) = y
+
+    fun clean ([], cleaned)      = cleaned
+    |   clean (x :: xs, cleaned) = 
+          if (second' x) = []
+          then clean (xs, cleaned)
+          else clean (xs, x :: cleaned)
+
+    fun search ([], res)      = res
+    |   search (x :: xs, res) = 
+          search ( xs, 
+                 (routeSearchByPoints x departure arrival currentTime) :: res )
+  in
+    clean ( search (RL, []), [] )
   end
 
 (*****************************************************************************
@@ -529,4 +538,5 @@ val R3 = makeRoute (3, fStopList, bStopList, 180, 1440, 8)
 
 val routes = [R5, R3, R15, R10];
 
-routeSearchByPoints R3 "Uniform" "Romeo" 200
+routeListSearchByPoints routes "Bravo" "Delta" 200
+
