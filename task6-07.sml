@@ -403,32 +403,55 @@ fun routeSearchByPoints route departure arrival currentTime =
        (first S) = departure andalso currentTime - 30 <= (second S)
        andalso currentTime + 30 >= (second S)
     
-    fun findSuitableTimes ([], res)      = res
-    |   findSuitableTimes (y :: ys, res) =
-          findSuitableTimes ( ys, 
-                            (List.filter (fn x => sortOutDeparture x)) y @ res )
-    
+    fun findSuitableDepartures []        = []
+    |   findSuitableDepartures (x :: xs) =
+          if sortOutDeparture x
+          then x :: xs
+          else findSuitableDepartures xs
 
-    fun findArrivals ([], res)      = res
-    |   findArrivals (y :: ys, res) =
-          findArrivals ( ys, 
-                       (List.filter (fn x => (first x) = arrival) y) @ res )
+    fun departures ([], res)      = res
+    |   departures (x :: xs, res) =
+          let
+            val r = (findSuitableDepartures x)
+          in
+            departures (xs , if r = [] then res else r :: res)  
+          end
+
+    fun prepareDL ([], res)      = res
+    |   prepareDL (x :: xs, res) = 
+          prepareDL (xs , (hd x) :: res)
     
+    fun findArrival []        = ("", 0)
+    |   findArrival (x :: xs) =
+          if (first x) = arrival
+          then x
+          else findArrival (xs)
+
+    fun arrivals ([], res)      = res
+    |   arrivals (x :: xs, res) =
+          let
+            val r = (findArrival x)
+          in
+            arrivals (xs, if r = ("", 0) then res else r :: res)
+          end
+
     (* all avaiable stops *)
     val stops = (routeStopMatrix route true) @ (routeStopMatrix route false) 
-    val suitableDeparture =  reverseBack ( findSuitableTimes (stops, []), [] )      
-    val foundArrivals = reverseBack ( findArrivals (stops, []), [] )
+    
+    val suitableDeparture =  reverseBack (departures (stops, []), [])          
   in
     (* setify to remove dublicates for starting station for both forward and
      * backward list *) 
-    ( (routeNumber route) ,
-      ListPair.zip( setify(suitableDeparture), setify(foundArrivals) ) )
+    ( routeNumber route, 
+      reverseBack(  ListPair.zip ( setify(prepareDL (suitableDeparture, []))
+                                 , arrivals (suitableDeparture, []))
+                  , []))
+      
     
   end
 
 fun routeListSearchByPoints RL departure arrival currentTime = 
-  let
-    fun first' (x, _) = x
+  let   
     fun second' (_, y) = y
 
     fun clean ([], cleaned)      = cleaned
@@ -439,9 +462,10 @@ fun routeListSearchByPoints RL departure arrival currentTime =
 
     fun search ([], res)      = res
     |   search (x :: xs, res) = 
-          search ( xs, 
-                 (routeSearchByPoints x departure arrival currentTime) :: res )
+          search (xs, 
+                  (routeSearchByPoints x departure arrival currentTime) :: res)
   in
+    (* remove empty routes *)
     clean ( search (RL, []), [] )
   end
 
@@ -538,5 +562,6 @@ val R3 = makeRoute (3, fStopList, bStopList, 180, 1440, 8)
 
 val routes = [R5, R3, R15, R10];
 
-routeListSearchByPoints routes "Bravo" "Delta" 200
 
+
+routeListSearchByPoints routes "Bravo" "Delta" 200
