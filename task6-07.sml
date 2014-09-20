@@ -3,11 +3,11 @@ load "ListPair";
 load "List";
 
 datatype 'a ternarylikeop = TrueExpression of 'a | FalseExpression
- 
+
 fun op ? (true, y)  = TrueExpression y
   | op ? (_, y)     = FalseExpression
 infix 6 ?;
- 
+
 fun op :- (TrueExpression x, _) = x
   | op :- (FalseExpression, y)  = y
 infix 6 :-;
@@ -484,7 +484,13 @@ fun routeSearchByPoints' route departure arrival arrivalTime =
 
     fun prepareArrivals ([], res) = res
     |   prepareArrivals (x :: xs, res) =
-          prepareArrivals (xs, (cutTail (reverseBack (x, [])), (hd x)) :: res)
+          let
+            val r = cutTail (reverseBack (x, []))
+          in
+            prepareArrivals (xs, if r = ("", 0) 
+                                 then res 
+                                 else (r, (hd x)) :: res)
+          end          
 
   in
     (* setify to remove dublicates for starting station for both forward and
