@@ -1,6 +1,4 @@
-load "Int";
 load "ListPair";
-load "List";
 
 datatype 'a ternarylikeop = TrueExpression of 'a | FalseExpression
 
@@ -38,9 +36,9 @@ fun second (x:string, y:int) = y
 
 fun quicksort lt xs =
   let
-    fun qsort []  k = k []
-      | qsort [x] k = k [x]
-      | qsort (p::xs) k =
+    fun qsort []  k     = k []
+      | qsort [x] k     = k [x]
+      | qsort (p :: xs) k =
     let
       val (left, right) = List.partition (fn x => lt (x, p)) xs
     in
@@ -53,15 +51,9 @@ fun quicksort lt xs =
 fun searchListByCriteria ( [], res, criteria )      = reverseBack (res, [])
 |   searchListByCriteria ( R :: RL, res, criteria ) =
       searchListByCriteria ( RL
-                              , if criteria R then R :: res else res
-                              , criteria
-                              )
-
-fun setify []      = []
-  | setify (x::xs) =
-    let val xs' = setify xs in
-        if (member (x, xs')) then xs' else (x :: xs')
-    end
+                           , if criteria R then R :: res else res
+                           , criteria
+                           )
 
 (*****************************************************************************
                                 Bus stop entity
@@ -228,7 +220,7 @@ fun isRouteEndTime eTime R = routeEndTime R = eTime
 fun isRouteInterval it R = routeInterval R = it
 
 (* comparative predicates *)
-fun routeNumberLessThan (R1, R2) = 
+fun routeNumberLessThan (R1, R2) =
   routeNumber R1 < routeNumber R2
 
 fun routeCountStationsLessThan (SL1, SL2) =
@@ -241,7 +233,7 @@ fun routeCountTravelTimeBackwardsLessThan (R1, R2) =
   getTravelTime (routeBWSList R1) < getTravelTime (routeBWSList R2)
 
 fun routeCountTravelTimeBothLessThan (R1, R2) =
-  getTravelTime (routeFWSList R1) + getTravelTime (routeBWSList R1) < 
+  getTravelTime (routeFWSList R1) + getTravelTime (routeBWSList R1) <
   getTravelTime (routeFWSList R2) + getTravelTime (routeBWSList R2)
 
 fun routeCountStationsForwardLessThan (R1, R2) =
@@ -258,7 +250,7 @@ fun routeCountStationsBothLessThan (R1, R2) =
 fun routeBeginTimeLessThan (R1, R2) =
   routeBeginTime R1 < routeBeginTime R2
 
-fun routeEndTimeLessThan (R1, R2) = 
+fun routeEndTimeLessThan (R1, R2) =
   routeEndTime R1 < routeEndTime R2
 
 fun routeIntervalLessThan (R1, R2) =
@@ -276,22 +268,21 @@ fun sortRoutesByEndTime RL =
   quicksort routeEndTimeLessThan RL
 
 fun sortRoutesByInterval RL =
-  quicksort routeIntervalLessThan RL 
+  quicksort routeIntervalLessThan RL
 
-fun sortRoutesByStopCount RL direction =
-  quicksort routeCountStationsBothLessThan RL
+fun sortRoutesByStopCount RL 1         =
+  quicksort routeCountStationsForwardLessThan RL
 |   sortRoutesByStopCount RL 2         =
       quicksort routeCountStationsBackwardsLessThan RL
-|   sortRoutesByStopCount RL 1         =
-      quicksort routeCountStationsForwardLessThan RL
+|   sortRoutesByStopCount RL direction =
+      quicksort routeCountStationsBothLessThan RL
 
-fun sortRoutesByTravelTime RL direction  = 
-      quicksort routeCountTravelTimeBothLessThan RL
-|   sortRoutesByTravelTime RL 2          = 
-      quicksort routeCountTravelTimeBackwardsLessThan RL
-|   sortRoutesByTravelTime RL 1          =
+fun sortRoutesByTravelTime RL 1          =
       quicksort routeCountTravelTimeForwardLessThan RL
-  
+|   sortRoutesByTravelTime RL 2          =
+      quicksort routeCountTravelTimeBackwardsLessThan RL
+|   sortRoutesByTravelTime RL direction  =
+      quicksort routeCountTravelTimeBothLessThan RL
 
 (* searching *)
 
@@ -299,7 +290,7 @@ fun selectRouteByNumber RL number =
   let
     fun search []          = false
     |   search (R' :: RL') =
-          isRouteNum number R' orelse search (RL')          
+          isRouteNum number R' orelse search (RL')
   in
     search (RL)
   end
@@ -308,7 +299,7 @@ fun findStopByName SL sName =
   let
     fun search []         = false
     |   search (S :: SL') =
-      isStopName sName S orelse search (SL')
+          isStopName sName S orelse search (SL')
   in
     search (SL)
   end
@@ -317,12 +308,12 @@ fun selectRoutesWithStop RL sName =
   let
     fun search ([], res)       = reverseBack (res, [])
     |   search (R :: RL', res) =
-          search (RL', if findStopByName (routeFWSList R) sName 
-                          orelse findStopByName (routeBWSList R) sName 
+          search (RL', if findStopByName (routeFWSList R) sName
+                          orelse findStopByName (routeBWSList R) sName
                           then R :: res
                           else res)
   in
-    search (RL, [])      
+    search (RL, [])
   end
 
 fun selectRoutesWithBeginTime RL bTime =
@@ -342,54 +333,54 @@ fun selectRoutesInterval RL iT =
 
 
 (*****************************************************************************
-                            Extra Functions                      
+                            Extra Functions
  ****************************************************************************)
 
-(* helping function: closes list of bus stops with its first station *)
-fun makeCircularSNamesList SL =  
-  let    
-    val stopNames = getStopNames SL
-  in
-    reverseBack (hd stopNames :: reverseBack (stopNames, []), [])
-  end
-
-(* gets pairs Name-Time (string * int list) in mins since midnight for the route 
+(* gets pairs Name-Time (string * int list) in mins since midnight for the route
  * and its departure time from the first stop station
  *
  * only interval-confirmed (routeBeginTime + n*Interval) values for
  * currentTime is allowed, otherwise returned empty list
  *
- * isFwd changes direction (list to use: routeFWSList or routeBWSList) 
- * 
+ * isFwd changes direction (list to use: routeFWSList or routeBWSList)
+ *
  * stopTimes creates a list of valid departure times
  *)
-fun stopTimes R currentTime isFwd = 
-  let  
-    fun stopTimes' (res, [])      = reverseBack (res, []) 
+fun stopTimes R currentTime isFwd =
+  let
+    (* helping function: closes list of bus stops with its first station *)
+    fun makeCircularSNamesList SL =
+      let
+        val stopNames = getStopNames SL
+      in
+        reverseBack (hd stopNames :: reverseBack (stopNames, []), [])
+      end
+
+    fun stopTimes' (res, [])      = reverseBack (res, [])
     |   stopTimes' (res, S :: SL) =
-          stopTimes' ( (hd res) + stopNextTime S :: res, SL )      
+          stopTimes' ( (hd res) + stopNextTime S :: res, SL )
 
-    fun intervals res = 
+    fun intervals res =
           if (hd res) + (routeInterval R) <= (routeEndTime R)
-          then intervals ((hd res) + routeInterval R :: res)      
-          else reverseBack(res, [])  
+          then intervals ((hd res) + routeInterval R :: res)
+          else reverseBack(res, [])
 
-    val listByDirection = (isFwd = true) ? routeFWSList R :- routeBWSList R    
+    val listByDirection = (isFwd = true) ? routeFWSList R :- routeBWSList R
   in
-    if member (currentTime, intervals( [routeBeginTime R] ) ) 
-    then ListPair.zip ( makeCircularSNamesList listByDirection, 
+    if member (currentTime, intervals( [routeBeginTime R] ) )
+    then ListPair.zip ( makeCircularSNamesList listByDirection,
                         stopTimes' ( [currentTime], listByDirection ) )
-    else []    
+    else []
   end
 
-(* function that prints time matrix, sorted by beginTimes + n * routeInterval 
+(* function that prints time matrix, sorted by beginTimes + n * routeInterval
  * with stop names, determening at what time bus arrives to the each stop *)
-fun routeStopMatrix R isFwd = 
-  let    
-    fun intervals res = 
+fun routeStopMatrix R isFwd =
+  let
+    fun intervals res =
           if (hd res) + (routeInterval R) <= (routeEndTime R)
-          then intervals ((hd res) + routeInterval R :: res)      
-          else reverseBack(res, [])  
+          then intervals ((hd res) + routeInterval R :: res)
+          else reverseBack(res, [])
 
     fun row (res, [])      = reverseBack (res, [])
     |   row (res, t :: ts) = row ( (stopTimes R t isFwd) :: res, ts )
@@ -397,12 +388,20 @@ fun routeStopMatrix R isFwd =
     row ( [], intervals [routeBeginTime R] )
   end
 
+(* Calculates available routes between _departure_ and _arrival stops
+ * with 30 mins precision of departure time *)
 fun routeSearchByPoints route departure arrival currentTime =
-  let 
+  let
+    fun setify []        = []
+    |   setify (x :: xs) =
+          let val xs' = setify xs in
+            if (member (x, xs')) then xs' else (x :: xs')
+          end
+
     fun sortOutDeparture S =
        (first S) = departure andalso currentTime - 30 <= (second S)
        andalso currentTime + 30 >= (second S)
-    
+
     (* cutting all unsatisfying departure stops *)
     fun findSuitableDepartures []        = []
     |   findSuitableDepartures (x :: xs) =
@@ -416,14 +415,14 @@ fun routeSearchByPoints route departure arrival currentTime =
           let
             val r = (findSuitableDepartures x)
           in
-            departures (xs , if r = [] then res else r :: res)  
+            departures (xs , if r = [] then res else r :: res)
           end
 
     (* cutting head and saving it for zipping *)
     fun prepareDL ([], res)      = res
-    |   prepareDL (x :: xs, res) = 
+    |   prepareDL (x :: xs, res) =
           prepareDL (xs , (hd x) :: res)
-    
+
     (* cutting till arrival station or returning bad case *)
     fun findArrival []        = ("", 0)
     |   findArrival (x :: xs) =
@@ -440,25 +439,24 @@ fun routeSearchByPoints route departure arrival currentTime =
             arrivals (xs, if r = ("", 0) then res else r :: res)
           end
 
-    val suitableDeparture =  reverseBack (departures 
-      ((routeStopMatrix route true) @ (routeStopMatrix route false) , []), [])          
+    val suitableDeparture =  reverseBack (departures
+      ((routeStopMatrix route true) @ (routeStopMatrix route false) , []), [])
   in
     (* setify to remove dublicates for starting station for both forward and
-     * backward list *) 
-    ( routeNumber route, 
+     * backward list *)
+    ( routeNumber route,
       reverseBack(  ListPair.zip ( setify(prepareDL (suitableDeparture, []))
                                  , arrivals (suitableDeparture, []))
                   , []))
   end
 
+(* Calculates available routes between _departure_ and _arrival stops
+ * with 30 mins precision of arrival time *)
 fun routeSearchByPoints' route departure arrival arrivalTime =
-  let 
+  let
     fun sortOutArrival S =
        (first S) = arrival andalso arrivalTime - 30 <= (second S)
        andalso arrivalTime + 30 >= (second S)
-    
-    fun sortOutDeparture S L =
-       (first S) = departure andalso arrivalTime > (second S)
 
     (* cutting all unsatisfying arrival stops *)
     fun findSuitableArrivals []        = []
@@ -469,10 +467,10 @@ fun routeSearchByPoints' route departure arrival arrivalTime =
 
     fun arrivals ([], res)      = res
     |   arrivals (x :: xs, res) =
-          let            
+          let
             val r = findSuitableArrivals ( reverseBack(x, []) )
           in
-            arrivals (xs , if r = [] then res else r :: res)  
+            arrivals (xs , if r = [] then res else r :: res)
           end
 
     fun cutTail []      = ("", 0)
@@ -487,34 +485,40 @@ fun routeSearchByPoints' route departure arrival arrivalTime =
           let
             val r = cutTail (reverseBack (x, []))
           in
-            prepareArrivals (xs, if r = ("", 0) 
-                                 then res 
+            prepareArrivals (xs, if r = ("", 0)
+                                 then res
                                  else (r, (hd x)) :: res)
-          end          
+          end
 
   in
     (* setify to remove dublicates for starting station for both forward and
-     * backward list *)  
-    ( routeNumber route, 
+     * backward list *)
+    ( routeNumber route,
     prepareArrivals (
-        arrivals ( (routeStopMatrix route true) @ (routeStopMatrix route false)
-               , [] ),
-        []))
+      arrivals (
+          (routeStopMatrix route true) @ (routeStopMatrix route false), [] )
+        , []))
   end
 
-fun routeListSearchByPoints RL departure arrival time isArrival = 
-  let   
+(* function that works in two modes. when _isArrival_ is TRUE it
+ * calculates all the available routes between _departure_ and _arrival_
+ * with precision of 30 minutes of DEPARTURING from _departure_ stop.
+ *
+ * when _isArrival_ is FALSE it calculates the same thing for ARRIVAL time
+ * to the destination (_arrival_) stop *) 
+fun routeListSearchByPoints RL departure arrival time isArrival =
+  let
     fun second' (_, y) = y
 
     fun clean ([], cleaned)      = cleaned
-    |   clean (x :: xs, cleaned) = 
+    |   clean (x :: xs, cleaned) =
           if (second' x) = []
           then clean (xs, cleaned)
           else clean (xs, x :: cleaned)
 
     fun search ([], res)      = res
-    |   search (x :: xs, res) = 
-          search (xs, 
+    |   search (x :: xs, res) =
+          search (xs,
                   if isArrival
                   then (routeSearchByPoints x departure arrival time) :: res
                   else (routeSearchByPoints' x departure arrival time) :: res)
@@ -551,7 +555,7 @@ val fStopList = []
 val fStopList = makeStop("Bravo", 12) :: fStopList
 val fStopList = makeStop("Delta", 10) :: fStopList
 val fStopList = makeStop("Zulu", 9) :: fStopList
-val fStopList = makeStop("Victor", 12) :: fStopList 
+val fStopList = makeStop("Victor", 12) :: fStopList
 val fStopList = makeStop("Golf", 15) :: fStopList
 val fStopList = makeStop("Kilo", 6) :: fStopList
 val fStopList = makeStop("Whiskey", 9) :: fStopList
@@ -571,12 +575,11 @@ val bStopList = reverseBack(bStopList, [])
 
 val R10 = makeRoute (10, fStopList, bStopList, 180, 1410, 10)
 
-
 val fStopList = []
 val fStopList = makeStop("Alpha", 8) :: fStopList
 val fStopList = makeStop("Bravo", 12) :: fStopList
 val fStopList = makeStop("Charlie", 5) :: fStopList
-val fStopList = makeStop("Delta", 10) :: fStopList 
+val fStopList = makeStop("Delta", 10) :: fStopList
 val fStopList = makeStop("Echo", 6) :: fStopList
 val fStopList = makeStop("Foxtrot", 4) :: fStopList
 val fStopList = reverseBack(fStopList, [])
@@ -596,7 +599,7 @@ val fStopList = []
 val fStopList = makeStop("Golf", 10) :: fStopList
 val fStopList = makeStop("Hotel", 6) :: fStopList
 val fStopList = makeStop("India", 7) :: fStopList
-val fStopList = makeStop("Juliett", 5) :: fStopList 
+val fStopList = makeStop("Juliett", 5) :: fStopList
 val fStopList = makeStop("Kilo", 16) :: fStopList
 val fStopList = makeStop("Lima", 20) :: fStopList
 val fStopList = makeStop("Mike", 11) :: fStopList
