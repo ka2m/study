@@ -1,4 +1,5 @@
 load "ListPair";
+load "List";
 
 datatype 'a ternarylikeop = TrueExpression of 'a | FalseExpression
 
@@ -34,19 +35,33 @@ fun first (x:string, y:int) = x
 
 fun second (x:string, y:int) = y
 
-fun quicksort lt xs =
-  let
-    fun qsort []  k     = k []
-      | qsort [x] k     = k [x]
-      | qsort (p :: xs) k =
-    let
-      val (left, right) = List.partition (fn x => lt (x, p)) xs
-    in
-      qsort left ( fn L => qsort right (fn L' => k (L @ [p] @ L')) )
-    end
-  in
-    qsort xs (fn x => x)
-  end
+(* Sorting function: passing comparator lt and list L *)
+fun quicksort lt L   =
+let
+  (* Nested tail-recursive sorting function
+   * qsort sortedList stackOfUnsortedLists resultingList   
+   * if no sorted and stack is empty - return sorted list
+   * Case 1: stack is empty, sortedList is empty - return result
+   * Case 2: sortedList is empty, have a list in stack, sort it then 
+   * Case 3: have the last element in sorted list, append it to resulting one
+   * Case 4: sorting the unsortedList, by halving the list into left
+   * and right parts using head element as pivot. List.partition
+   * puts in _left_ list elements, which satisfy _lt_ comparator, 
+   * in the right – not satisfying. Next, we call qsort with sorted chunk,
+   * stack of unsorted lists (by adding pivot (_[x]_) and unsorted (_right_))
+   * and resulting list, switching to case 3 or 2 sequentually *)   
+  fun qsort [] [] res              = res      
+  |   qsort [] (x :: xs) res       = qsort x xs res 
+  |   qsort [x] unsorted res       = qsort [] unsorted (x :: res)
+  |   qsort (x :: xs) unsorted res =
+        let
+          val (left, right) = List.partition (fn y => lt (x, y)) xs    
+        in
+          qsort left ([x] :: right :: unsorted) res
+        end
+in
+  qsort L [] []
+end
 
 fun searchListByCriteria ( [], res, criteria )      = reverseBack (res, [])
 |   searchListByCriteria ( R :: RL, res, criteria ) =
@@ -60,8 +75,8 @@ fun searchListByCriteria ( [], res, criteria )      = reverseBack (res, [])
  ****************************************************************************)
 
 (* As stops for bus route are stored in a linked list, we can precisely
-   determine, which stop comes first and which comes next. That's why I placed
-   travel times between two stops inside this type *)
+ * determine, which stop comes first and which comes next. That's why I placed
+ * travel times between two stops inside this type *)
 type stop = { name : string  (* stop name *)
             , nextTime: int   (* travel time between stops *)
             }
@@ -112,10 +127,10 @@ fun getTravelTime SL =
   end
 
 fun stopNamesLessThan (S1, S2) =
-  stopName S1 < stopName S2
+  (stopName S1) < (stopName S2)
 
 fun stopIntervalsLessThan (S1, S2) =
-  stopNextTime S1 < stopNextTime S2
+  (stopNextTime S1) < (stopNextTime S2)
 
 (* sorting *)
 fun sortStopsByName SL =
@@ -223,8 +238,8 @@ fun isRouteInterval it R = routeInterval R = it
 fun routeNumberLessThan (R1, R2) =
   routeNumber R1 < routeNumber R2
 
-fun routeCountStationsLessThan (SL1, SL2) =
-    count (SL1, 0) < count (SL2, 0)
+fun routeCountStationsLessThan SL1 SL2 =
+  count (SL1, 0) < count (SL2, 0)
 
 fun routeCountTravelTimeForwardLessThan (R1, R2) =
   getTravelTime (routeFWSList R1) < getTravelTime (routeFWSList R2)
@@ -237,10 +252,10 @@ fun routeCountTravelTimeBothLessThan (R1, R2) =
   getTravelTime (routeFWSList R2) + getTravelTime (routeBWSList R2)
 
 fun routeCountStationsForwardLessThan (R1, R2) =
-  routeCountStationsLessThan ( (routeFWSList R1), (routeFWSList R2) )
+  routeCountStationsLessThan  (routeFWSList R1) (routeFWSList R2)
 
 fun routeCountStationsBackwardsLessThan (R1, R2) =
-  routeCountStationsLessThan ( (routeBWSList R1), (routeBWSList R2) )
+  routeCountStationsLessThan (routeBWSList R1) (routeBWSList R2)
 
 fun routeCountStationsBothLessThan (R1, R2) =
   count ( (routeFWSList R1), 0 ) + count( (routeBWSList R1), 0 ) <
