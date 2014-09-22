@@ -1,3 +1,17 @@
-study
-=====
+In this repo you can find tasks, which I wrote during 3rd semester of Algorithms
+and Data Structures course.
 
+It is:
+
+Sorting:
+
+* Heapsort
+* Quicksort
+* Mergesort
+
+Hash Tables:
+
+* Hash Table with open double hashing function
+* Hash Table with chaininng hashing
+
+Graph:
