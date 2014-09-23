@@ -10,3 +10,7 @@ SML:
 * Task4 V20
 * Task5 V11
 * Task6 V07
+
+Haskell:
+
+* Task9 V02
