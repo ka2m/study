@@ -34,27 +34,9 @@ structure NeuralNetwork = struct
       add values []
     end
 
-  type outputNeuron = { weights: int list
-                      , output: real
-                      }
-
-  fun makeOutputNeuron ( nacs ) =
-    { weights = nacs
-    , output = 0.0
-    }
-
-  fun makeOutputLayer ( values ) = 
-    let
-      fun add [] res = reverseBack (res, [])
-      |   add (x::xs) res =
-            add xs ( ( makeOutputNeuron x ) :: res )
-    in
-      add values []
-    end
-
   type inList = inputNeuron list
   type layers = (hiddenNeuron list) list
-  type outList = outputNeuron list
+  type outList = hiddenNeuron list
 
   type neuralNetwork = { ilayer: inList
                        , hlayers: layers
@@ -80,7 +62,8 @@ val nn =
               [ ( [1, 2, 3, 4, 5], 1.25)
               , ( [3, 2, 1, 5, 4], 2.35)
               , ( [5, 4, 2, 3, 1], 3.15)])
-    val olayer = NeuralNetwork.makeOutputLayer ( [[1, 2, 3], [2, 1, 3]] )
+    val olayer = NeuralNetwork.makeHiddenLayer ( [ ([1, 2, 3], 1.1), 
+                                                   ([2, 1, 3], 2.3) ] )
   in
     NeuralNetwork.initNeuralNetwork (inputLayer, [hlayer], olayer)
   end
