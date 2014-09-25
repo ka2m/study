@@ -9,108 +9,81 @@ fun second (number:int, weight:int) = weight
 
 
 structure NeuralNetwork = struct
-  type inputNeuron = { number: int
-                     , output: real
-                     }
-  
-  fun makeInputNeuron ( nnum, value ) =
-    { number = nnum
-    , output = value
-    }
+  type inputNeuron = real
 
-  fun makeInputLayer ( values ) =
-    let
-      fun add [] i res = reverseBack (res, [])
-      |   add (x::xs) i res =
-            add xs (i+1) (makeInputNeuron ( i, x ) :: res)
-    in
-      add values 1 []
-    end
-
-  type hiddenNeuron = { number: int
-                      , ancestors: int * int list
+  type hiddenNeuron = { weights: int list
                       , shift: real
                       , output: real
                       }
 
-  fun makeHiddenNeuron ( nnum, nacs, nsh ) =
-    { number = nnum
-    , ancestors = nacs
+  fun makeHiddenNeuron ( nacs, nsh ) =
+    { weights = nacs
     , shift = nsh
     , output = 0.0
     }
 
   fun makeHiddenLayer ( values ) =
     let
-      fun first' (ancestors: (int * int) list, shift: real) = ancestors
-      fun second' (ancestors: (int * int) list, shift: real) = shift
+      fun first' (a: int list, b: real) = a
+      fun second' (a: int list, b: real) = b
 
-      fun add [] i res = reverseBack (res, [])
-      |   add (x::xs) i res =
-            add xs (i+1) (makeHiddenNeuron ( i, 
-                                             (first' x), (second' x) ) :: res)
+      fun add [] res = reverseBack (res, [])
+      |   add (x::xs) res =
+            add xs (makeHiddenNeuron ( (first' x), (second' x) ) :: res)
     in
-      add values 1 []
+      add values []
     end
 
-  type outputNeuron = { number: int
-                      , ancestors: int * int list
+  type outputNeuron = { weights: int list
                       , output: real
                       }
 
-  fun makeOutputNeuron ( nnum, nacs ) =
-    { number = nnum
-    , ancestors = nacs
+  fun makeOutputNeuron ( nacs ) =
+    { weights = nacs
     , output = 0.0
     }
 
   fun makeOutputLayer ( values ) = 
     let
-      fun add [] i res = reverseBack (res, [])
-      |   add (x::xs) i res =
-            add xs (i+1) ( makeOutputNeuron ( i, x ) :: res )
+      fun add [] res = reverseBack (res, [])
+      |   add (x::xs) res =
+            add xs ( ( makeOutputNeuron x ) :: res )
     in
-      add values 1 []
+      add values []
     end
 
-  fun makeNeuralNetwork ( inputList, intlList, outputList ) =
-    { inList = inputList
-    , internalList = intlList
-    , outList = outputList
-    }
-
   type inList = inputNeuron list
-  type internalList = (hiddenNeuron list) list
+  type layers = (hiddenNeuron list) list
   type outList = outputNeuron list
+
+  type neuralNetwork = { ilayer: inList
+                       , hlayers: layers
+                       , olayer: outList
+                       }
+
+  fun initNeuralNetwork ( inl, hls, ol ) =
+    { ilayer = inl
+    , hlayers = hls 
+    , olayer = ol
+    }
 end
 
 (*****************************************************************************
                                 Example
  ****************************************************************************)
 
-val ilayer = NeuralNetwork.makeInputLayer ( [ 1.0 
-                                          , 2.0
-                                          , 3.0
-                                          , 4.0
-                                          , 5.0] )
 
-val hlayer = NeuralNetwork.makeHiddenLayer (
-              [ ( [(1, 1), (2, 1), (3, 2), (4, 5), (5, 6)]
-                , 1.25)
-              , ( [(1, 3), (2, 2), (3, 1), (4, 2), (5, 3)]
-                , 2.25)
-              , ( [(1, 5), (2, 3), (3, 2), (4, 1), (5, 1)]
-                , 3.15) 
-              ] )
-
-val olayer = NeuralNetwork.makeOutputLayer ( [ (1, 1), (2, 2), (3, 3)
-                                             , (1, 2), (2, 1), (3, 2)
-                                             ] )
-
-val nn = NeuralNetwork.makeNeuralNetwork ( ilayer, [hlayer], olayer );
-
-
-
+val nn = 
+  let
+    val inputLayer = [1.0, 2.0, 3.0, 4.0, 5.0]
+    val hlayer = NeuralNetwork.makeHiddenLayer (
+              [ ( [1, 2, 3, 4, 5], 1.25)
+              , ( [3, 2, 1, 5, 4], 2.35)
+              , ( [5, 4, 2, 3, 1], 3.15)])
+    val olayer = NeuralNetwork.makeOutputLayer ( [[1, 2, 3], [2, 1, 3]] )
+  in
+    NeuralNetwork.initNeuralNetwork (inputLayer, [hlayer], olayer)
+  end
 
 
 
