@@ -3,11 +3,11 @@ sig
   type neuron 
   type neuralNetwork
   val makeLayer : (real list * real) list * bool -> neuron list
-  val initNeuralNetwork : real * (neuron list) list -> neuralNetwork
+  val initNeuralNetwork : real list * (neuron list) list -> neuralNetwork
   val eval : neuralNetwork -> real list
 end
 
-structure NeuralNetwork = struct
+structure NeuralNetwork : NN = struct
   
   fun activation (s, isOutput) =
     if isOutput
@@ -66,7 +66,9 @@ structure NeuralNetwork = struct
     let
       fun evalUnwrapped ( input, hidden ) =
         let
-          fun evaluateNeuronSum [] [] res           = res
+          fun evaluateNeuronSum [x] [] _            = 0.0 
+          |   evaluateNeuronSum [] [x] _            = 0.0
+          |   evaluateNeuronSum [] [] res           = res
           |   evaluateNeuronSum (x::xs) (y::ys) res =
                 evaluateNeuronSum xs ys res + (x * y)
 
