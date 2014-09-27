@@ -55,27 +55,31 @@ structure NeuralNetwork = struct
   fun networkInputLayer ({ilayer = i, ...} : neuralNetwork) = i
   fun networkInternals ({hlayers = h, ...} : neuralNetwork) = h
 
-  fun evaluateNetwork ( input, hidden ) =
+  fun eval ( network ) = 
     let
-      fun evaluateNeuronSum [] [] res           = res
-      |   evaluateNeuronSum (x::xs) (y::ys) res =
-            evaluateNeuronSum xs ys res + (x * y)
+      fun evalUnwrapped ( input, hidden ) =
+        let
+          fun evaluateNeuronSum [] [] res           = res
+          |   evaluateNeuronSum (x::xs) (y::ys) res =
+                evaluateNeuronSum xs ys res + (x * y)
 
-      fun evaluateNeuron previous n =
-        activation ( ((evaluateNeuronSum previous (neuronWeights n) 0.0) +
-                     (neuronShift n)), (neuronIsOutput n) )
+          fun evaluateNeuron previous n =
+            activation ( ((evaluateNeuronSum previous (neuronWeights n) 0.0) +
+                         (neuronShift n)), (neuronIsOutput n) )
 
-      (*  evalLayer previousResults currentNeuronLayer resultingList *)
-      fun evaluateLayer previous [] res      = res
-      |   evaluateLayer previous (x::xs) res =
-            evaluateLayer previous xs ((evaluateNeuron previous x) :: res)
+          (*  evalLayer previousResults currentNeuronLayer resultingList *)
+          fun evaluateLayer previous [] res      = res
+          |   evaluateLayer previous (x::xs) res =
+                evaluateLayer previous xs ((evaluateNeuron previous x) :: res)
 
-      fun evaluateNetwork previous []      = previous
-      |   evaluateNetwork previous (x::xs) =
-            evaluateNetwork (evaluateLayer previous x []) xs 
-
+          fun evaluateNetwork previous []      = previous
+          |   evaluateNetwork previous (x::xs) =
+                evaluateNetwork (evaluateLayer previous x []) xs 
+        in
+            evaluateNetwork input hidden
+        end
     in
-        evaluateNetwork input hidden
+      evalUnwrapped ( (networkInputLayer network), (networkInternals network) )
     end
 end
 
@@ -92,5 +96,4 @@ in
   NeuralNetwork.initNeuralNetwork ( inputLayer, [hlayer, olayer] )
 end
 
-val p = NeuralNetwork.evaluateNetwork ( (NeuralNetwork.networkInputLayer nn),
-                                        (NeuralNetwork.networkInternals nn) );
+val p = NeuralNetwork.eval (nn)
