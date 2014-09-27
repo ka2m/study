@@ -21,7 +21,6 @@ def bfs_paths(graph, start, goal):
     while queue:
         (vertex, path) = queue.pop(0)
         for next in graph[vertex] - set(path):
-            print(path + [next])
             if next == goal:
                 yield path + [next]
             else:
@@ -35,4 +34,4 @@ def shortest_path(graph, start, goal):
         return None
 
 print(list(bfs_paths(graph, 'A', 'F')))
-# print(shortest_path(graph, 'A', 'F'))
+print(shortest_path(graph, 'A', 'F'))
