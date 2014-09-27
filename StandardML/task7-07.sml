@@ -3,16 +3,11 @@ sig
   type neuron 
   type neuralNetwork
   val makeLayer : (real list * real) list * bool -> neuron list
-  val initNeuralNetwork : real list * (neuron list) list -> neuralNetwork
-  val eval : neuralNetwork -> real list
+  val initNeuralNetwork : int * (neuron list) list -> neuralNetwork
+  val eval : neuralNetwork * real list * (real -> real) -> real list
 end
 
 structure NeuralNetwork : NN = struct
-  
-  fun activation (s, isOutput) =
-    if isOutput
-    then s
-    else s / ( (abs s) + 0.8)
 
   type neuron = { weights: real list
                 , shift: real
@@ -50,19 +45,18 @@ structure NeuralNetwork : NN = struct
       add values []
     end
 
-  type neuralNetwork = { ilayer: real list
+  type neuralNetwork = { inputNeurons: int
                        , hlayers: (neuron list) list
                        }
 
-  fun initNeuralNetwork ( inl, hls ) =
-    { ilayer = inl
+  fun initNeuralNetwork ( ins, hls ) =
+    { inputNeurons = ins
     , hlayers = hls
     }
-
-  fun networkInputLayer ({ilayer = i, ...} : neuralNetwork) = i
+ 
   fun networkInternals ({hlayers = h, ...} : neuralNetwork) = h
 
-  fun eval ( network ) = 
+  fun eval ( network, input, activationFn ) = 
     let
       fun evalUnwrapped ( input, hidden ) =
         let
@@ -73,8 +67,14 @@ structure NeuralNetwork : NN = struct
                 evaluateNeuronSum xs ys res + (x * y)
 
           fun evaluateNeuron previous n =
-            activation ( ((evaluateNeuronSum previous (neuronWeights n) 0.0) +
-                         (neuronShift n)), (neuronIsOutput n) )
+            let 
+              val s = ( (evaluateNeuronSum previous (neuronWeights n) 0.0) +
+                        (neuronShift n) )
+            in
+              if (neuronIsOutput n)
+              then s
+              else activationFn s
+            end
 
           (*  evalLayer previousResults currentNeuronLayer resultingList *)
           fun evaluateLayer previous [] res      = res
@@ -88,7 +88,7 @@ structure NeuralNetwork : NN = struct
             evaluateNetwork input hidden
         end
     in
-      evalUnwrapped ( (networkInputLayer network), (networkInternals network) )
+      evalUnwrapped ( input, (networkInternals network) )
     end
 end
 
@@ -97,12 +97,13 @@ end
  ****************************************************************************)
 val nn =
 let
-  val inputLayer = [1.0, 2.0, 3.0]
   val hlayer = NeuralNetwork.makeLayer ([ ([3.0, 2.0, 1.0], 0.5), 
                                             ([1.0, 2.0, 3.0], 0.75) ], false)
   val olayer = NeuralNetwork.makeLayer ([ ([1.0, 2.0], 0.125) ], true)
 in
-  NeuralNetwork.initNeuralNetwork ( inputLayer, [hlayer, olayer] )
+  NeuralNetwork.initNeuralNetwork ( 3, [hlayer, olayer] )
 end
 
-val p = NeuralNetwork.eval (nn)
+fun activation s =  s / ( (abs s) + 0.8)
+
+val p = NeuralNetwork.eval (nn, [1.0, 2.0, 3.0], activation)
