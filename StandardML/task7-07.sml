@@ -1,11 +1,18 @@
-load "List";
-
-fun activation (s, isOutput) =
-  if isOutput
-  then s
-  else s / ( (abs s) + 0.8)
+signature NN = 
+sig
+  type neuron 
+  type neuralNetwork
+  val makeLayer : (real list * real) list * bool -> neuron list
+  val initNeuralNetwork : real * (neuron list) list -> neuralNetwork
+  val eval : neuralNetwork -> real list
+end
 
 structure NeuralNetwork = struct
+  
+  fun activation (s, isOutput) =
+    if isOutput
+    then s
+    else s / ( (abs s) + 0.8)
 
   type neuron = { weights: real list
                 , shift: real
