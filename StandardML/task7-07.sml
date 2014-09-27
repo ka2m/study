@@ -96,14 +96,18 @@ end
                                 Example
  ****************************************************************************)
 val nn =
-let
-  val hlayer = NeuralNetwork.makeLayer ([ ([3.0, 2.0, 1.0], 0.5), 
-                                            ([1.0, 2.0, 3.0], 0.75) ], false)
-  val olayer = NeuralNetwork.makeLayer ([ ([1.0, 2.0], 0.125) ], true)
-in
-  NeuralNetwork.initNeuralNetwork ( 3, [hlayer, olayer] )
-end
+  let
+    val hlayer = NeuralNetwork.makeLayer ([ ([3.0, 2.0, 1.0], 0.5), 
+                                              ([1.0, 2.0, 3.0], 0.75) ], false)
+    val olayer = NeuralNetwork.makeLayer ([ ([1.0, 2.0], 0.125) ], true)
+  in
+    NeuralNetwork.initNeuralNetwork ( 3, [hlayer, olayer] )
+  end
 
-fun activation s =  s / ( (abs s) + 0.8)
-
-val p = NeuralNetwork.eval (nn, [1.0, 2.0, 3.0], activation)
+val e = 
+  let
+    fun activation s =  s / ( (abs s) + 0.8)
+  in
+    NeuralNetwork.eval (nn, [1.0, 2.0, 3.0], activation)
+  end
+  
