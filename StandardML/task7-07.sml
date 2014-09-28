@@ -7,7 +7,7 @@ sig
   val eval : neuralNetwork * real list * (real -> real) -> real list
 end
 
-structure NeuralNetwork : NN = struct
+structure NeuralNetwork = struct
 
   type neuron = { weights: real list
                 , shift: real
@@ -54,18 +54,21 @@ structure NeuralNetwork : NN = struct
     , hlayers = hls
     }
  
+  fun inNeurons ({inputNeurons = n, ...} : neuralNetwork) = n
   fun networkInternals ({hlayers = h, ...} : neuralNetwork) = h
+  fun networkHiddenLayers network = rev (tl (rev (networkInternals network)))
+  fun networkOutputLayer network = hd (rev (networkInternals network))
 
-  fun eval ( network, input, activationFn ) = 
-    let
-      fun evalUnwrapped ( input, hidden ) =
+  fun evaluateNeuronSum [x] [] _            = 0.0 
+  |   evaluateNeuronSum [] [x] _            = 0.0
+  |   evaluateNeuronSum [] [] res           = res
+  |   evaluateNeuronSum (x::xs) (y::ys) res =
+        evaluateNeuronSum xs ys res + (x * y)
+
+  (*  evalLayer activFn previousResults currentNeuronLayer resultingList *)
+  fun evaluateLayer afn previous [] res      = res
+  |   evaluateLayer afn previous (x::xs) res =
         let
-          fun evaluateNeuronSum [x] [] _            = 0.0 
-          |   evaluateNeuronSum [] [x] _            = 0.0
-          |   evaluateNeuronSum [] [] res           = res
-          |   evaluateNeuronSum (x::xs) (y::ys) res =
-                evaluateNeuronSum xs ys res + (x * y)
-
           fun evaluateNeuron previous n =
             let 
               val s = ( (evaluateNeuronSum previous (neuronWeights n) 0.0) +
@@ -73,22 +76,86 @@ structure NeuralNetwork : NN = struct
             in
               if (neuronIsOutput n)
               then s
-              else activationFn s
+              else afn s
             end
-
-          (*  evalLayer previousResults currentNeuronLayer resultingList *)
-          fun evaluateLayer previous [] res      = res
-          |   evaluateLayer previous (x::xs) res =
-                evaluateLayer previous xs ((evaluateNeuron previous x) :: res)
-
-          fun evaluateNetwork previous []      = previous
-          |   evaluateNetwork previous (x::xs) =
-                evaluateNetwork (evaluateLayer previous x []) xs 
         in
-            evaluateNetwork input hidden
+          evaluateLayer afn previous xs ((evaluateNeuron previous x) :: res)
+        end
+        
+  fun eval ( network, input, activationFn ) = 
+    let
+      fun evalUnwrapped ( input, hidden ) =
+        let
+          fun evaluateNetwork previous []        = previous
+          |   evaluateNetwork previous (x :: xs) =
+                evaluateNetwork (evaluateLayer activationFn previous x []) xs
+        in
+          evaluateNetwork input hidden
         end
     in
       evalUnwrapped ( input, (networkInternals network) )
+    end
+
+  fun train ( network, inputs, outputs, retries, rate, afn, derivative ) =
+    let
+      (* print runtime neuron output values, packed in lists by layers *)
+      val verboseNetworkOutput =
+        let
+          fun evaluateLayerResults previous []  res       = res
+          |   evaluateLayerResults previous (x :: xs) res = 
+                let 
+                  val p = evaluateLayer afn previous x []
+                in
+                  evaluateLayerResults p xs (p :: res)
+                end      
+        in
+          evaluateLayerResults inputs (networkInternals network) []     
+        end
+
+      fun updateNeuronWeight oldWeight realValue desireValue =
+        oldWeight + rate * 
+        ( realValue - desireValue ) * (derivative desireValue) * realValue
+
+      (*  updateOutputNeuron oldWeights neuronShift realValue desiredValue *)
+      (*  set new synapse weight *)
+      fun updateOutputNeuron oldNeuron rv dv = 
+          let            
+            fun upd [] shift res        = makeOutputNeuron (res, shift)
+            |   upd (x :: xs) shift res = 
+                  upd xs shift ((updateNeuronWeight x rv dv) :: res)
+          in
+            upd (neuronWeights oldNeuron) (neuronShift oldNeuron) []
+          end
+
+      (* updateOutputLayer neuronList realValueList desiredValList resultNL *)
+      (* apply updates to each neuron *)
+      fun updateOutputLayer [] [] [] res                      = res
+      |   updateOutputLayer (n :: ns) (r :: rs) (d :: ds) res =
+            updateOutputLayer ns rs ds ((updateOutputNeuron n r d) :: res)
+
+      (* check if outputs are equal with some precision *)
+      fun eq [] [] = true
+      |   eq (x :: xs) (y :: ys) =
+            if x > y - 0.005 andalso x < y + 0.005
+            then eq xs ys
+            else false
+      
+      fun iterate nn iter = 
+        let
+          val rawOuts = (hd verboseNetworkOutput) 
+          val hls = networkHiddenLayers nn
+          val ol = updateOutputLayer (networkOutputLayer nn)
+                                     rawOuts
+                                     outputs
+                                     []
+          val nnn = initNeuralNetwork ( (inNeurons nn), hls @ [ol])
+         in
+           if (eq outputs rawOuts) orelse iter = 0 
+           then nnn
+           else iterate nnn (iter - 1)
+         end 
+    in
+      iterate network retries
     end
 end
 
@@ -110,4 +177,30 @@ val e =
   in
     NeuralNetwork.eval (nn, [1.0, 2.0, 3.0], activation)
   end
-  
+
+
+val trainer = 
+  let  
+    fun p s = (abs s) + 0.8
+    fun activation s =  s / (p s)
+    fun derivative s =  (~(s * s)/abs (s) + (p s))/((p s) * (p s))
+
+    val nn =
+      let
+        val hlayer = NeuralNetwork.makeLayer ([ ([0.1, 0.2, 0.3], 0.05), 
+                                              ([0.3, 0.2, 0.1], 0.075) ], false)
+        val olayer = NeuralNetwork.makeLayer ([ ([0.6, 0.8], 0.0125) ], true)
+      in
+        NeuralNetwork.initNeuralNetwork ( 3, [hlayer, olayer] )
+      end
+  in
+    NeuralNetwork.eval ( NeuralNetwork.train ( nn
+                                             , [1.0, 2.0, 3.0], [0.9]
+                                             , 10000, 0.0001  
+                                             , activation, derivative )
+                       , [1.0, 2.0, 3.0]
+                       , activation)
+  end  
+
+
+
