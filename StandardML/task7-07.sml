@@ -99,7 +99,7 @@ structure NeuralNetwork = struct
   fun train ( network, inputs, outputs, retries, rate, afn, derivative ) =
     let
       (* print runtime neuron output values, packed in lists by layers *)
-      val verboseNetworkOutput =
+      fun verboseNetworkOutput nn =
         let
           fun evaluateLayerResults previous []  res       = res
           |   evaluateLayerResults previous (x :: xs) res = 
@@ -109,12 +109,12 @@ structure NeuralNetwork = struct
                   evaluateLayerResults p xs (p :: res)
                 end      
         in
-          evaluateLayerResults inputs (networkInternals network) []     
+          evaluateLayerResults inputs (networkInternals nn) []     
         end
 
       fun updateNeuronWeight oldWeight realValue desireValue =
-        oldWeight + rate * 
-        ( realValue - desireValue ) * (derivative desireValue) * realValue
+        oldWeight + ( ~ 1.0 * rate * 
+        ( realValue - desireValue ) * (derivative realValue) * realValue )
 
       (*  updateOutputNeuron oldWeights neuronShift realValue desiredValue *)
       (*  set new synapse weight *)
@@ -134,23 +134,23 @@ structure NeuralNetwork = struct
             updateOutputLayer ns rs ds ((updateOutputNeuron n r d) :: res)
 
       (* check if outputs are equal with some precision *)
-      fun eq [] [] = true
-      |   eq (x :: xs) (y :: ys) =
-            if x > y - 0.005 andalso x < y + 0.005
-            then eq xs ys
+      fun eq ([], [])               = true
+      |   eq ((x :: xs), (y :: ys)) =
+            if x > ( y - 0.0001 ) andalso x < ( y + 0.0001 )  
+            then eq (xs, ys)
             else false
       
       fun iterate nn iter = 
-        let
-          val rawOuts = (hd verboseNetworkOutput) 
+        let          
           val hls = networkHiddenLayers nn
           val ol = updateOutputLayer (networkOutputLayer nn)
-                                     rawOuts
+                                     (hd (verboseNetworkOutput nn)) 
                                      outputs
                                      []
           val nnn = initNeuralNetwork ( (inNeurons nn), hls @ [ol])
+          val updatedOutput = (hd (verboseNetworkOutput nnn))
          in
-           if (eq outputs rawOuts) orelse iter = 0 
+           if (eq (outputs,  updatedOutput)) orelse iter = 0
            then nnn
            else iterate nnn (iter - 1)
          end 
@@ -163,44 +163,39 @@ end
                                 Example
  ****************************************************************************)
 val nn =
-  let
-    val hlayer = NeuralNetwork.makeLayer ([ ([3.0, 2.0, 1.0], 0.5), 
-                                              ([1.0, 2.0, 3.0], 0.75) ], false)
-    val olayer = NeuralNetwork.makeLayer ([ ([1.0, 2.0], 0.125) ], true)
-  in
-    NeuralNetwork.initNeuralNetwork ( 3, [hlayer, olayer] )
-  end
+let
+  val hlayer = NeuralNetwork.makeLayer ([ ([0.1, 0.2, 0.3], 0.05), 
+                                          ([0.3, 0.2, 0.1], 0.075) ], false)
+  val olayer = NeuralNetwork.makeLayer ([ ([0.6, 0.8], 0.0125) ], true)
+in
+  NeuralNetwork.initNeuralNetwork ( 3, [hlayer, olayer] )
+end
+
+
+fun p s = (abs s) + 0.8
+fun activation s =  s / (p s)
+fun derivative s =  (~(s * s)/abs (s) + (p s))/((p s) * (p s))
+
+val inputValues = [1.0, 2.0, 3.0]
 
 val e = 
   let
     fun activation s =  s / ( (abs s) + 0.8)
   in
-    NeuralNetwork.eval (nn, [1.0, 2.0, 3.0], activation)
+    NeuralNetwork.eval (nn, inputValues, activation)
   end
 
 
 val trainer = 
-  let  
-    fun p s = (abs s) + 0.8
-    fun activation s =  s / (p s)
-    fun derivative s =  (~(s * s)/abs (s) + (p s))/((p s) * (p s))
-
-    val nn =
-      let
-        val hlayer = NeuralNetwork.makeLayer ([ ([0.1, 0.2, 0.3], 0.05), 
-                                              ([0.3, 0.2, 0.1], 0.075) ], false)
-        val olayer = NeuralNetwork.makeLayer ([ ([0.6, 0.8], 0.0125) ], true)
-      in
-        NeuralNetwork.initNeuralNetwork ( 3, [hlayer, olayer] )
-      end
-  in
-    NeuralNetwork.eval ( NeuralNetwork.train ( nn
-                                             , [1.0, 2.0, 3.0], [0.9]
-                                             , 10000, 0.0001  
-                                             , activation, derivative )
-                       , [1.0, 2.0, 3.0]
-                       , activation)
-  end  
+  NeuralNetwork.eval ( NeuralNetwork.train ( nn
+                                           , inputValues
+                                           , [2.0]
+                                           , 100000
+                                           , 0.00025  
+                                           , activation
+                                           , derivative )
+                     , inputValues
+                     , activation)
 
 
 
