@@ -1,7 +1,6 @@
 derivation :: (Fractional a) => (a -> a) -> (a -> a)
 derivation f = \ x -> ( ( f (x + dx) - f (x) ) / dx ) where dx = 0.1
 
---evalA :: (Fractional a, Integral b) => b -> (a -> a) -> (a -> a)
 evalA k f
   | k == 0 =  \x -> x
   | otherwise = \x -> (derivation (evalA (k-1) f) x) / (derivation f x)
