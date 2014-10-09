@@ -18,8 +18,7 @@ inverseFun f x = iter 0 1.0 0.0
                     else iter (k + 1) elemB (sum' + newItem)
 
 
-f1 :: Fractional a => a -> a
-f1 x = 1.0 * x * x
+f1 x = 1.0 * sqrt(x)
 
 main = do
-    print $ (inverseFun f1 2.5 :: Double)
+    print $ (inverseFun f1 2.5)
