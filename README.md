@@ -15,3 +15,12 @@ Hash Tables:
 * Hash Table with chaininng hashing
 
 Graph:
+
+* BFS
+* DFS
+* Dijkstra
+* Floyd-Warshall
+* Ford-Bellman
+* Kruskal with DSU
+* Prim
+* Connected Components
