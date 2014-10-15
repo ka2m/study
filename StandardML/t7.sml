@@ -1,15 +1,13 @@
-signature NN =
+signature NN = 
 sig
-  type neuron
+  type neuron 
   type neuralNetwork
   val makeLayer : (real list * real) list * bool -> neuron list
   val initNeuralNetwork : int * (neuron list) list -> neuralNetwork
   val eval : neuralNetwork * real list * (real -> real) -> real list
-  val train : neuralNetwork * real list list * real list * (real -> real) *
-     (real -> real) * real * int -> neuralNetwork
 end
 
-structure NeuralNetwork : NN = struct
+structure NeuralNetwork = struct
 
   type neuron = { weights: real list
                 , shift: real
@@ -18,7 +16,7 @@ structure NeuralNetwork : NN = struct
 
   fun makeHiddenNeuron ( nacs, nsh ) =
     { weights = nacs
-    , shift = nsh
+    , shift = nsh    
     , isOutput = false
     }
 
@@ -55,13 +53,13 @@ structure NeuralNetwork : NN = struct
     { inputNeurons = ins
     , hlayers = hls
     }
-
+ 
   fun inNeurons ({inputNeurons = n, ...} : neuralNetwork) = n
   fun networkInternals ({hlayers = h, ...} : neuralNetwork) = h
   fun networkHiddenLayers network = rev (tl (rev (networkInternals network)))
   fun networkOutputLayer network = hd (rev (networkInternals network))
 
-  fun evaluateNeuronSum [x] [] _            = 0.0
+  fun evaluateNeuronSum [x] [] _            = 0.0 
   |   evaluateNeuronSum [] [x] _            = 0.0
   |   evaluateNeuronSum [] [] res           = res
   |   evaluateNeuronSum (x::xs) (y::ys) res =
@@ -72,7 +70,7 @@ structure NeuralNetwork : NN = struct
   |   evaluateLayer afn previous (x::xs) res =
         let
           fun evaluateNeuron previous n =
-            let
+            let 
               val s = ( (evaluateNeuronSum previous (neuronWeights n) 0.0) +
                         (neuronShift n) )
             in
@@ -83,8 +81,8 @@ structure NeuralNetwork : NN = struct
         in
           evaluateLayer afn previous xs ((evaluateNeuron previous x) :: res)
         end
-
-  fun eval ( network, input, activationFn ) =
+        
+  fun eval ( network, input, activationFn ) = 
     let
       fun evalUnwrapped ( input, hidden ) =
         let
@@ -98,6 +96,9 @@ structure NeuralNetwork : NN = struct
       evalUnwrapped ( input, (networkInternals network) )
     end
 
+
+       
+    
   fun train ( network, trainingExamplesInputs, desiredOutputs
             , activationFn, derivative, rate, generations ) =
     let
@@ -105,41 +106,38 @@ structure NeuralNetwork : NN = struct
       fun verboseNetworkOutput inputExample nn =
         let
           fun evaluateLayerResults previous []  res       = res
-          |   evaluateLayerResults previous (x :: xs) res =
-                let
+          |   evaluateLayerResults previous (x :: xs) res = 
+                let 
                   val p = evaluateLayer activationFn previous x []
                 in
                   evaluateLayerResults p xs (p :: res)
-                end
+                end      
         in
           evaluateLayerResults inputExample (networkInternals nn) []
         end
 
       fun verboseNetworkOutputForAll [] res nn        = res
       |   verboseNetworkOutputForAll (x :: xs) res nn =
-            verboseNetworkOutputForAll xs
+            verboseNetworkOutputForAll xs 
                                        (( verboseNetworkOutput x nn ) :: res)
                                        nn
 
-      fun evalOutputDelta expectedOutputNeuronValue trainingOutputs =
-        map (fn x => (expectedOutputNeuronValue - x ) * (derivative x) * x)
-            trainingOutputs
-
-
       fun evalOutputDeltaSum expectedOutputNeuronValue trainingOutputs  =
-        foldr (op +)
+        foldr (op +) 
               0.0
-              (evalOutputDelta expectedOutputNeuronValue trainingOutputs)
-
+              (map  
+                (fn x => (expectedOutputNeuronValue - x ) * (derivative x) * x)
+                trainingOutputs)
+          
 
       fun updateNeuronWeight oldWeight expected training =
         oldWeight + rate * (evalOutputDeltaSum expected training)
 
 
-      fun updateOutputNeuron oldNeuron rv dv =
-          let
+      fun updateOutputNeuron oldNeuron rv dv = 
+          let            
             fun upd [] shift res        = makeOutputNeuron (rev res, shift)
-            |   upd (x :: xs) shift res =
+            |   upd (x :: xs) shift res = 
                   upd xs shift ((updateNeuronWeight x dv rv) :: res)
           in
             upd (neuronWeights oldNeuron) (neuronShift oldNeuron) []
@@ -155,14 +153,13 @@ structure NeuralNetwork : NN = struct
       (* covnert outputs for iterating over TRAINING result list instead
          of output layer list *)
       fun convert' [[], _] res = rev res
-      |   convert' output res  =
+      |   convert' output res =
             convert' (foldr (op ::) [] (map (tl) output))
                      ((map (hd) output) :: res)
-
-
+    
       fun eq ([], [])               = true
       |   eq ((x :: xs), (y :: ys)) =
-            if x > ( y - 0.5 ) andalso x < ( y + 0.5 )
+            if x > ( y - 0.0001 ) andalso x < ( y + 0.0001 )  
             then eq (xs, ys)
             else false
 
@@ -170,33 +167,27 @@ structure NeuralNetwork : NN = struct
       fun iterate nn iter =
         let
           val hls = (networkHiddenLayers nn)
-          val oldOutputNeuronList = (networkOutputLayer nn)
-
-          val exampleVerboseOutput =
+          val exampleVerboseOutput = 
             verboseNetworkOutputForAll trainingExamplesInputs [] nn
           val exampleOutputLayerValues = map (hd) exampleVerboseOutput
-
-
-          val realOutputValueListByExample =
+          val oldOutputNeuronList = (networkOutputLayer nn)
+          val realOutputValueListByExample = 
             (convert' exampleOutputLayerValues [])
-
-          val newOutputLayer =
-            updateOutputLayer oldOutputNeuronList
+          val newOutputLayer = 
+            updateOutputLayer oldOutputNeuronList 
                               realOutputValueListByExample
                               desiredOutputs
                               []
-
           val newNeuralNetwork = initNeuralNetwork ( (inNeurons nn)
                                                    ,  hls @ [newOutputLayer] )
-          val updatedOutput =
-            hd (map (hd) (verboseNetworkOutputForAll trainingExamplesInputs
-                                       []
-                                       newNeuralNetwork))
+          (*val updatedOutput = (hd (verboseNetworkOutput nnn))*)
 
         in
-           if (eq (desiredOutputs,  updatedOutput)) orelse iter = 0
+           (*if (eq (desiredOutputs,  updatedOutput)) orelse iter = 0*)
+           (*if iter = 0
            then newNeuralNetwork
-           else iterate newNeuralNetwork (iter - 1)
+           else iterate newNeuralNetwork (iter - 1)*)
+           newNeuralNetwork
         end
 
     in
@@ -210,7 +201,7 @@ structure NeuralNetwork : NN = struct
  ****************************************************************************)
 val nn =
 let
-  val hlayer = NeuralNetwork.makeLayer ([ ([0.1, 0.2, 0.3], 0.05),
+  val hlayer = NeuralNetwork.makeLayer ([ ([0.1, 0.2, 0.3], 0.05), 
                                           ([0.3, 0.2, 0.1], 0.075),
                                           ([0.5, 0.2, 0.4], 0.095) ], false)
   val olayer = NeuralNetwork.makeLayer ([ ([0.6, 0.8], 0.0125),
@@ -227,7 +218,7 @@ fun derivative s =  (~(s * s)/abs (s) + (p s))/((p s) * (p s))
 val inputValues = [[1.0, 2.0, 3.0]]
 val inputValues = rev ( [5.0, 6.0, 7.0] :: inputValues )
 
-val e =
+val e = 
   let
     fun activation s =  s / ( (abs s) + 0.8)
   in
