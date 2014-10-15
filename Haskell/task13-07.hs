@@ -28,10 +28,11 @@ value (IP (_, x)) = x
 
 type Polynomial = [Poly]
 
+data PP = List(Poly)
 
 findValueByPower :: Polynomial -> Int -> Double
 findValueByPower p pw
-  | p == [] = undefined
+  | p == [] = 0
   | otherwise =
       if power (head  p) == pw
       then value  (head p)
@@ -64,6 +65,48 @@ invertPolynomial p = map (inv) p
 substractPolynomials :: Polynomial -> Polynomial -> Polynomial
 substractPolynomials p1 p2 = sumPolynomials p1 (invertPolynomial p2)
 
+convertToNormalForm :: Polynomial -> [Double]
+convertToNormalForm p =
+  let
+    pl = reverse $ [x | x <- [0 .. head $ reverse $ sort (powerList p)]]
+    iter  [] res = reverse res
+    iter (x : xs) res = iter xs ((findValueByPower p x) : res)
+  in
+    iter pl []
+
+reverseConvert :: [Double] -> Polynomial
+reverseConvert bareList =
+  let
+    rc' c [] res = reverse res
+    rc' c (x:xs) res = rc' (c-1)
+                           xs
+                           (if (x /= 0.0) then (IP (c, x) : res) else res)
+  in
+    rc' (length (bareList) - 1) bareList []
+
+multiplyPolynomials :: Polynomial -> Polynomial -> Polynomial
+multiplyPolynomials p1 p2 =
+  let
+    timesPoly c p1 = map (c*) p1
+    -- Multiply two polynomials
+    multPoly [] p2 = []
+    multPoly (p:p1) p2 =
+      let
+        multiplyByX p = 0:p
+
+        pTimesP2 = timesPoly p p2
+        xTimesP1TimesP2 = multiplyByX $ multPoly p1 p2
+
+        addPoly [] []     = []
+        addPoly (x:xs) [] = x : addPoly xs []
+        addPoly [] (y:ys) = y : addPoly [] ys
+        addPoly (x:xs) (y:ys) = x + y : addPoly xs ys
+      in
+        addPoly pTimesP2 xTimesP1TimesP2
+  in
+    reverseConvert ( multPoly (convertToNormalForm p1) (convertToNormalForm p2) )
+
+
 test =
   let
     poly1 = IP (2, 5.0)
@@ -73,8 +116,8 @@ test =
     poly4 = IP (1, 8.0)
     poly' = [poly3, poly4]
   in
-    printPolynomal (substractPolynomials poly poly')
-    -- invertPolynomial poly
+    -- printPolynomal (substractPolynomials poly poly')
+    printPolynomal $ multiplyPolynomials poly poly'
 
 main = do
   print $ test
