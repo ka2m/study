@@ -1,123 +1,139 @@
 import Data.List
 
-data Poly = IP (Int, Double)
+-- Classes definition
 
--- only power equality!
-instance Eq Poly where
-  (==) p1 p2 = (power p1) == (power p2)
-  (/=) p1 p2 = not (p1 == p2)
+data Term = IT (Int, Double)
 
-instance Ord Poly where
-  (<) p1 p2 = (power p1) < (power p2)
-  (>) p1 p2 = (power p1) > (power p2)
+data Polynomial = Polynomial [Term]
 
-  compare p1 p2
-    | p1 <= p2 = LT
-    | p1 >= p2 = GT
-    | p1 == p2 = EQ
-    | otherwise = error "The intervals are non-comparable"
+-- Term accessors
 
-instance Show Poly where
-    show (IP (x,y)) = "(" ++ show y ++"x^" ++ (show x ++ ")" ) ++ "+"
+power :: Term -> Int
+power (IT (x, _)) = x
 
-power :: Poly -> Int
-power (IP (x, _)) = x
+value :: Term -> Double
+value (IT (_, x)) = x
 
-value :: Poly -> Double
-value (IP (_, x)) = x
+-- Term instances
 
-type Polynomial = [Poly]
+instance Ord Term where
+  IT (x, _) <= IT (x', _) = x'<= x
 
-data PP = List(Poly)
+instance Eq Term where
+  IT (x, _) == IT (x', _) = x' == x
 
-findValueByPower :: Polynomial -> Int -> Double
-findValueByPower p pw
-  | p == [] = 0
-  | otherwise =
-      if power (head  p) == pw
-      then value  (head p)
-      else findValueByPower (tail p) pw
+instance Num Term where
+  IT (a, b) + IT (a', b')
+    | a == a' = IT (a, b + b')
+    | otherwise = error "Powers are not equal"
+
+  IT (a, b) * IT (a', b') = IT (a + a', b * b')
+  abs (IT (a, b)) = IT (a, abs b)
+  signum (IT (_, b))
+    | b > 1 = 1
+    | b < 1 = -1
+    | otherwise = 0
+
+  negate (IT (a, b)) = IT (a, negate b)
+
+instance Show Term where
+  show (IT (x, y))
+    | x == 0 && y /= 0 =  show y
+    | x == 1 = show y ++ "x"
+    | otherwise = show y ++ "x^" ++ show x
+
+-- Helping functions
+
+findTerm :: [Term] -> Term -> Term
+findTerm [] y = IT (0, 0)
+findTerm (x : xs) y
+  | power x == power y = x
+  | otherwise = findTerm xs y
+
+-- Polynomial instances
+
+instance Show Polynomial where
+  show (Polynomial p) =
+    let
+      v = foldr (++) "" [ sign' x | x <- sort p] where
+      sign' x
+        | value x > 0 = "+" ++ show (abs x)
+        | value x < 0 = "-" ++ show (abs x)
+        | otherwise = ""
+    in
+      if value (head p) > 0
+      then v
+      else if v == "" then "0.0" else v
+
+instance Eq Polynomial where
+  Polynomial a == Polynomial a' =  a == a' && vall a == vall a' where
+    vall p = [x | IT (_, x) <- p]
+
+instance Num Polynomial where
+  Polynomial a + Polynomial a' =
+    Polynomial (sort ((a \\ a') ++ (a' \\ a) ++ (reduce a a')))
+      where
+        reduce p p' =
+          let
+            f' (p, _) = p
+            s' (_, p) = p
+            s [] res = reverse res
+            s (x : xs) res = s xs
+                               ( IT (power (f' x),
+                                    value (f' x) + value (s' x)) : res)
+          in
+            s (zip (sort(intersectBy (\x y -> x == y) p p'))
+                   (sort(intersectBy (\x y -> x == y) p' p)) ) []
+
+  Polynomial a - Polynomial a' =
+    Polynomial a + (invertPolynomial (Polynomial a'))
+
+  Polynomial a * Polynomial a' =
+    Polynomial (multIter (terml (Polynomial a)) (terml (Polynomial a')) [])
+      where
+        multIter [] [] res = res
+        multIter (x : xs) [] res = multIter xs (terml (Polynomial a')) res
+        multIter (x : xs) (y : ys) res = multIter (x : xs) ys [x * y] ++ res
+        multIter _ _ res = res
+
+  abs (Polynomial a) = Polynomial [abs x | x <- a]
 
 
-printPolynomal :: Polynomial -> String
-printPolynomal ps = reverse $ tail $ reverse $ (foldr (++) "" (map (show) ps))
+-- Helping functions
 
-powerList :: Polynomial -> [Int]
-powerList l = foldr (:) [] (map (power) l)
+-- Unwrap
+terml :: Polynomial -> [Term]
+terml (Polynomial p) = p
 
-sumPolynomials :: Polynomial -> Polynomial -> Polynomial
-sumPolynomials p1 p2 = (p2 \\ p1) ++ (p1 \\ p2) ++ (reduceIntersections p1 p2)
-
-reduceIntersections :: Polynomial -> Polynomial -> Polynomial
-reduceIntersections p1 p2 =
-  let
-    first (p, _) = p
-    second (_, p) = p
-    s [] res = reverse res
-    s (x : xs) res = s xs (IP((power (first x)), (value (first x)) + (value(second x))) : res)
-  in
-    s (zip (sort(intersectBy (\x y -> x == y) p1 p2))  (sort(intersectBy (\x y -> x == y) p2 p1)) ) []
-
+-- Change sign
 invertPolynomial :: Polynomial -> Polynomial
-invertPolynomial p = map (inv) p
-  where inv pp = IP ((power pp), negate (value pp))
+invertPolynomial p = Polynomial [negate t | t <- terml p]
 
-substractPolynomials :: Polynomial -> Polynomial -> Polynomial
-substractPolynomials p1 p2 = sumPolynomials p1 (invertPolynomial p2)
+a1 = IT (0, 1.0)
+a2 = IT (1, -2.0)
+a3 = IT (2, 3.0)
+p = Polynomial [a1, a2, a3]
 
-convertToNormalForm :: Polynomial -> [Double]
-convertToNormalForm p =
-  let
-    pl = reverse $ [x | x <- [0 .. head $ reverse $ sort (powerList p)]]
-    iter  [] res = reverse res
-    iter (x : xs) res = iter xs ((findValueByPower p x) : res)
-  in
-    iter pl []
-
-reverseConvert :: [Double] -> Polynomial
-reverseConvert bareList =
-  let
-    rc' c [] res = reverse res
-    rc' c (x:xs) res = rc' (c-1)
-                           xs
-                           (if (x /= 0.0) then (IP (c, x) : res) else res)
-  in
-    rc' (length (bareList) - 1) bareList []
-
-multiplyPolynomials :: Polynomial -> Polynomial -> Polynomial
-multiplyPolynomials p1 p2 =
-  let
-    timesPoly c p1 = map (c*) p1
-    -- Multiply two polynomials
-    multPoly [] p2 = []
-    multPoly (p:p1) p2 =
-      let
-        multiplyByX p = 0:p
-
-        pTimesP2 = timesPoly p p2
-        xTimesP1TimesP2 = multiplyByX $ multPoly p1 p2
-
-        addPoly [] []     = []
-        addPoly (x:xs) [] = x : addPoly xs []
-        addPoly [] (y:ys) = y : addPoly [] ys
-        addPoly (x:xs) (y:ys) = x + y : addPoly xs ys
-      in
-        addPoly pTimesP2 xTimesP1TimesP2
-  in
-    reverseConvert ( multPoly (convertToNormalForm p1) (convertToNormalForm p2) )
-
-
-test =
-  let
-    poly1 = IP (2, 5.0)
-    poly2 = IP (0, 2.0)
-    poly = [poly1, poly2]
-    poly3 = IP (2, 6.0)
-    poly4 = IP (1, 8.0)
-    poly' = [poly3, poly4]
-  in
-    -- printPolynomal (substractPolynomials poly poly')
-    printPolynomal $ multiplyPolynomials poly poly'
+a00' = IT (5, 10.0)
+a0' = IT (4, 7.0)
+a1' = IT (3, 4.0)
+a2' = IT (2, 8.0)
+p' = Polynomial [ a0', a1', a2']
 
 main = do
-  print $ test
+  print $ a1 -- Check output of x^0
+  print $ a2 -- Check output of x^1
+  print $ a3 -- Check output of x^(>= 2)
+  print $ p -- Check the whole polynomial print
+  print $ p'
+  print $ invertPolynomial p -- check terml values inversion
+  print $ invertPolynomial p' -- check terml values inversion
+  print $ p == p -- Equality - positive
+  print $ p == invertPolynomial p -- Equality - negaite
+  print $ p == p' -- Equality - negative
+  print $ p + p' -- Addition of p and p'
+  print $ p + (invertPolynomial p) -- Should get zero
+  print $ p - p' -- Substraction
+  print $ p - p  -- Should get zero
+  print $ p * p' -- Multiplication
+  print $ abs p
