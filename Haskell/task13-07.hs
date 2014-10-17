@@ -62,7 +62,7 @@ instance Show Polynomial where
         | otherwise = ""
     in
       if value (head p) > 0
-      then v
+      then tail v
       else if v == "" then "0.0" else v
 
 instance Eq Polynomial where
@@ -86,7 +86,7 @@ instance Num Polynomial where
                    (sort(intersectBy (\x y -> x == y) p' p)) ) []
 
   Polynomial a - Polynomial a' =
-    Polynomial a + (invertPolynomial (Polynomial a'))
+    Polynomial a + (negate (Polynomial a'))
 
   Polynomial a * Polynomial a' =
     Polynomial (multIter (terml (Polynomial a)) (terml (Polynomial a')) [])
@@ -97,7 +97,7 @@ instance Num Polynomial where
         multIter _ _ res = res
 
   abs (Polynomial a) = Polynomial [abs x | x <- a]
-
+  negate (Polynomial a) = Polynomial [negate t | t <- a]
 
 -- Helping functions
 
@@ -105,35 +105,46 @@ instance Num Polynomial where
 terml :: Polynomial -> [Term]
 terml (Polynomial p) = p
 
--- Change sign
-invertPolynomial :: Polynomial -> Polynomial
-invertPolynomial p = Polynomial [negate t | t <- terml p]
-
 a1 = IT (0, 1.0)
 a2 = IT (1, -2.0)
 a3 = IT (2, 3.0)
 p = Polynomial [a1, a2, a3]
 
-a00' = IT (5, 10.0)
 a0' = IT (4, 7.0)
 a1' = IT (3, 4.0)
 a2' = IT (2, 8.0)
 p' = Polynomial [ a0', a1', a2']
 
 main = do
-  print $ a1 -- Check output of x^0
-  print $ a2 -- Check output of x^1
-  print $ a3 -- Check output of x^(>= 2)
-  print $ p -- Check the whole polynomial print
+  putStrLn "Check output of x^0:"
+  print $ a1
+  putStrLn "Check output of x^1:"
+  print $ a2
+  putStrLn "Check output of x^(>= 2):"
+  print $ a3
+  putStrLn "Check the whole polynomial print:"
+  print $ p
+  putStrLn "Same:"
   print $ p'
-  print $ invertPolynomial p -- check terml values inversion
-  print $ invertPolynomial p' -- check terml values inversion
-  print $ p == p -- Equality - positive
-  print $ p == invertPolynomial p -- Equality - negaite
-  print $ p == p' -- Equality - negative
-  print $ p + p' -- Addition of p and p'
-  print $ p + (invertPolynomial p) -- Should get zero
-  print $ p - p' -- Substraction
-  print $ p - p  -- Should get zero
-  print $ p * p' -- Multiplication
+  putStrLn "Invert polynomial:"
+  print $ negate p
+  putStrLn "Same:"
+  print $ negate p'
+  putStrLn "Check p == p:"
+  print $ p == p
+  putStrLn "Check p == !p:"
+  print $ p == negate p
+  putStrLn "Check p == p':"
+  print $ p == p'
+  putStrLn "Addition p + p':"
+  print $ p + p'
+  putStrLn "Addition of inverse p p + neg p, should be zero:"
+  print $ p + (negate p)
+  putStrLn "Substration p - p':"
+  print $ p - p'
+  putStrLn "Substraction p - p, should be zero:"
+  print $ p - p
+  putStrLn "Multiplication p * p':"
+  print $ p * p'
+  putStrLn "Absolute value of p:"
   print $ abs p
