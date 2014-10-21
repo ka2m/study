@@ -50,6 +50,32 @@ findTerm (x : xs) y
   | power x == power y = x
   | otherwise = findTerm xs y
 
+normalize :: [Term] -> [Term]
+normalize a =
+  let
+    reduce x xs = foldl (+) (IT (x, 0.0)) xs
+
+    iter [] res = res
+    iter (x : xs) res =
+      let
+        (same, diff) = partition (\y -> power y == power x) (x : xs)
+      in
+        iter diff [reduce (power x) same] ++ res
+  in
+    sort (filter (\x -> value x /= 0) (iter a []))
+
+-- Unwrap
+terml :: Polynomial -> [Term]
+terml (Polynomial p) = p
+
+
+powp :: Polynomial -> Int
+powp (Polynomial a) = power y where
+  y = if null (normalize a)
+      then IT (0, 0.0)
+      else (normalize a) !! 0
+
+
 -- Polynomial instances
 
 instance Show Polynomial where
@@ -99,12 +125,10 @@ instance Num Polynomial where
   abs (Polynomial a) = Polynomial [abs x | x <- a]
   negate (Polynomial a) = Polynomial [negate t | t <- a]
 
--- Helping functions
 
--- Unwrap
-terml :: Polynomial -> [Term]
-terml (Polynomial p) = p
 
+
+-- Examples
 a1 = IT (0, 1.0)
 a2 = IT (1, -2.0)
 a3 = IT (2, 3.0)
@@ -148,3 +172,5 @@ main = do
   print $ p * p'
   putStrLn "Absolute value of p:"
   print $ abs p
+  putStrLn "p / p':"
+  print $ division p p'
