@@ -87,13 +87,13 @@ instance Show Polynomial where
         | value x < 0 = "-" ++ show (abs x)
         | otherwise = ""
     in
-      if value (head p) > 0
+      if (length p /= 0) && value (head p) > 0
       then tail v
       else if v == "" then "0.0" else v
 
 instance Eq Polynomial where
-  Polynomial a == Polynomial a' =  a == a' && vall a == vall a' where
-    vall p = [x | IT (_, x) <- p]
+  Polynomial a == Polynomial a' = vall a == vall a' where
+    vall p = normalize p
 
 instance Num Polynomial where
   Polynomial a + Polynomial a' =
@@ -105,11 +105,11 @@ instance Num Polynomial where
             s' (_, p) = p
             s [] res = reverse res
             s (x : xs) res = s xs
-                               ( IT (power (f' x),
+                               (IT (power (f' x),
                                     value (f' x) + value (s' x)) : res)
           in
             s (zip (sort(intersectBy (\x y -> x == y) p p'))
-                   (sort(intersectBy (\x y -> x == y) p' p)) ) []
+                   (sort(intersectBy (\x y -> x == y) p' p))) []
 
   Polynomial a - Polynomial a' =
     Polynomial a + (negate (Polynomial a'))
@@ -125,7 +125,45 @@ instance Num Polynomial where
   abs (Polynomial a) = Polynomial [abs x | x <- a]
   negate (Polynomial a) = Polynomial [negate t | t <- a]
 
+instance Real Polynomial where
+  toRational a = 0.0
 
+instance Ord Polynomial where
+  a <= b = powp a <= powp b
+
+instance Enum Polynomial where
+  toEnum a = Polynomial [IT (0, 0.0)]
+  fromEnum a = 1
+
+
+instance Integral Polynomial where
+  a `div` a' =
+    let
+      ta = Polynomial (normalize (terml a))
+      ta' = Polynomial (normalize (terml a'))
+
+      iter a a' res
+        | powp a < powp a'
+          || null (normalize (terml a))
+          || null (normalize (terml a')) = Polynomial (reduce' res [])
+        | otherwise =
+          let
+            t = head (normalize (terml a))
+            t' = head (normalize (terml a'))
+            tp = power t
+            tp' = power t'
+            t'' = IT (tp - tp', (value t) / (value t'))
+            tmp'' = Polynomial [t''] * a'
+            sub = a - tmp''
+          in
+            iter sub a' ([t''] ++ res)
+    in
+      iter ta ta' []
+
+  a `mod` a' = a - (a `div` a') * a'
+  a `divMod` a' = (a `div` a', a `mod` a')
+  a `quotRem` a' = (a, a')
+  toInteger a = 0
 
 
 -- Examples
@@ -133,11 +171,12 @@ a1 = IT (0, 1.0)
 a2 = IT (1, -2.0)
 a3 = IT (2, 3.0)
 p = Polynomial [a1, a2, a3]
+p'' = Polynomial [a2, a1, a3]
 
 a0' = IT (4, 7.0)
 a1' = IT (3, 4.0)
 a2' = IT (2, 8.0)
-p' = Polynomial [ a0', a1', a2']
+p' = Polynomial [a0', a1', a2']
 
 main = do
   putStrLn "Check output of x^0:"
@@ -154,8 +193,8 @@ main = do
   print $ negate p
   putStrLn "Same:"
   print $ negate p'
-  putStrLn "Check p == p:"
-  print $ p == p
+  putStrLn "Check p == p'':"
+  print $ p == p''
   putStrLn "Check p == !p:"
   print $ p == negate p
   putStrLn "Check p == p':"
@@ -172,5 +211,10 @@ main = do
   print $ p * p'
   putStrLn "Absolute value of p:"
   print $ abs p
-  putStrLn "p / p':"
-  print $ division p p'
+  putStrLn "p' div p:"
+  print $  p' `div` p
+  putStrLn "p' / p (should give 0.0):"
+  print $  p `div` p'
+  print $ divMod p p''
+  print $ divMod p p'
+  print $ divMod p' p

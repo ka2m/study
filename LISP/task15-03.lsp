@@ -1,1 +1,1 @@
-(print  (let ( (L '(((A B C D) (E (X) F)) G H)))    (caddr (caar L)))) ; get 3rd atom ( C ) from the list
+(print  (let ((L '(((A B C D) (E (X) F)) G H)))    (car (cddr L)))) ;
