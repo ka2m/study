@@ -1,1 +1,1 @@
-(print  (let ((L '(((A B C D) (E (X) F)) G H)))    (car (cddr L)))) ;
+(print  (let ((L '(((A B C D) (E (X) F)) G H)))    (caadr ; get X from (E (X) F )      (cadar L)))) ; get (E (X) F)
