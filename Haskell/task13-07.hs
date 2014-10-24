@@ -1,4 +1,5 @@
 import Data.List
+import Numeric
 
 -- Classes definition
 
@@ -37,10 +38,14 @@ instance Num Term where
   negate (IT (a, b)) = IT (a, negate b)
 
 instance Show Term where
-  show (IT (x, y))
-    | x == 0 && y /= 0 =  show y
-    | x == 1 = show y ++ "x"
-    | otherwise = show y ++ "x^" ++ show x
+  show (IT (x, y)) =
+    let
+      s (_, x) = x
+      sh' = showFFloat (Just (if s (properFraction y) == 0 then 0 else 2)) y ""
+    in
+      if x == 0 && y /= 0 then sh'
+      else if x == 1      then sh' ++ "x"
+      else sh' ++ "x^" ++ show x
 
 -- Helping functions
 
@@ -55,7 +60,7 @@ normalize a =
   let
     reduce x xs = foldl (+) (IT (x, 0.0)) xs
 
-    iter [] res = res
+    iter [] res       = res
     iter (x : xs) res =
       let
         (same, diff) = partition (\y -> power y == power x) (x : xs)
@@ -68,13 +73,11 @@ normalize a =
 terml :: Polynomial -> [Term]
 terml (Polynomial p) = p
 
-
 powp :: Polynomial -> Int
 powp (Polynomial a) = power y where
   y = if null (normalize a)
       then IT (0, 0.0)
       else (normalize a) !! 0
-
 
 -- Polynomial instances
 
@@ -97,30 +100,25 @@ instance Eq Polynomial where
 
 instance Num Polynomial where
   Polynomial a + Polynomial a' =
-    Polynomial (sort ((a \\ a') ++ (a' \\ a) ++ (reduce a a')))
-      where
-        reduce p p' =
-          let
-            f' (p, _) = p
-            s' (_, p) = p
-            s [] res = reverse res
-            s (x : xs) res = s xs
-                               (IT (power (f' x),
-                                    value (f' x) + value (s' x)) : res)
-          in
-            s (zip (sort(intersectBy (\x y -> x == y) p p'))
-                   (sort(intersectBy (\x y -> x == y) p' p))) []
+    Polynomial (sort ((a \\ a') ++
+                      (a' \\ a) ++
+                      normalize ((intersectBy (\x y -> x == y) a a') ++
+                                 (intersectBy (\x y -> x == y) a' a))))
 
   Polynomial a - Polynomial a' =
     Polynomial a + (negate (Polynomial a'))
 
   Polynomial a * Polynomial a' =
-    Polynomial (multIter (terml (Polynomial a)) (terml (Polynomial a')) [])
+    Polynomial (normalize (multIter a a' []))
       where
-        multIter [] [] res = res
-        multIter (x : xs) [] res = multIter xs (terml (Polynomial a')) res
-        multIter (x : xs) (y : ys) res = multIter (x : xs) ys [x * y] ++ res
-        multIter _ _ res = res
+        multIter [] [] res             = res
+        multIter (x : xs) [] res       = multIter xs
+                                                  (terml (Polynomial a'))
+                                                  res
+        multIter (x : xs) (y : ys) res = multIter (x : xs)
+                                                  ys
+                                                  [x * y] ++ res
+        multIter _ _ res               = res
 
   abs (Polynomial a) = Polynomial [abs x | x <- a]
   negate (Polynomial a) = Polynomial [negate t | t <- a]
@@ -135,7 +133,6 @@ instance Enum Polynomial where
   toEnum a = Polynomial [IT (0, 0.0)]
   fromEnum a = 1
 
-
 instance Integral Polynomial where
   a `div` a' =
     let
@@ -145,7 +142,7 @@ instance Integral Polynomial where
       iter a a' res
         | powp a < powp a'
           || null (normalize (terml a))
-          || null (normalize (terml a')) = Polynomial (reduce' res [])
+          || null (normalize (terml a')) = Polynomial (res)
         | otherwise =
           let
             t = head (normalize (terml a))
@@ -164,7 +161,6 @@ instance Integral Polynomial where
   a `divMod` a' = (a `div` a', a `mod` a')
   a `quotRem` a' = (a, a')
   toInteger a = 0
-
 
 -- Examples
 a1 = IT (0, 1.0)
@@ -212,9 +208,9 @@ main = do
   putStrLn "Absolute value of p:"
   print $ abs p
   putStrLn "p' div p:"
-  print $  p' `div` p
+  print $ p' `div` p
   putStrLn "p' / p (should give 0.0):"
-  print $  p `div` p'
+  print $ p `div` p'
   print $ divMod p p''
   print $ divMod p p'
   print $ divMod p' p
