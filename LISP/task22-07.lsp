@@ -10,15 +10,15 @@
        (,iter)))))
 
 (defmacro prod-range ((iter-var low-bound high-bound) &body body)
-  (let ((func-name (gensym)) (prod (gensym)))
+  (let ((iter (gensym)) (prod (gensym)))
     `(let ((,iter-var ,low-bound) (,prod 1))
-       (labels ((,func-name ()
+       (labels ((,iter ()
                   (if (<= ,iter-var ,high-bound)
                       (progn (setq ,prod (* ,prod (progn ,@body)))
                              (incf ,iter-var)
-                             (,func-name))
+                             (,iter))
                       ,prod)))
-       (,func-name)))))
+       (,iter)))))
 
 
 (print (sum-range (i 0 5) (sin i)))
