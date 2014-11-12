@@ -7,7 +7,7 @@
                              (incf ,iter-var)
                              (,iter))
                       ,sum)))
-       (,iter)))))
+                (,iter)))))
 
 (defmacro prod-range ((iter-var low-bound high-bound) &body body)
   (let ((iter (gensym)) (prod (gensym)))
@@ -18,8 +18,10 @@
                              (incf ,iter-var)
                              (,iter))
                       ,prod)))
-       (,iter)))))
+                (,iter)))))
 
+; task 20 variant 19
+(defun y (N)
+  (sum-range (i 1 N) (sum-range (j 1 N) (+ (sqrt i) (* j j)))))
 
-(print (sum-range (i 0 5) (sin i)))
-(print (prod-range (i 0 5) (sin i)))
+(print (y 20))
