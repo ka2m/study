@@ -6,6 +6,7 @@ def ineffective_z_func(s):
 
     return res
 
+
 def effective_z_func(s):
     res = [0] * len(s)
     l = 0
@@ -23,10 +24,12 @@ def effective_z_func(s):
 
     return res
 
+print ineffective_z_func('abacaba')
 print ineffective_z_func('aaabaab')
 print ineffective_z_func('aaaaaaa')
 print ineffective_z_func('abracadabra')
 
+print effective_z_func('abacaba')
 print effective_z_func('aaabaab')
 print effective_z_func('aaaaaaa')
 print effective_z_func('abracadabra')
