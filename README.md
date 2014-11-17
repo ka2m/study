@@ -28,3 +28,8 @@ Graph:
 * Kruskal with DSU
 * Prim
 * Connected Components
+
+Z-Functions:
+
+* Z-Function
+* Prefix function
