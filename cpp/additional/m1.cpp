@@ -4,20 +4,17 @@ using namespace std;
 
 double f (double x, double eps, int& ncount)
 {
-    ncount += 1;
     double step = 1;
     double s = 0;
     int fact = 3;
-    int factn = 3;
     int t = -1;
     while (fabs(step)>=eps)
     {
         s += step;
         step *= t*x*x/fact;
         ncount ++;
-        factn ++;
+        fact += 2;
         t = -t;
-        fact *= factn;
     }
     return s;
 }
@@ -35,7 +32,7 @@ int main (void)
     {
         int ncount = 0;
         double fx = f(a, eps, ncount);
-        printf("%d\t%4.5f\t%4.5f\t%d\n", i, a, fx, ncount);
+        printf("%d\t%2.1f\t%4.5f\t\t%d\n", i, a, fx, ncount);
         i++;
     }
 }
