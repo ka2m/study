@@ -1,15 +1,10 @@
-llength([], 0).
-llength([H | T], N) :- llength(T, N1), N is N1+1.
-
-add(X, [], [X]).
+add(X, [], [X]) :- !.
 add(X, [A|L], [A|L1]) :- add(X, L, L1).
 
-insert(L, V, 0, [V|L]).
-insert([H | T], V, N, R) :- Nn is N-1, insert(T, V, Nn, R0), R = [H | R0].
+task(_, RP, -1, [], RL, RL) :- !.
+task(V, RP, CP, [], L, RL) :- CP /= -1, NP is CP + 1, add(-1000, L, RR), task(V, RP, NP, [], RR, RL).
+task(_, RP, -1, [H | T], L, RL) :- add(H, L, RR), task(V, RP, -1, T, RR, RL).
+task(V, RP, RP, IL, L, RL) :- add(V, L, RR), task(V, RP, -1, IL, RR, RL).
+task(V, RP, CP, [H | T], L, RL) :- NP is CP + 1, add(H, L, RR), task(V, RP, NP, T, RR, RL).
 
-mytask(L, V, N, N, R).
-mytask(L, V, N, _, R) :- llength(L, LL), N < LL, insert(L, V, N, R).
-mytask(L, V, N, _, R) :- llength(L, LL), N >= LL, mytask(add(V, R, R1), V, N, LL, add(V, R, R1)).
-
-
-task :- mytask([1,2], 3, 2, 0, R), write(R).
+calltask(V, P, L) :- task(V, P, 0, L, [], R), write(R), !.
