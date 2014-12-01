@@ -8,7 +8,10 @@ int main (void)
   string s;
   getline(cin, s);
   char* token;
-  char delims[] = " ,.-;!?:";
+  char delims[] = " ,-;:";
+  // c_str(): string -> const char *
+  // strtok(char *, char *) -> char *
+  // strdup(const char *) -> char *
   token = strtok(strdup(s.c_str()), delims);  
   int maxlen = 0;
   while (token != NULL)
@@ -16,7 +19,7 @@ int main (void)
     if (strlen(token) > maxlen)
         maxlen = strlen(token);
     cout << token << endl;
-    token = strtok (NULL, delims);
+    token = strtok(NULL, delims);
   }
   cout << maxlen;
 }
