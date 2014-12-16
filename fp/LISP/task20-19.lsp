@@ -1,0 +1,1 @@
+(defun y (N)  (labels    ((ij−func (i j) ; eval ij-term of sum       (+ (sqrt i) (* j j)))     (y-iter (i j insum res) ; eval sum       (cond ((> i N) res)             ((> j N) (y-iter (+ i 1) 1 0 (+ res insum)))             (T (y-iter i (+ j 1) (+ insum (ij-func i j)) res)))))    (y-iter 1 1 0 0))) ; start with these values

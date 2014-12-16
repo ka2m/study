@@ -1,0 +1,1 @@
+(print  (let ((3rd (cons 'C (cons 'D ())))        (4th          (cons (cons 'X (cons 'E ()))              (cons 'F                (cons 'G ())))))    (cons 'A        (cons 'B          (cons 3rd            (cons 4th              (cons 'H ())))))))
