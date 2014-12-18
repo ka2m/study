@@ -8,8 +8,8 @@ int** iter(int** a, int** b, int n)
   int** res = new int* [n];
 
   for (int i = 0; i < n; i++) {
-    res[i]=new int[n];
-    for (int j=0;j<n;j++)
+    res[i] = new int[n];
+    for (int j = 0;j < n;j++)
       res[i][j] = 0;
   }
 
@@ -27,8 +27,8 @@ int** power(int** a, int** b, int n, int s)
 
   int** res = new int* [n];
   for (int i = 0; i < n; i++) {
-    res[i]=new int[n];
-    for (int j=0;j<n;j++) 
+    res[i] = new int[n];
+    for (int j = 0;j < n; j++) 
       res[i][j] = 0;
   }
 
@@ -45,11 +45,11 @@ int** power(int** a, int** b, int n, int s)
 }
 
 
-int main (void)
+int main(void)
 {
 
-  ifstream in ("input.txt");
-  ofstream out ("output.txt");
+  ifstream in("input.txt");
+  ofstream out("output.txt");
   
   int n;
   in >> n;
@@ -65,8 +65,8 @@ int main (void)
   
   int s;
   in >> s;
-  for ( int i = 0; i < n; i++)
-    for ( int j = 0; j < n; j++)
+  for (int i = 0; i < n; i++)
+    for (int j = 0; j < n; j++)
       {
         in >> a[i][j];
         b[i][j] = a[i][j];
