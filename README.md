@@ -13,18 +13,18 @@ It is:
 Detailed overview
 =================
 
-Sorting:
+Sorting (Python):
 
 * Heapsort
 * Quicksort
 * Mergesort
 
-Hash Tables:
+Hash Tables (Python):
 
 * Hash Table with open double hashing function
 * Hash Table with chaininng hashing
 
-Graph:
+Graph (Python):
 
 * BFS
 * DFS
@@ -35,7 +35,7 @@ Graph:
 * Prim
 * Connected Components
 
-Z-Functions:
+Z-Functions (Python):
 
 * Z-Function
 * Prefix function
