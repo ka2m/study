@@ -1,15 +1,17 @@
 #include <iostream>
 #include <fstream>
+#include <cstdio>
+
 using namespace std;
 
 
 int** iter(int** a, int** b, int n)
 {
-  int** res = new int* [n];
+  int** res = new int*[n];
 
   for (int i = 0; i < n; i++) {
     res[i] = new int[n];
-    for (int j = 0;j < n;j++)
+    for (int j = 0; j<n; j++)
       res[i][j] = 0;
   }
 
@@ -25,35 +27,33 @@ int** iter(int** a, int** b, int n)
 int** power(int** a, int** b, int n, int s)
 {
 
-  int** res = new int* [n];
+  int** res = new int*[n];
   for (int i = 0; i < n; i++) {
     res[i] = new int[n];
-    for (int j = 0;j < n; j++) 
-      res[i][j] = 0;
+    for (int j = 0; j < n; j++)
+    res[i][j] = 0;
   }
 
   res = iter(a, b, n);
 
   if (s == 1) return res;
-  
+
   for (int i = 2; i < s; i++) {
     res = iter(res, b, n);
   }
 
   return res;
-
 }
 
 
 int main(void)
 {
+  freopen("input.txt", "r", stdin);
+  freopen("output.txt", "w", stdout);
 
-  ifstream in("input.txt");
-  ofstream out("output.txt");
-  
   int n;
-  in >> n;
-  
+  cin » n;
+
   int** a = new int *[n];
   int** b = new int *[n];
   int** r = new int *[n];
@@ -62,22 +62,23 @@ int main(void)
     b[i] = new int[n];
     r[i] = new int[n];
   }
-  
+
   int s;
-  in >> s;
+  cin >> s;
   for (int i = 0; i < n; i++)
     for (int j = 0; j < n; j++)
-      {
-        in >> a[i][j];
-        b[i][j] = a[i][j];
-        r[i][j] = 0;
-      }
-  
+    {
+      cin >> a[i][j];
+      b[i][j] = a[i][j];
+      r[i][j] = 0;
+    }
+
   r = power(a, b, n, s);
 
   for (int i = 0; i < n; i++) {
     for (int j = 0; j < n; j++)
-      out << r[i][j] << " ";
-    out << endl;
-  }
+      cout << r[i][j] << " ";
+    cout << endl;
+    }
+
 }
