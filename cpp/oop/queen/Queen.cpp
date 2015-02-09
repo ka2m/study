@@ -2,6 +2,7 @@
 
 bool Queen::canAttack(int aCol, int aRow) {
 		if (col == aCol) return true;
+		if (row == aRow) return true;
 		if (abs(col - aCol) == abs(row - aRow)) return true;
 
 		if (!nb) return false;
@@ -28,16 +29,22 @@ bool Queen::findSolution() {
 		if (!nb) return true;
 
 		if (nb->canAttack(col, row)) {
-				while (this->advance())
-					if (!(nb->canAttack(col, row)))
-						return true;
+				while (nb->canAttack(col, row))
+					if (!(this->advance()))
+						return false;
 		}
-		return false;
+		return true;
 }
 
 void Queen::print() {
 	if (nb) nb->print();
-	std::cout << row << " " << col << std::endl;
+	for (int i = 0; i < 8; i++) {
+		if (row == i) 
+			std::cout << "*"; 
+		else
+			std::cout << "_";
+	}
+	std::cout << std::endl;
 }
 
 
