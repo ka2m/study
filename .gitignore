@@ -17,3 +17,4 @@ workspace.xml
 advanced/target
 maze2
 .idea
+__pycache__
