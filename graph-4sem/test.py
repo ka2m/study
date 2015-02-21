@@ -1,5 +1,4 @@
-from graphfau import Graph
+from graphfau import BaseGraph
 
-g = Graph.Graph('data')
-
-
+g = BaseGraph.BaseGraph('data')
+print(g)
