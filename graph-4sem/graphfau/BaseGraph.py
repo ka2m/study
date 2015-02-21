@@ -20,6 +20,15 @@ class BaseGraph:
             except IOError as e:
                 print('Unable to open file: %s\nCreating empty graph' % e)
 
+    def get_adjlist_by_vertex(self, vertex):
+        l = []
+        try:
+            l = self.adj[str(vertex)]
+        except KeyError:
+            print('No such vertex: %d' % vertex)
+        finally:
+            return l
+
     def add_vertex(self, key):
         self.vertexes.append(key)
         self.adj[key] = []
