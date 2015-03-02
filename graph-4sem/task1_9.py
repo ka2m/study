@@ -8,9 +8,6 @@ g = BaseGraph.BaseGraph('data')
 print(g)
 print('-----')
 
-print(outcomingVertexes(g, 0))
+v = input('outcomingVertexes: enter desired vertex to check: ')
 
-print('-----')
-
-print(outcomingVertexes(g, 23))
-print('-----')
+print(outcomingVertexes(g, v))

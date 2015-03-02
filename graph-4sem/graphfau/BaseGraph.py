@@ -6,11 +6,9 @@ class BaseGraph:
     adj = {}
 
     def __init__(self, filename=None):
-        if not filename is None:
+        if filename is not None:
             try:
                 with open(filename, 'r') as f:
-                    # skip first line
-                    f.readline()
                     for line in f.read().splitlines():
                         vfrom = line.split(':')[0]
                         self.add_vertex(vfrom)
@@ -25,7 +23,7 @@ class BaseGraph:
         try:
             l = self.adj[str(vertex)]
         except KeyError:
-            print('No such vertex: %d' % vertex)
+            print('No such vertex: %s' % vertex)
         finally:
             return l
 
@@ -43,14 +41,14 @@ class BaseGraph:
         self.add_arc(vto, vfrom)
 
     def remove_arc(self, vfrom, vto):
-        if not vfrom in self.adj.keys():
+        if vfrom not in self.adj.keys():
             raise Exception('Vertex %d not found' % vfrom)
-        if not vto in self.adj[vfrom]:
+        if vto not in self.adj[vfrom]:
             raise Exception('Arc %d - %d not found' % (vfrom, vto))
 
         self.adj[vfrom].remove(vto)
 
-    def remove_edege(self, vfrom, vto):
+    def remove_edge(self, vfrom, vto):
         self.remove_arc(vfrom, vto)
         self.remove_arc(vto, vfrom)
 
