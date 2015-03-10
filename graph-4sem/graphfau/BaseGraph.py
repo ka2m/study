@@ -1,5 +1,7 @@
 __author__ = 'fau'
 
+import copy
+
 
 class BaseGraph:
     vertexes = []
@@ -17,6 +19,12 @@ class BaseGraph:
 
             except IOError as e:
                 print('Unable to open file: %s\nCreating empty graph' % e)
+
+    def __deepcopy__(self, memo):
+        dup = BaseGraph()
+        dup.vertexes = copy.deepcopy(self.vertexes)
+        dup.adj = copy.deepcopy(self.adj)
+        return dup
 
     def get_adjlist_by_vertex(self, vertex):
         l = []
@@ -51,6 +59,16 @@ class BaseGraph:
     def remove_edge(self, vfrom, vto):
         self.remove_arc(vfrom, vto)
         self.remove_arc(vto, vfrom)
+
+    def remove_vertex(self, vertex):
+        if str(vertex) not in self.vertexes:
+            raise Exception('Vertex %d not found' % vertex)
+        self.vertexes.remove(str(vertex))
+        del self.adj[str(vertex)]
+        for v in self.adj.keys():
+            if vertex in self.adj[v]:
+                self.adj[v].remove(vertex)
+
 
     def degree(self, vertex):
         try:
