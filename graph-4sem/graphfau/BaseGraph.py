@@ -19,7 +19,6 @@ class BaseGraph:
                         if vfrom not in self.vertices:
                             self.add_vertex(int(vfrom))
                             self.adj[int(vfrom)] = set()
-                        print self.vertices
                         for vto in eval('[' + line.split(':')[1] + ']'):
                             if not directed:
                                 self.add_edge(vfrom, vto)
@@ -51,15 +50,12 @@ class BaseGraph:
             self.vertices.append(key)
 
     def add_arc(self, vfrom, vto):
-        print vfrom, vto
-        print self.vertices
         if type(vfrom) is not int:
             vfrom = int(vfrom)
         if type(vto) is not int:
             vto = int(vto)
 
         if vto not in self.vertices:
-            print vto
             self.add_vertex(vto)
             self.adj[vto] = set()
         if vfrom not in self.adj:
@@ -124,4 +120,4 @@ class BaseGraph:
                                                                        for y in
                                                                        self.
                                                                        adj[x])))
-                                                for x in self.adj.keys()))
+                                              for x in self.adj.keys()))
