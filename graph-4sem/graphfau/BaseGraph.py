@@ -5,7 +5,7 @@ import operator
 
 
 class BaseGraph:
-    vertexes = []
+    vertices = []
     adj = {}
 
     def __init__(self, directed=False, filename=None):
@@ -26,7 +26,7 @@ class BaseGraph:
 
     def __deepcopy__(self, memo):
         dup = BaseGraph()
-        dup.vertexes = copy.deepcopy(self.vertexes)
+        dup.vertices = copy.deepcopy(self.vertices)
         dup.adj = copy.deepcopy(self.adj)
         return dup
 
@@ -42,7 +42,7 @@ class BaseGraph:
             return l
 
     def add_vertex(self, key):
-        self.vertexes.append(key)
+        self.vertices.append(key)
         self.adj[key] = set()
 
     def add_arc(self, vfrom, vto):
@@ -70,7 +70,7 @@ class BaseGraph:
         if type(vertex) is not str:
             vertex = str(vertex)
         try:
-            self.vertexes.remove(vertex)
+            self.vertices.remove(vertex)
             del self.adj[vertex]
         except KeyError:
             print 'Vertex %d not found' % vertex
@@ -87,12 +87,12 @@ class BaseGraph:
         except KeyError:
             print('Vertex %d not found' % vertex)
 
-    def count_vertexes(self):
-        return len(self.vertexes)
+    def count_vertices(self):
+        return len(self.vertices)
 
     def count_arcs(self):
         return reduce(operator.add,
-                      map(lambda x: self.degree(x), self.vertexes), 0)
+                      map(lambda x: self.degree(x), self.vertices), 0)
 
     def __str__(self):
         return '%d\n%s\n' % (len(self.adj), '\n'.join('%s:%s' %
