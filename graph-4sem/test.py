@@ -1,7 +1,4 @@
-from graphfau import BaseGraph
+from graphfau.WGraph import WGraph
 
-g = BaseGraph.BaseGraph('data')
-print(g)
-
-g.remove_vertex(2)
+g = WGraph(filename='wdata')
 print(g)

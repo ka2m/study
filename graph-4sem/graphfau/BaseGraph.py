@@ -16,8 +16,10 @@ class BaseGraph:
                 with open(filename, 'r') as f:
                     for line in f.read().splitlines():
                         vfrom = line.split(':')[0]
-                        self.add_vertex(int(vfrom))
-                        self.adj[int(vfrom)] = set()
+                        if vfrom not in self.vertices:
+                            self.add_vertex(int(vfrom))
+                            self.adj[int(vfrom)] = set()
+                        print self.vertices
                         for vto in eval('[' + line.split(':')[1] + ']'):
                             if not directed:
                                 self.add_edge(vfrom, vto)
@@ -45,14 +47,21 @@ class BaseGraph:
             return l
 
     def add_vertex(self, key):
-        self.vertices.append(key)
+        if key not in self.vertices:
+            self.vertices.append(key)
 
     def add_arc(self, vfrom, vto):
+        print vfrom, vto
+        print self.vertices
         if type(vfrom) is not int:
             vfrom = int(vfrom)
         if type(vto) is not int:
             vto = int(vto)
 
+        if vto not in self.vertices:
+            print vto
+            self.add_vertex(vto)
+            self.adj[vto] = set()
         if vfrom not in self.adj:
             self.adj[vfrom] = set()
         self.adj[vfrom].add(vto)
@@ -109,9 +118,10 @@ class BaseGraph:
                       map(lambda x: self.degree(x), self.vertices), 0)
 
     def __str__(self):
-        return '%d\n%s\n' % (len(self.adj),
-                             '\n'.join('%d:%s' % (x,
-                                                  str(', '.join(str(y)
-                                                                for y in
-                                                                self.adj[x])))
-                                       for x in self.adj.keys()))
+        return 'D: %s\n%d\n%s\n' % (self.directed, len(self.adj),
+                                    '\n'.join('%d:%s' % (x,
+                                                         str(', '.join(str(y)
+                                                                       for y in
+                                                                       self.
+                                                                       adj[x])))
+                                                for x in self.adj.keys()))
