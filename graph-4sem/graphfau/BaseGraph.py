@@ -16,7 +16,7 @@ class BaseGraph:
                 with open(filename, 'r') as f:
                     for line in f.read().splitlines():
                         vfrom = line.split(':')[0]
-                        self.add_vertex(str(vfrom))
+                        self.add_vertex(int(vfrom))
                         for vto in eval('[' + line.split(':')[1] + ']'):
                             if not directed:
                                 self.add_edge(vfrom, vto)
@@ -33,21 +33,25 @@ class BaseGraph:
         return dup
 
     def get_adjlist_by_vertex(self, vertex):
-        if type(vertex) is not str:
-            vertex = str(vertex)
+        if type(vertex) is not int:
+            vertex = int(vertex)
         l = set()
         try:
             l = self.adj[vertex]
         except KeyError:
-            print('No such vertex: %s' % vertex)
+            print('No such vertex: %d' % vertex)
         finally:
             return l
 
     def add_vertex(self, key):
         self.vertices.append(key)
-        self.adj[key] = set()
 
     def add_arc(self, vfrom, vto):
+        if type(vfrom) is not int:
+            vfrom = int(vfrom)
+        if type(vto) is not int:
+            vto = int(vto)
+
         if vfrom not in self.adj:
             self.adj[vfrom] = set()
         self.adj[vfrom].add(vto)
@@ -57,10 +61,10 @@ class BaseGraph:
         self.add_arc(vto, vfrom)
 
     def has_edge(self, v1, v2):
-        if type(v1) is not str:
-            v1 = str(v1)
-        if type(v2) is not str:
-            v2 = str(v2)
+        if type(v1) is not int:
+            v1 = int(v1)
+        if type(v2) is not int:
+            v2 = int(v2)
         return int(v2) in self.adj[v1] or int(v1) in self.adj[v2]
 
     def remove_arc(self, vfrom, vto):
@@ -76,8 +80,8 @@ class BaseGraph:
         self.remove_arc(vto, vfrom)
 
     def remove_vertex(self, vertex):
-        if type(vertex) is not str:
-            vertex = str(vertex)
+        if type(vertex) is not int:
+            vertex = int(vertex)
         try:
             self.vertices.remove(vertex)
             del self.adj[vertex]
@@ -94,7 +98,7 @@ class BaseGraph:
         try:
             return len(self.adj[vertex])
         except KeyError:
-            print('Vertex %d not found' % vertex)
+            print('Vertex %s not found' % vertex)
 
     def count_vertices(self):
         return len(self.vertices)
@@ -104,6 +108,9 @@ class BaseGraph:
                       map(lambda x: self.degree(x), self.vertices), 0)
 
     def __str__(self):
-        return '%d\n%s\n' % (len(self.adj), '\n'.join('%s:%s' %
-                             (x, ' '.join(str(y) for y in self.adj[x]))
-                             for x in sorted(self.adj.keys())))
+        return '%d\n%s\n' % (len(self.adj),
+                             '\n'.join('%d:%s' % (x,
+                                                  str(', '.join(str(y)
+                                                                for y in
+                                                                self.adj[x])))
+                                       for x in self.adj.keys()))
