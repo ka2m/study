@@ -7,9 +7,9 @@ class Algo:
         if visited is None:
             visited = set()
         visited.add(start)
-        for next in graph.adj[str(start)] - visited:
+        for next in graph.adj[int(start)] - visited:
             Algo.dfs(graph, next, visited)
-        return list(map(lambda v: str(v), visited))
+        return list(visited)
 
     @staticmethod
     def connected_components(graph, result=None, vertices=None):
@@ -22,7 +22,7 @@ class Algo:
         comp = Algo.dfs(graph, int(v))
         # directed graph safety
         # cases like 5:
-        if list(v) != comp or graph.has_edge(v, v):
+        if [v] != comp or graph.has_edge(v, v):
             result.append(comp)
         return Algo.connected_components(graph,
                                          result,

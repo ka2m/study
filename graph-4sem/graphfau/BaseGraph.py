@@ -66,7 +66,7 @@ class BaseGraph:
             v1 = int(v1)
         if type(v2) is not int:
             v2 = int(v2)
-        return int(v2) in self.adj[v1] or int(v1) in self.adj[v2]
+        return v2 in self.adj[v1] or v1 in self.adj[v2]
 
     def remove_arc(self, vfrom, vto):
         if vfrom not in self.adj.keys():
