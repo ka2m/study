@@ -17,6 +17,7 @@ class BaseGraph:
                     for line in f.read().splitlines():
                         vfrom = line.split(':')[0]
                         self.add_vertex(int(vfrom))
+                        self.adj[int(vfrom)] = set()
                         for vto in eval('[' + line.split(':')[1] + ']'):
                             if not directed:
                                 self.add_edge(vfrom, vto)
