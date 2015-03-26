@@ -1,21 +1,25 @@
 __author__ = 'fau'
 
 import copy
+import operator
 
 
 class BaseGraph:
     vertexes = []
     adj = {}
 
-    def __init__(self, filename=None):
+    def __init__(self, directed=False, filename=None):
         if filename is not None:
             try:
                 with open(filename, 'r') as f:
                     for line in f.read().splitlines():
                         vfrom = line.split(':')[0]
-                        self.add_vertex(vfrom)
+                        self.add_vertex(str(vfrom))
                         for vto in eval('[' + line.split(':')[1] + ']'):
-                            self.add_arc(vfrom, vto)
+                            if not directed:
+                                self.add_edge(vfrom, vto)
+                            else:
+                                self.add_arc(vfrom, vto)
 
             except IOError as e:
                 print('Unable to open file: %s\nCreating empty graph' % e)
@@ -27,9 +31,11 @@ class BaseGraph:
         return dup
 
     def get_adjlist_by_vertex(self, vertex):
-        l = []
+        if type(vertex) is not str:
+            vertex = str(vertex)
+        l = set()
         try:
-            l = self.adj[str(vertex)]
+            l = self.adj[vertex]
         except KeyError:
             print('No such vertex: %s' % vertex)
         finally:
@@ -37,12 +43,12 @@ class BaseGraph:
 
     def add_vertex(self, key):
         self.vertexes.append(key)
-        self.adj[key] = []
+        self.adj[key] = set()
 
     def add_arc(self, vfrom, vto):
-        if not vfrom in self.adj:
-            self.adj[vfrom] = []
-        self.adj[vfrom].append(vto)
+        if vfrom not in self.adj:
+            self.adj[vfrom] = set()
+        self.adj[vfrom].add(vto)
 
     def add_edge(self, vfrom, vto):
         self.add_arc(vfrom, vto)
@@ -61,20 +67,32 @@ class BaseGraph:
         self.remove_arc(vto, vfrom)
 
     def remove_vertex(self, vertex):
-        if str(vertex) not in self.vertexes:
-            raise Exception('Vertex %d not found' % vertex)
-        self.vertexes.remove(str(vertex))
-        del self.adj[str(vertex)]
+        if type(vertex) is not str:
+            vertex = str(vertex)
+        try:
+            self.vertexes.remove(vertex)
+            del self.adj[vertex]
+        except KeyError:
+            print 'Vertex %d not found' % vertex
         for v in self.adj.keys():
             if vertex in self.adj[v]:
-                self.adj[v].remove(vertex)
-
+                try:
+                    self.adj[v].remove(vertex)
+                except KeyError:
+                    print 'Vertex %d not found' % vertex
 
     def degree(self, vertex):
         try:
             return len(self.adj[vertex])
         except KeyError:
             print('Vertex %d not found' % vertex)
+
+    def count_vertexes(self):
+        return len(self.vertexes)
+
+    def count_arcs(self):
+        return reduce(operator.add,
+                      map(lambda x: self.degree(x), self.vertexes), 0)
 
     def __str__(self):
         return '%d\n%s\n' % (len(self.adj), '\n'.join('%s:%s' %
