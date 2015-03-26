@@ -7,8 +7,10 @@ import operator
 class BaseGraph:
     vertices = []
     adj = {}
+    directed = False
 
     def __init__(self, directed=False, filename=None):
+        self.directed = directed
         if filename is not None:
             try:
                 with open(filename, 'r') as f:
@@ -53,6 +55,13 @@ class BaseGraph:
     def add_edge(self, vfrom, vto):
         self.add_arc(vfrom, vto)
         self.add_arc(vto, vfrom)
+
+    def has_edge(self, v1, v2):
+        if type(v1) is not str:
+            v1 = str(v1)
+        if type(v2) is not str:
+            v2 = str(v2)
+        return int(v2) in self.adj[v1] or int(v1) in self.adj[v2]
 
     def remove_arc(self, vfrom, vto):
         if vfrom not in self.adj.keys():
