@@ -1,5 +1,4 @@
 #include "RoadVertex.h"
-#include <iostream>
 
 RoadVertex::RoadVertex(int id) {
     this->_id = id;

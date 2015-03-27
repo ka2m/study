@@ -22,3 +22,4 @@ maze2
 .idea
 __pycache__
 *.pyc*
+autopilot

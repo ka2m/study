@@ -1,4 +1,5 @@
 #include "RoadGraph.h"
+#define VERBOSE 0
 
 RoadGraph::RoadGraph(std::string filename) {
     std::ifstream in;
@@ -71,7 +72,7 @@ void RoadGraph::addLayer(layerType layer, int layerCount) {
     }
 
     if (!previousLevel) {
-        std::cout << "Connecting enter point" << std::endl;
+        if (VERBOSE) std::cout << "Connecting enter point" << std::endl;
         this->_adj.insert(std::pair<int, t_vv>(0, ids));
     }
     else
@@ -82,7 +83,7 @@ void RoadGraph::addLayer(layerType layer, int layerCount) {
             ids.push_back(v - 10);
             if (!(v - 10)) break;
         }*/
-        printf("Connecting layer with nodes of level %d:  %d - %d\n", previousLevel,  prevLevelMin, prevLevelMax);
+        if (VERBOSE) printf("Connecting layer with nodes of level %d:  %d - %d\n", previousLevel,  prevLevelMin, prevLevelMax);
         for (int v = prevLevelMin; v <= prevLevelMax; v++) {
             this->_adj.insert(std::pair<int, t_vv>(v, ids));
             }
@@ -122,10 +123,10 @@ float RoadGraph::_calculateWeight(RoadVertex * v) {
     speed = speed * roadMultiplier;
 
     float weight = v->getDistance() / speed;
-    printf("Calculating ETA for %d\nMax spd: %3.2f\nETA: %2.2f (min)\n",
-               v->getId(),
-               speed,
-               weight * 60);
+    if (VERBOSE) printf("Calculating ETA for %d\nMax spd: %3.2f\nETA: %2.2f (min)\n",
+                        v->getId(),
+                        speed,
+                        weight * 60);
 
     return weight;
 }

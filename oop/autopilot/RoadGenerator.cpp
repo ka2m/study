@@ -1,8 +1,5 @@
 #include "RoadGenerator.h"
-#include <cmath>
-#include <cstdlib>
-#include <ctime>
-#include <cfloat>
+#define VERBOSE 0
 
 RoadGenerator::RoadGenerator(RoadGraph * graph) {
     this->_graph = graph;
@@ -33,11 +30,11 @@ RoadGenerator::RoadGenerator(RoadGraph * graph) {
             v->setRoadType(roadType);
             v->setWeatherCondition(weather);
             v->setLimit(limit);
-            std::cout << v->toString();
+            if (VERBOSE) std::cout << v->toString();
             _layer.push_back(v);
         }
         this->_graph->addLayer(_layer, layer + 1);
-        std::cout << "Layer added" << std::endl << std::endl;
+        if (VERBOSE) std::cout << "Layer added" << std::endl << std::endl;
     }
     this->_graph->addOutro();
 }
