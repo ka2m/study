@@ -1,5 +1,5 @@
 """
-    Task 1.9 Get all out-connected vertices for the vertice
+    Task 1a.9 Get all out-connected vertices for the vertice
     Graph: directed, not weighted
 """
 

@@ -2,6 +2,8 @@
     Directed unweighted graph
 """
 
+import copy
+
 
 class DGraph:
     def __init__(self, vertices, adj_list):
@@ -18,6 +20,12 @@ class DGraph:
                 '\n'.join(['%s: %s' % (v,
                                        ' '.join([str(x) for x in self.adj[v]]))
                           for v in self.adj]), self.connections)
+
+    def __deepcopy__(self, memo):
+        dup = DGraph(copy.deepcopy(self.vertices),
+                     copy.deepcopy(self.adj))
+        dup.gen_connections()
+        return dup
 
     def type_check(self, v):
         return v if type(v) is int else int(v)

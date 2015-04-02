@@ -2,6 +2,8 @@
     Undirected unweighted graph
 """
 
+import copy
+
 
 class Graph:
     def __init__(self, vertices, adj_list):
@@ -18,6 +20,12 @@ class Graph:
                 '\n'.join(['%s: %s' % (v,
                                        ' '.join([str(x) for x in self.adj[v]]))
                           for v in self.adj]), self.connections)
+
+    def __deepcopy__(self, memo):
+        dup = Graph(copy.deepcopy(self.vertices),
+                    copy.deepcopy(self.adj))
+        dup.gen_connections()
+        return dup
 
     def type_check(self, v):
         return v if type(v) is int else int(v)
@@ -47,9 +55,9 @@ class Graph:
         vertex = self.type_check(vertex)
         if vertex not in self.vertices:
             raise Exception('Vertex %d not found' % vertex)
-        self.vertices.remove(vertex)
         for conn in self.get_connections(vertex):
             self.adj[conn[0]].remove(conn[1])
+        self.vertices.remove(vertex)
         del self.adj[vertex]
         self.gen_connections()
 
@@ -87,3 +95,6 @@ class Graph:
            (vertex, vertex) not in self.get_connections(vertex):
             res.remove(vertex)
         return res
+
+    def degree(self, vertex):
+        return len(self.adj[vertex])
