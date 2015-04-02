@@ -1,17 +1,17 @@
 """
-    Undirected unweighted graph
+    Directed unweighted graph
 """
 
 
-class Graph:
+class DGraph:
     def __init__(self, vertices, adj_list):
         self.vertices = vertices  # set
         self.adj = {}
-        self.gen_adj_list_undir(adj_list)  # map int-set of ints
+        self.gen_adj_list(adj_list)  # map int-set of ints
         self.gen_connections()  # list of tuples
 
     def __str__(self):
-        return 'Graph:\nnot directed\nnot weighted\nVertices: %s\n' \
+        return 'Graph:\ndirected\nnot weighted\nVertices: %s\n' \
                'Adjcency map:\n%s\n' \
                'All connecions:\n%s\n' % \
                (' '.join([str(x) for x in self.vertices]),
@@ -29,19 +29,22 @@ class Graph:
         self.vertices.add(vertex)
         self.adj[vertex] = set()
 
-    def add_arc(self, vfrom, vto):
+    def add_edge(self, vfrom, vto):
         vfrom = self.type_check(vfrom)
         vto = self.type_check(vto)
 
         if vfrom not in self.vertices:
-            raise Exception('Vertex to add arc FROM is not in graph')
+            raise Exception('Vertex to add edge FROM is not in graph')
 
         if vto not in self.vertices:
-            raise Exception('Vertex to add arc TO is not in graph')
+            raise Exception('Vertex to add edge TO is not in graph')
 
         self.adj[vfrom].add(vto)
-        self.adj[vto].add(vfrom)
         self.gen_connections()
+
+    def add_arc(self, vfrom, vto):
+        self.add_edge(vfrom, vto)
+        self.add_edge(vto, vfrom)
 
     def remove_vertex(self, vertex):
         vertex = self.type_check(vertex)
@@ -60,13 +63,12 @@ class Graph:
                 res.append((v, vv))
         self.connections = res
 
-    def gen_adj_list_undir(self, adj_list):
+    def gen_adj_list(self, adj_list):
         for v in self.vertices:
             self.adj[v] = set()
         for v in adj_list:
             for vv in adj_list[v]:
                 self.adj[v].add(vv)
-                self.adj[vv].add(v)
 
     def get_connections(self, vertex):
         vertex = self.type_check(vertex)
@@ -75,14 +77,20 @@ class Graph:
         return [v for v in self.connections if v[0] == vertex
                 or v[1] == vertex]
 
-    def get_connected_vertices(self, vertex):
+    def get_connected_vertices(self, vertex, direction):
+        # 0 - both, -1 - from, 1 - to
         vertex = self.type_check(vertex)
         if vertex not in self.vertices:
             raise Exception('Vertex %d not found' % vertex)
         res = set()
         for v in self.get_connections(vertex):
-            res.add(v[0])
-            res.add(v[1])
+            if not direction:
+                res.add(v[0])
+                res.add(v[1])
+            if direction == 1:
+                res.add(v[1])
+            if direction == -1:
+                res.add(v[0])
         if vertex in res and \
            (vertex, vertex) not in self.get_connections(vertex):
             res.remove(vertex)

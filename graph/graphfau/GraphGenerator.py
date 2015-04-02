@@ -1,4 +1,6 @@
 from graphfau.Graph import Graph
+from graphfau.DGraph import DGraph
+
 
 class GraphGenerator:
     @staticmethod
@@ -50,7 +52,9 @@ class GraphGenerator:
         vertices = GraphGenerator.create_vertices_list(adjacency_list)
         adj = GraphGenerator.adjl_to_set(adjacency_list)
         if not directed and not weighted:
-                return Graph(vertices, adj)
+            return Graph(vertices, adj)
+        if directed and not weighted:
+            return DGraph(vertices, adj)
 
     @staticmethod
     def conform_undir(adj_list):
