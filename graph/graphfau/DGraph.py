@@ -107,13 +107,16 @@ class DGraph:
     def degree(self, vertex):
         return len(self.get_connections(vertex))
 
-    def count_edges(self):
+    def get_edges(self):
         edges = []
         for conn in self.connections:
             if conn not in edges and \
                conn[::-1] not in edges:
                 edges.append(conn)
-        return len(edges)
+        return edges
+
+    def count_edges(self):
+        return len(self.get_edges())
 
     def count_arcs(self):
         return len(self.connections)

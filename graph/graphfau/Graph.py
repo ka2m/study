@@ -99,13 +99,16 @@ class Graph:
     def degree(self, vertex):
         return len(self.adj[vertex])
 
-    def count_edges(self):
+    def get_edges(self):
         unique_conns = []
         for conn in self.connections:
             if conn not in unique_conns and \
                conn[::-1] not in unique_conns:
                 unique_conns.append(conn)
-        return len(unique_conns)
+        return unique_conns
+
+    def count_edges(self):
+        return len(self.get_edges())
 
     def count_vertices(self):
         return len(self.vertices)

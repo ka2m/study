@@ -1,4 +1,5 @@
 from graphfau.Algo import Algo as func
+from graphfau.GraphGenerator import GraphGenerator as gg
 import copy
 
 
@@ -51,3 +52,45 @@ class Tasks:
         edges = g.count_edges()
         ccs = len(func.connected_components(g))
         return ccs + edges - vertices
+
+    @staticmethod
+    def tf(g):
+        """
+            Task 2.II.20 Check if graph is forest, tree or not
+        """
+        cc = func.connected_components(g)
+        # if graph has one connected component and has no circuits
+        # it is a tree
+        if len(cc) == 1 and not Tasks.circuit_rank(g):
+            return 'Tree'
+        if len(cc) > 1:
+            flag = False
+            for subtree in cc:
+                subtree_adj = {}
+                for vertex in subtree:
+                    for vu in g.get_edges():
+                        # vertex found - add its connections
+                        if vertex == vu[0] or vertex == vu[1]:
+                            if vu[0] not in subtree_adj.keys():
+                                subtree_adj[vu[0]] = set()
+                            subtree_adj[vu[0]].add(vu[1])
+
+                # convert back to map of lists
+                for v in subtree_adj:
+                    subtree_adj[v] = list(subtree_adj[v])
+                # is adjacency map is empty, then we have
+                # separated vertices
+                # create empty lists for them
+                if subtree_adj == {}:
+                    for vertex in subtree:
+                        subtree_adj[vertex] = []
+                params = {'directed': False, 'weigthed': False}
+                subtree = gg.create(params=params, adj_list=subtree_adj)
+                scc = func.connected_components(subtree)
+                if len(scc) == 1 and not Tasks.circuit_rank(subtree):
+                    flag = True
+                else:
+                    flag = False
+            if flag:
+                return 'Forest'
+        return 'Graph'
