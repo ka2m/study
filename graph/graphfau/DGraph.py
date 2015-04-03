@@ -37,7 +37,7 @@ class DGraph:
         self.vertices.add(vertex)
         self.adj[vertex] = set()
 
-    def add_edge(self, vfrom, vto):
+    def add_arc(self, vfrom, vto):
         vfrom = self.type_check(vfrom)
         vto = self.type_check(vto)
 
@@ -50,9 +50,9 @@ class DGraph:
         self.adj[vfrom].add(vto)
         self.gen_connections()
 
-    def add_arc(self, vfrom, vto):
-        self.add_edge(vfrom, vto)
-        self.add_edge(vto, vfrom)
+    def add_edge(self, vfrom, vto):
+        self.add_arc(vfrom, vto)
+        self.add_arc(vto, vfrom)
 
     def remove_vertex(self, vertex):
         vertex = self.type_check(vertex)
@@ -103,3 +103,27 @@ class DGraph:
            (vertex, vertex) not in self.get_connections(vertex):
             res.remove(vertex)
         return res
+
+    def degree(self, vertex):
+        return len(self.get_connections(vertex))
+
+    def count_edges(self):
+        edges = []
+        for conn in self.connections:
+            if conn not in edges and \
+               conn[::-1] not in edges:
+                edges.append(conn)
+        return len(edges)
+
+    def count_arcs(self):
+        return len(self.connections)
+
+    def count_vertices(self):
+        return len(self.vertices)
+
+    def has_arc(self, vfrom, vto):
+        return (vfrom, vto) in self.connections
+
+    def has_edge(self, vfrom, vto):
+        return (vfrom, vto) in self.connections or (vto, vfrom) \
+            in self.connections

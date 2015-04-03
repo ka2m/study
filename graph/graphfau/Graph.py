@@ -37,7 +37,7 @@ class Graph:
         self.vertices.add(vertex)
         self.adj[vertex] = set()
 
-    def add_arc(self, vfrom, vto):
+    def add_edge(self, vfrom, vto):
         vfrom = self.type_check(vfrom)
         vto = self.type_check(vto)
 
@@ -98,3 +98,21 @@ class Graph:
 
     def degree(self, vertex):
         return len(self.adj[vertex])
+
+    def count_edges(self):
+        unique_conns = []
+        for conn in self.connections:
+            if conn not in unique_conns and \
+               conn[::-1] not in unique_conns:
+                unique_conns.append(conn)
+        return len(unique_conns)
+
+    def count_vertices(self):
+        return len(self.vertices)
+
+    def count_arcs(self):
+        return len(self.connections)
+
+    def has_edge(self, vfrom, vto):
+        return (vfrom, vto) in self.connections or (vto, vfrom) \
+            in self.connections

@@ -1,5 +1,4 @@
-from graphfau.Graph import Graph
-from graphfau.DGraph import DGraph
+from graphfau.Algo import Algo as func
 import copy
 
 
@@ -42,3 +41,13 @@ class Tasks:
             print('No even vertices found')
 
         return g2
+
+    @staticmethod
+    def circuit_rank(g):
+        """
+            Task 2.II.11 Found circuit rank of graph (directed or not)
+        """
+        vertices = g.count_vertices()
+        edges = g.count_edges()
+        ccs = len(func.connected_components(g))
+        return ccs + edges - vertices
