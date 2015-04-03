@@ -1,5 +1,6 @@
 from graphfau.Graph import Graph
 from graphfau.DGraph import DGraph
+from graphfau.WGraph import WGraph
 
 
 class GraphGenerator:
@@ -29,7 +30,7 @@ class GraphGenerator:
             if type(v) is not int:
                 v = int(v)
             for vv in adj_list[v]:
-                if type(vv) is not int:
+                if type(vv) is not int and type(vv) is not tuple:
                     vv = int(vv)
         return GraphGenerator.generate(params, used_adj_list)
 
@@ -55,6 +56,11 @@ class GraphGenerator:
             return Graph(vertices, adj)
         if directed and not weighted:
             return DGraph(vertices, adj)
+        if not directed and weighted:
+            vv = set()
+            for v in vertices:
+                vv.add(v)
+            return WGraph(vv, adj)
 
     @staticmethod
     def conform_undir(adj_list):
@@ -80,7 +86,10 @@ class GraphGenerator:
         for v in adj_list:
             result.add(v)
             for vv in adj_list[v]:
-                result.add(vv)
+                if type(vv) is tuple:
+                    result.add(vv[0])
+                else:
+                    result.add(vv)
         return result
 
     @staticmethod

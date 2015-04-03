@@ -6,9 +6,10 @@
 from graphfau.GraphGenerator import GraphGenerator as gg
 from graphfau.Tasks import Tasks as ts
 from graphfau.Algo import Algo
-params = {'directed': True, 'weigthed': False}
-adj_list = {1: [2, 3, 4], 7:[], 3: [1,5]}
+params = {'directed': False, 'weigthed': True}
+adj_list = {1: [(2, 0), (3, 1), (4, 0)], 4:[(5, 1)], 7:[], 3: [(5,1)]}
 g = gg.create(params=params, adj_list=adj_list)
 
 print g
-print ts.tf(g)
+print Algo.wu_bfs(g, 1)
+

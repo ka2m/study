@@ -58,12 +58,17 @@ class Tasks:
         """
             Task 2.II.20 Check if graph is forest, tree or not
         """
-        cc = func.connected_components(g)
+        count_cc = len(func.connected_components(g))
         # if graph has one connected component and has no circuits
         # it is a tree
-        if len(cc) == 1 and not Tasks.circuit_rank(g):
+        rank = Tasks.circuit_rank(g)
+        if count_cc == 1 and not rank:
             return 'Tree'
-        if len(cc) > 1:
+            # if graph has many CCs and has no circuits
+            # it is a forest
+        if count_cc > 1 and not rank:
+            return 'Forest'
+            """
             flag = False
             for subtree in cc:
                 subtree_adj = {}
@@ -93,4 +98,14 @@ class Tasks:
                     flag = False
             if flag:
                 return 'Forest'
+            """
         return 'Graph'
+
+    @staticmethod
+    def sssp01(g, u):
+        """
+            Task 2.II.30 Given weighted 0-1 graph. Get shortest path from u
+            vertex to others
+        """
+
+
