@@ -1,3 +1,6 @@
+import copy
+
+
 class Algo:
     @staticmethod
     def dfs(graph, start, visited=None):
@@ -12,7 +15,7 @@ class Algo:
     def connected_components(graph, result=None, vertices=None):
         if vertices is None:
             result = []
-            vertices = graph.vertices
+            vertices = copy.copy(graph.vertices)
         if vertices == []:
             return result
         v = vertices.pop()
