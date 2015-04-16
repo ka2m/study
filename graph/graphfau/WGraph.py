@@ -118,6 +118,17 @@ class WGraph:
                 unique_conns.append(conn)
         return unique_conns
 
+    def get_w_edges(self):
+        unique_conns = []
+        ucw = []
+        for conn in self.connections:
+            pair = (conn[0], conn[1])
+            if pair not in unique_conns and \
+               pair[::-1] not in unique_conns:
+                unique_conns.append(pair)
+                ucw.append(conn)
+        return ucw
+
     def count_edges(self):
         return len(self.get_edges())
 
