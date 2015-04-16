@@ -1,4 +1,6 @@
 import copy
+from operator import itemgetter
+from graphfau.GraphGenerator import GraphGenerator as gg
 
 
 class Algo:
@@ -44,6 +46,27 @@ class Algo:
         for next in graph.adj[int(start)] - visited:
             Algo.dfs(graph, next, visited)
         return list(visited)
+
+    @staticmethod
+    def boruvka(graph):
+        props = {'directed': False, 'weigthed': True}
+        mst = gg.create(params=props,
+                        adj_list={x: [] for x in graph.vertices})
+        all_edges = graph.get_w_edges()
+        print all_edges
+        while mst.count_edges() < (mst.count_vertices() - 1):
+            for edge in all_edges:
+                ccs = Algo.connected_components(mst)
+                print ccs
+                do_add_edge = True
+                for comp in ccs:
+                    if edge[0] in comp and edge[1] in comp:
+                        do_add_edge = False
+                if do_add_edge:
+                    emin = sorted([x for x in all_edges if x[0] == edge[0] and
+                                  x[1] == edge[1]], key=itemgetter(2))[0]
+                    mst.add_edge(*emin)
+        return mst
 
     @staticmethod
     def connected_components(graph, result=None, vertices=None):
