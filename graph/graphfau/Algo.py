@@ -84,18 +84,19 @@ class Algo:
 
     @staticmethod
     def convert_adjmap_to_adjmatrix(g):
-        vertices = g.keys()
         dist = {}
-        for i in vertices:
-            dist[i] = {}
-            for j in vertices:
+        for i in g.adj.keys():
+            p = {}
+            for j in g.adj.keys():
                 try:
-                    dist[i][j] = g[i][j]
-                except KeyError:
+                    cw = g.get_connection_weight(i, j)
                     if i == j:
-                        dist[i][j] = 0
+                        p[j] = 0
                     else:
-                        dist[i][j] = float('inf')
+                        p[j] = cw
+                except:
+                    p[j] = float('inf')
+            dist[i] = p
         return dist
 
     @staticmethod
@@ -103,9 +104,9 @@ class Algo:
         pass
 
     @staticmethod
-    def fb(graph):
+    def floyd(graph):
         vertices = graph.vertices
-        d = dict(Algo.convert_adjmap_to_adjmatrix(graph.adj))
+        d = dict(Algo.convert_adjmap_to_adjmatrix(graph))
         for k in vertices:
             for i in vertices:
                 for j in vertices:
@@ -113,5 +114,5 @@ class Algo:
         return d
 
     @staticmethod
-    def floyd(graph):
+    def ford(graph):
         pass

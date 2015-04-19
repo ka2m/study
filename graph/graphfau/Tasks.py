@@ -1,5 +1,5 @@
 from graphfau.Algo import Algo as func
-from graphfau.GraphGenerator import GraphGenerator as gg
+# from graphfau.GraphGenerator import GraphGenerator as gg
 import copy
 
 
@@ -102,10 +102,17 @@ class Tasks:
         return 'Graph'
 
     @staticmethod
-    def sssp01(g, u):
+    def fb_pairs(g):
         """
-            Task 2.II.30 Given weighted 0-1 graph. Get shortest path from u
-            vertex to others
+            Task 4.9b Get connections between all the vertices
+            Graph: directed, weighted
         """
-
-
+        d = func.floyd(g)
+        for vertex in d:
+            for to in d[vertex]:
+                lng = d[vertex][to]
+                if lng:
+                    if lng == float('inf') and not vertex == to:
+                        print vertex, '--', to, 'has no path'
+                    elif not vertex == to:
+                        print vertex, '--', to, 'has path of length', lng
