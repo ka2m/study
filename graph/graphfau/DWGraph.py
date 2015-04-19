@@ -1,19 +1,19 @@
 """
-    Undirected weighted graph
+    Directed weighted graph
 """
 
 import copy
 
 
-class WGraph:
+class DWGraph:
     def __init__(self, vertices, adj_list):
         self.vertices = vertices  # set
         self.adj = adj_list
         self.gen_connections()  # list of tuples
-        self.gen_adj_list_undir()  # map int-set of ints
+        self.gen_adj_list_undir()
 
     def __str__(self):
-        return 'Graph:\nnot directed\nweighted\nVertices: %s\n' \
+        return 'Graph:\ndirected\nweighted\nVertices: %s\n' \
                'Adjcency map:\n%s\n' \
                'All connecions:\n%s\n' % \
                (' '.join([str(x) for x in self.vertices]),
@@ -22,8 +22,8 @@ class WGraph:
                           for v in self.adj]), self.connections)
 
     def __deepcopy__(self, memo):
-        dup = WGraph(copy.deepcopy(self.vertices),
-                     copy.deepcopy(self.adj))
+        dup = DWGraph(copy.deepcopy(self.vertices),
+                      copy.deepcopy(self.adj))
         dup.gen_connections()
         return dup
 
@@ -37,28 +37,30 @@ class WGraph:
         self.vertices.add(vertex)
         self.adj[vertex] = set()
 
-    def add_edge(self, vfrom, vto, weight):
+    def add_arc(self, vfrom, vto, weight):
         vfrom = self.type_check(vfrom)
         vto = self.type_check(vto)
 
         if vfrom not in self.vertices:
-            raise Exception('Vertex to add arc FROM is not in graph')
+            raise Exception('Vertex to add edge FROM is not in graph')
 
         if vto not in self.vertices:
-            raise Exception('Vertex to add arc TO is not in graph')
+            raise Exception('Vertex to add edge TO is not in graph')
 
         self.adj[vfrom].add(vto)
-        self.adj[vto].add(vfrom)
-        self.connections.append([vto, vfrom, weight])
         self.connections.append([vfrom, vto, weight])
+
+    def add_edge(self, vfrom, vto):
+        self.add_arc(vfrom, vto)
+        self.add_arc(vto, vfrom)
 
     def remove_vertex(self, vertex):
         vertex = self.type_check(vertex)
         if vertex not in self.vertices:
             raise Exception('Vertex %d not found' % vertex)
+        self.vertices.remove(vertex)
         for conn in self.get_connections(vertex):
             self.adj[conn[0]].remove(conn[1])
-        self.vertices.remove(vertex)
         del self.adj[vertex]
         self.connections = [c for c in self.connections
                             if not (c[0] == vertex or c[1] == vertex)]
@@ -68,7 +70,6 @@ class WGraph:
         for v in self.adj:
             for vv in self.adj[v]:
                 res.append([v, vv[0], vv[1]])
-                res.append([vv[0], v, vv[1]])
         self.connections = res
 
     def gen_adj_list_undir(self):
@@ -78,6 +79,13 @@ class WGraph:
         for v in self.connections:
             self.adj[v[0]].add(v[1])
 
+    def gen_adj_list(self, adj_list):
+        for v in self.vertices:
+            self.adj[v] = set()
+        for v in adj_list:
+            for vv in adj_list[v]:
+                self.adj[v].add(vv)
+
     def get_connections(self, vertex):
         vertex = self.type_check(vertex)
         if vertex not in self.vertices:
@@ -85,37 +93,42 @@ class WGraph:
         return [v for v in self.connections if v[0] == vertex
                 or v[1] == vertex]
 
-    def get_connection_weight(self, vfrom, vto):
-        vs = self.get_connections(vfrom)
-        for v in vs:
-            if v[1] == vto:
-                return v[2]
-        return -1
-
-    def get_connected_vertices(self, vertex):
+    def get_connected_vertices(self, vertex, direction):
+        # 0 - both, -1 - from, 1 - to
         vertex = self.type_check(vertex)
         if vertex not in self.vertices:
             raise Exception('Vertex %d not found' % vertex)
         res = set()
         for v in self.get_connections(vertex):
-            res.add(v[0])
-            res.add(v[1])
+            if not direction:
+                res.add(v[0])
+                res.add(v[1])
+            if direction == 1:
+                res.add(v[1])
+            if direction == -1:
+                res.add(v[0])
         if vertex in res and \
            (vertex, vertex) not in self.get_connections(vertex):
             res.remove(vertex)
         return res
 
+    def get_connection_weight(self, vfrom, vto):
+        vs = self.get_connections(vfrom)
+        for v in vs:
+            if v[1] == vto:
+                return v[2]
+        raise Exception('No connection')
+
     def degree(self, vertex):
-        return len(self.adj[vertex])
+        return len(self.get_connections(vertex))
 
     def get_edges(self):
-        unique_conns = []
+        edges = []
         for conn in self.connections:
-            conn = (conn[0], conn[1])
-            if conn not in unique_conns and \
-               conn[::-1] not in unique_conns:
-                unique_conns.append(conn)
-        return unique_conns
+            if conn not in edges and \
+               conn[::-1] not in edges:
+                edges.append(conn)
+        return edges
 
     def get_w_edges(self):
         unique_conns = []
@@ -131,15 +144,15 @@ class WGraph:
     def count_edges(self):
         return len(self.get_edges())
 
-    def count_vertices(self):
-        return len(self.vertices)
-
     def count_arcs(self):
         return len(self.connections)
 
+    def count_vertices(self):
+        return len(self.vertices)
+
+    def has_arc(self, vfrom, vto):
+        return (vfrom, vto) in self.connections
+
     def has_edge(self, vfrom, vto):
-        conns = {}
-        for c in self.connections:
-            conns.add((c[0], c[1]))
         return (vfrom, vto) in self.connections or (vto, vfrom) \
             in self.connections

@@ -1,6 +1,7 @@
 from graphfau.Graph import Graph
 from graphfau.DGraph import DGraph
 from graphfau.WGraph import WGraph
+from graphfau.DWGraph import DWGraph
 
 
 class GraphGenerator:
@@ -49,6 +50,11 @@ class GraphGenerator:
         if weighted and GraphGenerator.conform_wgh(adjacency_list):
             raise Exception('Adjacency list doesn\'t conform to '
                             'weighted graph')
+        if weighted and directed \
+           and GraphGenerator.conform_wgh(adjacency_list) \
+           and not GraphGenerator.conform_undir(adjacency_list):
+            raise Exception('Adjcaency list doesn\'t conform to '
+                            'either weighted or directed graph')
 
         vertices = GraphGenerator.create_vertices_list(adjacency_list)
         adj = GraphGenerator.adjl_to_set(adjacency_list)
@@ -61,6 +67,11 @@ class GraphGenerator:
             for v in vertices:
                 vv.add(v)
             return WGraph(vv, adj)
+        if directed and weighted:
+            vv = set()
+            for v in vertices:
+                vv.add(v)
+            return DWGraph(vv, adj)
 
     @staticmethod
     def conform_undir(adj_list):

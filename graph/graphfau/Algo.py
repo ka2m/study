@@ -81,3 +81,37 @@ class Algo:
         return Algo.connected_components(graph,
                                          result,
                                          list(set(vertices) - set(comp)))
+
+    @staticmethod
+    def convert_adjmap_to_adjmatrix(g):
+        vertices = g.keys()
+        dist = {}
+        for i in vertices:
+            dist[i] = {}
+            for j in vertices:
+                try:
+                    dist[i][j] = g[i][j]
+                except KeyError:
+                    if i == j:
+                        dist[i][j] = 0
+                    else:
+                        dist[i][j] = float('inf')
+        return dist
+
+    @staticmethod
+    def djikstra(graph):
+        pass
+
+    @staticmethod
+    def fb(graph):
+        vertices = graph.vertices
+        d = dict(Algo.convert_adjmap_to_adjmatrix(graph.adj))
+        for k in vertices:
+            for i in vertices:
+                for j in vertices:
+                    d[i][j] = min(d[i][j], d[i][k] + d[k][j])
+        return d
+
+    @staticmethod
+    def floyd(graph):
+        pass
