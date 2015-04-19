@@ -39,7 +39,7 @@ class GraphGenerator:
     def generate(params, adjacency_list):
         try:
             directed = params['directed']
-            weighted = params['weigthed']
+            weighted = params['weighted']
         except KeyError as error:
             print 'Not all parameters has been passed: %s' % error
             return None

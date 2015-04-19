@@ -49,7 +49,7 @@ class Algo:
 
     @staticmethod
     def boruvka(graph):
-        props = {'directed': False, 'weigthed': True}
+        props = {'directed': False, 'weighted': True}
         mst = gg.create(params=props,
                         adj_list={x: [] for x in graph.vertices})
         all_edges = graph.get_w_edges()

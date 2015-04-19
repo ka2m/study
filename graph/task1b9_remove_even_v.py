@@ -6,7 +6,7 @@
 from graphfau.GraphGenerator import GraphGenerator as gg
 from graphfau.Tasks import Tasks as ts
 
-params = {'directed': False, 'weigthed': False}
+params = {'directed': False, 'weighted': False}
 adj_list = {1: [2, 3, 4], 3: [5, 4], 6: []}
 g = gg.create(params=params, adj_list=adj_list)
 

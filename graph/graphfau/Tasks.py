@@ -89,7 +89,7 @@ class Tasks:
                 if subtree_adj == {}:
                     for vertex in subtree:
                         subtree_adj[vertex] = []
-                params = {'directed': False, 'weigthed': False}
+                params = {'directed': False, 'weighted': False}
                 subtree = gg.create(params=params, adj_list=subtree_adj)
                 scc = func.connected_components(subtree)
                 if len(scc) == 1 and not Tasks.circuit_rank(subtree):
