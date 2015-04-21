@@ -85,6 +85,21 @@ class WGraph:
         return [v for v in self.connections if v[0] == vertex
                 or v[1] == vertex]
 
+    def get_unique_connections_from_vertex(self, vertex):
+        vertex = self.type_check(vertex)
+        if vertex not in self.vertices:
+            raise Exception('Vertex %d not found' % vertex)
+        unique_conns = []
+        res = []
+        for conn in self.connections:
+            pair = (conn[0], conn[1])
+            if pair not in unique_conns and \
+               pair[::-1] not in unique_conns and \
+               (pair[0] == vertex or pair[1] == vertex):
+                unique_conns.append(pair)
+                res.append(conn)
+        return res
+
     def get_connection_weight(self, vfrom, vto):
         vs = self.get_connections(vfrom)
         for v in vs:

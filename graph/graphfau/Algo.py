@@ -100,8 +100,36 @@ class Algo:
         return dist
 
     @staticmethod
-    def djikstra(graph):
-        pass
+    def djikstra(graph, from_vertex, multi_path=False):
+        dist = dict.fromkeys(graph.vertices, float('inf'))
+        paths = dict.fromkeys(graph.vertices, [-1]) if multi_path else \
+            dict.fromkeys(graph.vertices, -1)
+        visited = dict.fromkeys(graph.vertices, False)
+        print dist, paths, visited
+        dist[from_vertex] = 0
+        for count in graph.vertices:
+            vertex = -1
+            for vv in graph.vertices:
+                if not visited[vv] and (vertex == -1
+                                        or dist[vv] < dist[vertex]):
+                    vertex = vv
+            if dist[vertex] == float('inf'):
+                break
+            visited[vertex] = True
+
+            for conns in graph.get_unique_connections_from_vertex(vertex):
+                to_vertex = conns[1]
+                if conns[1] == vertex:
+                    to_vertex = conns[0]
+                wght = conns[2]
+                new_wght = dist[vertex] + wght
+                if new_wght < dist[to_vertex]:
+                    dist[to_vertex] = new_wght
+                    paths[to_vertex] = [vertex] if multi_path else vertex
+                elif new_wght == dist[to_vertex] and multi_path:
+                    paths[to_vertex].append(vertex)
+
+        return dist, paths
 
     @staticmethod
     def floyd(graph):
