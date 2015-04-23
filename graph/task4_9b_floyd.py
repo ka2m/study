@@ -8,10 +8,10 @@ from graphfau.Tasks import Tasks as ts
 
 params = {'directed': True, 'weighted': True}
 adj_list = {1: [(2, 30), (3, 10)],
-            2: [(9, 15)],
+            2: [(9, -15)],
             3: [(5, 25), (4, 40)],
             4: [(8, 12)],
-            5: [(6, 7)],
+            5: [(6, -7)],
             6: [(7, 12)],
             7: [(9, 30)],
             8: [(9, 25)],

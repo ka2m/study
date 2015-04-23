@@ -112,7 +112,5 @@ class Tasks:
             for to in d[vertex]:
                 lng = d[vertex][to]
                 if lng:
-                    if lng == float('inf') and not vertex == to:
-                        print vertex, '--', to, 'has no path'
-                    elif not vertex == to:
+                    if not lng == float('inf') and not vertex == to:
                         print vertex, '--', to, 'has path of length', lng
