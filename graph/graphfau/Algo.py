@@ -102,15 +102,15 @@ class Algo:
     @staticmethod
     def djikstra(graph, from_vertex, multi_path=False):
         dist = dict.fromkeys(graph.vertices, float('inf'))
-        paths = dict.fromkeys(graph.vertices, [-1]) if multi_path else \
-            dict.fromkeys(graph.vertices, -1)
+        paths = dict.fromkeys(graph.vertices, [None]) if multi_path else \
+            dict.fromkeys(graph.vertices, None)
         visited = dict.fromkeys(graph.vertices, False)
         print dist, paths, visited
         dist[from_vertex] = 0
         for count in graph.vertices:
-            vertex = -1
+            vertex = None
             for vv in graph.vertices:
-                if not visited[vv] and (vertex == -1
+                if not visited[vv] and (vertex is None
                                         or dist[vv] < dist[vertex]):
                     vertex = vv
             if dist[vertex] == float('inf'):
