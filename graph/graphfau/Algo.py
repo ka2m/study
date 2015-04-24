@@ -142,5 +142,22 @@ class Algo:
         return d
 
     @staticmethod
-    def ford(graph):
-        pass
+    def ford(graph, from_vertex):
+        dist = dict.fromkeys(graph.vertices, float('inf'))
+        dist[from_vertex] = 0
+
+        for count in graph.vertices:
+            for vertex in graph.adj:
+                for vv in graph.get_connections(vertex):
+                    upd = dist[vertex] + vv[2]
+                    if dist[vv[1]] > upd:
+                        dist[vv[1]] = upd
+
+        for vertex in graph.vertices:
+            for vv in graph.adj[vertex]:
+                try:
+                    assert dist[vertex] <= dist[vv] + graph.get_connection_weight(vv, vertex)
+                    assert dist[vertex] <= dist[vv] + graph.get_connection_weight(vertex, vv)
+                except Exception:
+                    pass
+        return dist

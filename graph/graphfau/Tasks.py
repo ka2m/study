@@ -114,3 +114,18 @@ class Tasks:
                 if lng:
                     if not lng == float('inf') and not vertex == to:
                         print vertex, '--', to, 'has path of length', lng
+
+    @staticmethod
+    def ford_pairs(g):
+        """
+            Task 4.17c Get connection weights between all the vertices
+            Graph: directed, weighted
+        """
+
+        for vertex in g.vertices:
+            p = func.ford(g, vertex)
+
+            p = {k: v for (k, v) in p.iteritems() if not k == vertex
+                 and not v == float('inf')}
+            if len(p):
+                print p
