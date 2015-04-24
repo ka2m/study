@@ -19,4 +19,4 @@ adj_list = {1: [(2, 30), (3, 10)],
 g = gg.create(params=params, adj_list=adj_list)
 
 print g
-ts.fb_pairs(g)
+ts.fl_pairs(g)

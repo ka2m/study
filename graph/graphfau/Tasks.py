@@ -102,7 +102,7 @@ class Tasks:
         return 'Graph'
 
     @staticmethod
-    def fb_pairs(g):
+    def fl_pairs(g):
         """
             Task 4.9b Get connections between all the vertices
             Graph: directed, weighted
