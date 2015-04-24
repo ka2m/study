@@ -156,8 +156,14 @@ class Algo:
         for vertex in graph.vertices:
             for vv in graph.adj[vertex]:
                 try:
-                    assert dist[vertex] <= dist[vv] + graph.get_connection_weight(vv, vertex)
-                    assert dist[vertex] <= dist[vv] + graph.get_connection_weight(vertex, vv)
-                except Exception:
-                    pass
+                    cw = 0
+                    try:
+                        cw = graph.get_connection_weight(vv, vertex)
+                    except:
+                        cw = graph.get_connection_weight(vertex, vv)
+
+                    assert dist[vv] <= dist[vertex] + cw
+                except AssertionError:
+                    print 'Negative circuit exists!'
+                    return None
         return dist

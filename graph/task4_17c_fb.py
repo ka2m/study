@@ -7,15 +7,12 @@ from graphfau.GraphGenerator import GraphGenerator as gg
 from graphfau.Tasks import Tasks as ts
 
 params = {'directed': True, 'weighted': True}
-adj_list = {1: [(2, 30), (3, 10)],
-            2: [(9, 15)],
-            3: [(5, 25), (4, 40)],
-            4: [(8, 12)],
-            5: [(6, 7)],
-            6: [(7, 12)],
-            7: [(9, 30)],
-            8: [(9, 25)],
-            9: [(10, 11)]}
+adj_list = {1: [(2, 2), (3, -2)],
+            2: [(5, 3), (4, 2), (6, 12)],
+            3: [(4, -2)],
+            4: [(5, 1), (1, -1)],
+            5: [(6, 4)]}
+
 g = gg.create(params=params, adj_list=adj_list)
 
 print g

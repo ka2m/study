@@ -124,8 +124,8 @@ class Tasks:
 
         for vertex in g.vertices:
             p = func.ford(g, vertex)
-
-            p = {k: v for (k, v) in p.iteritems() if not k == vertex
-                 and not v == float('inf')}
-            if len(p):
-                print p
+            if p is not None:
+                p = {k: v for (k, v) in p.iteritems() if not k == vertex
+                     and not v == float('inf')}
+                if len(p):
+                    print vertex, p
