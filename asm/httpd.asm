@@ -155,8 +155,6 @@ section .text
         mov eax, __NR_close ; close socket
         mov ebx, [fd_socket]
         int 80h
-    goodexit:
-        xor	eax, eax		; success
     exit:
         mov ebx, eax		; exitcode
         neg ebx
