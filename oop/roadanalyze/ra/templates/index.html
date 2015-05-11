@@ -1,0 +1,113 @@
+<h1> Анализ загруженности дорог v0.1 </h1>
+<h2> В базе сейчас находятся {{count_points}} мест и {{count_roads}} дорог </h2>
+<h2> Есть ифнормация о {{count_loads}} случаях загрузки благодаря {{count_cars}} сообщениям </h2>
+<table>
+<tr><td><h3>Добавление машины</h3></td>
+    <td><h3>Добавление дороги</h3></td>
+    <td><h3>Добавление пункта</h3></td>
+    <td><h3>Анализ</h3></td>
+</tr>
+<tr><td>
+<form action="{% url 'addcar' %}" method="post">
+<table>
+<tr></td>
+    <td>Название:</td>
+    <td><input type="text" name="name"></td>
+</tr>
+<tr>
+    <td>Скорость:</td>
+    <td><input type="text" name="speed"></td>
+</tr>
+<tr>
+    <td>Откуда:</td>
+    <td>
+        <select title="car_from" name="car_from">
+            {% for loc_from in poi %}
+                <option value="{{loc_from.id}}">{{loc_from.name}}</option>
+            {% endfor %}
+        </select>
+    </td></tr>
+    <tr>
+    <td>Куда:</td>
+    <td>
+        <select title="car_to" name="car_to">
+            {% for loc_to in poi %}
+                <option value="{{loc_to.id}}">{{loc_to.name}}</option>
+            {% endfor %}
+        </select>
+    </td>
+    </tr>
+<tr><td>Час выезда:</td>
+<td><input type="text" name="hrstart"></td></tr>
+<tr><td>Минута выезда:</td>
+<td><input type="text" name="minstart"></td></tr>
+</table>
+<input type="submit"  value="Добавить запись о машине">
+</form>
+</td><td valign="top">
+<form action="{% url 'addroad' %}" method="post">
+<table>
+<tr>
+    <td>Название:</td>
+    <td><input type="text" name="road_name"></td>
+</tr>
+<tr>
+    <td>Расстояние:</td>
+    <td><input type="text" name="road_length"></td>
+</tr>
+<tr>
+    <td>Откуда:</td>
+    <td>
+        <select title="rasfrom" name="rasfrom">
+            {% for loc_from in poi %}
+                <option value="{{loc_from.id}}">{{loc_from.name}}</option>
+            {% endfor %}
+        </select>
+    </td></tr>
+    <tr>
+    <td>Куда:</td>
+    <td>
+        <select title="rasto" name="rasto">
+            {% for loc_to in poi %}
+                <option value="{{loc_to.id}}">{{loc_to.name}}</option>
+            {% endfor %}
+        </select>
+    </td>
+    </tr>
+</table>
+<input type="submit"  value="Добавить дорогу">
+</form>
+</td>
+<td valign="top">
+<form action="{% url 'addplace' %}" method="post">
+<table>
+<tr>
+    <td>Название:<input type="text" name="place_name"></td>
+</tr>
+<tr><td>
+<input type="submit"  value="Добавить место">
+</tr></td>
+</table>
+</form>
+</td>
+
+<td valign="top">
+<form action="{% url 'viewstat' %}" method="post">
+<table>
+<tr><td>Дорога:</td>
+<td>
+        <select title="analroad" name="analroad">
+            {% for road in roads %}
+                <option value="{{road.id}}">{{road.name}}</option>
+            {% endfor %}
+        </select>
+</td>
+</tr>
+<tr><td>С:</td><td><input type="text" name="from_hr"></td><td><input type="text" name="from_min"></td></tr>
+<tr><td>По:</td><td><input type="text" name="to_hr"></td><td><input type="text" name="to_min"></td></tr>
+<tr><td><input type="submit"  value="Посмотреть статистику"></tr></td>
+
+</table>
+</form>
+</td>
+</table>

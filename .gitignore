@@ -23,3 +23,5 @@ maze2
 __pycache__
 *.pyc*
 autopilot
+venv
+venv/**
