@@ -12,15 +12,26 @@ def addcar(request):
     car_to = int(request.POST['car_to'])
     hr_from = int(request.POST['hrstart'])
     min_from = int(request.POST['minstart'])
-    add_car(car_name,
-            car_speed,
-            car_from,
-            car_to,
-            hr_from,
-            min_from,
-            0)
     context = {}
-    context['msg'] = u'Добавлено!'
+    if not car_name:
+        context['msg'] = u'Имя не может быть пустым!'
+    if car_speed <= 0.0:
+        context['msg'] = u'Скорость не может быть не положительной!'
+    if car_from == car_to:
+        context['msg'] = u'Пункты не могут совпадать'
+    if hr_from < 0 and hr_from > 24:
+        context['msg'] = u'Часы заданы неверно'
+    if min_from < 0 and min_from > 60:
+        context['msg'] = u'Минуты заданы неверно'
+    else:
+        add_car(car_name,
+                car_speed,
+                car_from,
+                car_to,
+                hr_from,
+                min_from,
+                0)
+        context['msg'] = u'Добавлено!'
     return render(request, 'added.html', context)
 
 
@@ -34,7 +45,7 @@ def addroad(request):
         context['msg'] = u'Имя не может быть пустым'
     elif from_id == to_id:
         context['msg'] = u'Начальный и конечный пункт совпадают'
-    elif not float(road_length):
+    elif float(road_length) <= 0:
         context['msg'] = u'Нулевая длина!'
     else:
         try:
