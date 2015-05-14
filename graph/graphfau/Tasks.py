@@ -144,3 +144,7 @@ class Tasks:
                         print 'No path between %d and %d' % (vertex, rv)
                     else:
                         print vertex, '--', rv, 'has path: ', res[::-1]
+
+    @staticmethod
+    def flow_ford_fulkerson(g):
+        pass

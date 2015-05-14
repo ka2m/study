@@ -6,7 +6,10 @@ from graphfau.DWGraph import DWGraph
 
 class GraphGenerator:
     @staticmethod
-    def create(params=None, use_file=False, filename=None, adj_list=None):
+    def create(params=None, use_file=False, filename=None, adj_list=None,
+               network=False):
+        if network:
+            params = {'directed': True, 'weighted': True, 'network': True}
         if not use_file and not adj_list:
             raise Exception('Using bare adj_list, but passed None')
         if use_file and filename is None:
@@ -33,13 +36,20 @@ class GraphGenerator:
             for vv in adj_list[v]:
                 if type(vv) is not int and type(vv) is not tuple:
                     vv = int(vv)
-        return GraphGenerator.generate(params, used_adj_list)
+
+        g = GraphGenerator.generate(params, used_adj_list)
+        if network:
+            return GraphGenerator.finish_netowrk_creation(g)
+        return g
 
     @staticmethod
     def generate(params, adjacency_list):
         try:
             directed = params['directed']
             weighted = params['weighted']
+            network = False
+            if 'network' in params:
+                network = True
         except KeyError as error:
             print 'Not all parameters has been passed: %s' % error
             return None
@@ -71,7 +81,7 @@ class GraphGenerator:
             vv = set()
             for v in vertices:
                 vv.add(v)
-            return DWGraph(vv, adj)
+            return DWGraph(vv, adj, network=network)
 
     @staticmethod
     def conform_undir(adj_list):
@@ -109,3 +119,10 @@ class GraphGenerator:
         for v in adj_list:
             res[v] = set(adj_list[v])
         return res
+
+    @staticmethod
+    def finish_netowrk_creation(g):
+        print g
+        for edge in g.get_w_edges():
+            g.add_arc(edge[1], edge[0], 0)
+        print g

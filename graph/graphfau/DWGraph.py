@@ -6,17 +6,19 @@ import copy
 
 
 class DWGraph:
-    def __init__(self, vertices, adj_list):
+    def __init__(self, vertices, adj_list, network=False):
         self.vertices = vertices  # set
         self.adj = adj_list
         self.gen_connections()  # list of tuples
         self.gen_adj_list_undir()
+        self.is_network = network
 
     def __str__(self):
-        return 'Graph:\ndirected\nweighted\nVertices: %s\n' \
+        return 'Graph:%s\nVertices: %s\n' \
                'Adjcency map:\n%s\n' \
                'All connecions:\n%s\n' % \
-               (' '.join([str(x) for x in self.vertices]),
+               ('\nnetwork' if self.is_network else '\ndirected\nweighted',
+                ' '.join([str(x) for x in self.vertices]),
                 '\n'.join(['%s: %s' % (v,
                                        ' '.join([str(x) for x in self.adj[v]]))
                           for v in self.adj]), self.connections)
