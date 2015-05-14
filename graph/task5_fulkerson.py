@@ -12,3 +12,5 @@ adj_list = {1: [(2, 8), (3, 6)],
             4: [(6, 10), (5, 8)],
             5: [(6, 7)]}
 g = gg.create(network=True, adj_list=adj_list)
+print g
+print ts.flow_ford_fulkerson(g, 1, 6)

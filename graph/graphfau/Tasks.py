@@ -146,5 +146,37 @@ class Tasks:
                         print vertex, '--', rv, 'has path: ', res[::-1]
 
     @staticmethod
-    def flow_ford_fulkerson(g):
-        pass
+    def flow_ford_fulkerson(g, source, sink):
+        """
+            Task 5 Ford-Fulkerson algorithm: max flow in the network
+            Graph: network
+        """
+        edge_id_list = []
+        idx = 1
+        for edge in g.get_w_edges():
+            edge_id_list.append((idx, (edge[0], edge[1])))
+            edge_id_list.append((-idx, (edge[1], edge[0])))
+            idx += 1
+        flow = dict.fromkeys([t[0] for t in edge_id_list], 0)
+        path = func.find_flow_path(g,
+                                   edge_id_list,
+                                   flow,
+                                   source,
+                                   sink,
+                                   [])
+        while path is not None:
+            residuals = [edge[2] -
+                         flow[func.get_flow_id_from_edge(edge,
+                                                         edge_id_list,
+                                                         flow)]
+                         for edge in path]
+            print residuals
+            _flow = min(residuals)
+            for edge in path:
+                _id = func.get_flow_id_from_edge(edge, edge_id_list, flow)
+                flow[_id] += _flow
+                flow[-_id] -= _flow
+            path = func.find_flow_path(g, edge_id_list, flow, source, sink, [])
+
+        return sum(flow[func.get_flow_id_from_edge(edge, edge_id_list, flow)]
+                   for edge in g.get_connections(source) if edge[2])
