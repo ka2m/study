@@ -1,16 +1,17 @@
 """
-    Task 4.17c Get connection length between all the vertices
+    Task 4.17c Get CONNECTIONS between all the vertices
     Graph: directed, weighted
+    Graph contains negative circuits
 """
 
 from graphfau.GraphGenerator import GraphGenerator as gg
 from graphfau.Tasks import Tasks as ts
 
 params = {'directed': True, 'weighted': True}
-adj_list = {1: [(2, 2), (3, -2)],
-            2: [(5, 3), (4, 2), (6, 12)],
-            3: [(4, -2)],
-            4: [(5, 1), (1, -1)],
+adj_list = {1: [(2, -5), (6, 5)],
+            2: [(4, 6), (3, -8)],
+            3: [(1, -4)],
+            4: [(5, 3)],
             5: [(6, 4)]}
 
 g = gg.create(params=params, adj_list=adj_list)

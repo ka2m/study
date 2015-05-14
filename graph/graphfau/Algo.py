@@ -135,6 +135,7 @@ class Algo:
     def floyd(graph):
         vertices = graph.vertices
         d = dict(Algo.convert_adjmap_to_adjmatrix(graph))
+        print d
         for k in vertices:
             for i in vertices:
                 for j in vertices:
@@ -144,26 +145,17 @@ class Algo:
     @staticmethod
     def ford(graph, from_vertex):
         dist = dict.fromkeys(graph.vertices, float('inf'))
+        paths = dict.fromkeys(graph.vertices, None)
         dist[from_vertex] = 0
+        list_vertices = list(graph.vertices)
 
-        for count in graph.vertices:
-            for vertex in graph.adj:
-                for vv in graph.get_connections(vertex):
-                    upd = dist[vertex] + vv[2]
-                    if dist[vv[1]] > upd:
-                        dist[vv[1]] = upd
+        for vertice in list_vertices[::-1]:
+            negv = None
+            for edge in graph.get_w_edges():
+                new_wght = dist[edge[0]] + edge[2]
+                if new_wght < dist[edge[1]]:
+                    dist[edge[1]] = new_wght
+                    paths[edge[1]] = edge[0]
+                    negv = edge[1]
 
-        for vertex in graph.vertices:
-            for vv in graph.adj[vertex]:
-                try:
-                    cw = 0
-                    try:
-                        cw = graph.get_connection_weight(vv, vertex)
-                    except:
-                        cw = graph.get_connection_weight(vertex, vv)
-
-                    assert dist[vv] <= dist[vertex] + cw
-                except AssertionError:
-                    print 'Negative circuit exists!'
-                    return None
-        return dist
+        return negv, paths

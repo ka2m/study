@@ -102,30 +102,45 @@ class Tasks:
         return 'Graph'
 
     @staticmethod
-    def fl_pairs(g):
+    def floyd_lengths(g):
         """
-            Task 4.9b Get connections between all the vertices
+            Task 4.9b Get connection LENGTHS between all the vertices
             Graph: directed, weighted
         """
+        verbose = True
         d = func.floyd(g)
         for vertex in d:
             for to in d[vertex]:
                 lng = d[vertex][to]
-                if lng:
-                    if not lng == float('inf') and not vertex == to:
+                if not vertex == to:
+                    if not lng == float('inf'):
                         print vertex, '--', to, 'has path of length', lng
+                    elif verbose:
+                        print 'There is no path between %d and %d' % (vertex,
+                                                                      to)
 
     @staticmethod
     def ford_pairs(g):
         """
-            Task 4.17c Get connection weights between all the vertices
+            Task 4.17c Get CONNECTIONS between all the vertices
             Graph: directed, weighted
         """
-
         for vertex in g.vertices:
-            p = func.ford(g, vertex)
-            if p is not None:
-                p = {k: v for (k, v) in p.iteritems() if not k == vertex
-                     and not v == float('inf')}
-                if len(p):
-                    print vertex, p
+            negv, path = func.ford(g, vertex)
+            for rv in path:
+                if not rv == vertex:
+                    cur = rv
+                    res = [cur]
+
+                    while cur is not None:
+                        cur = path[cur]
+                        if (cur == rv and len(res) > 1) or cur == vertex:
+                            # second case  if having normal path in neg-cyc g
+                            break
+                        res.append(cur)
+
+                    res.append(vertex)
+                    if None in res:
+                        print 'No path between %d and %d' % (vertex, rv)
+                    else:
+                        print vertex, '--', rv, 'has path: ', res[::-1]
