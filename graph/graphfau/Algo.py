@@ -159,3 +159,9 @@ class Algo:
                     negv = edge[1]
 
         return negv, paths
+
+    @staticmethod
+    def find_flow_path(flow, source, sink, path):
+        if source == sink:
+            return path
+        #for

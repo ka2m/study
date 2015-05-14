@@ -122,7 +122,6 @@ class GraphGenerator:
 
     @staticmethod
     def finish_netowrk_creation(g):
-        print g
         for edge in g.get_w_edges():
             g.add_arc(edge[1], edge[0], 0)
-        print g
+        return g
