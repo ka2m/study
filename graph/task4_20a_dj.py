@@ -6,7 +6,7 @@
 
 from graphfau.GraphGenerator import GraphGenerator as gg
 from graphfau.Tasks import Tasks as ts
-from graphfau.Algo import Algo
+
 params = {'directed': False, 'weighted': True}
 adj_list = {1: [(2, 2), (3, 2)],
             2: [(5, 3), (4, 2), (6, 12)],
@@ -16,4 +16,4 @@ adj_list = {1: [(2, 2), (3, 2)],
 g = gg.create(params=params, adj_list=adj_list)
 
 print g
-print Algo.djikstra(g, 1, multi_path=True)
+ts.djikstra_count_paths(g, 1)

@@ -120,30 +120,45 @@ class Tasks:
                                                                       to)
 
     @staticmethod
+    def djikstra_count_paths(g, from_vertex):
+        """
+            Task 4.20a Get number of shortest paths from some vertex to all
+            the others
+            Graph: not directed, weighted
+        """
+        _, path = func.djikstra(g, from_vertex, multi_path=True)
+        for vertex in path:
+            if not vertex == from_vertex:
+                print '%d-%d: %d' % (from_vertex, vertex, len(path[vertex]))
+
+    @staticmethod
     def ford_pairs(g):
         """
             Task 4.17c Get CONNECTIONS between all the vertices
             Graph: directed, weighted
         """
         for vertex in g.vertices:
-            negv, path = func.ford(g, vertex)
-            for rv in path:
-                if not rv == vertex:
-                    cur = rv
-                    res = [cur]
-
-                    while cur is not None:
-                        cur = path[cur]
-                        if (cur == rv and len(res) > 1) or cur == vertex:
-                            # second case  if having normal path in neg-cyc g
-                            break
-                        res.append(cur)
-
-                    res.append(vertex)
-                    if None in res:
-                        print 'No path between %d and %d' % (vertex, rv)
+            cc, negv, path = func.ford(g, vertex)
+            for to_vertex in path:
+                if to_vertex in cc:
+                    if not to_vertex == vertex:
+                        print 'There is negative cycle %d-%d' % (vertex, to_vertex)
+                else:
+                    if path[to_vertex] is None:
+                        if not to_vertex == vertex:
+                            print 'There is no path %d-%d' % (vertex, to_vertex)
                     else:
-                        print vertex, '--', rv, 'has path: ', res[::-1]
+                        if not to_vertex == vertex:
+                            rpath = []
+                            curv = to_vertex
+
+                            while curv is not None:
+                                rpath.append(curv)
+                                curv = path[curv]
+                            print 'Path %d-%d: %s' %  (vertex, to_vertex, rpath[::-1])
+
+
+
 
     @staticmethod
     def flow_ford_fulkerson(g, source, sink):

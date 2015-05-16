@@ -105,7 +105,6 @@ class Algo:
         paths = dict.fromkeys(graph.vertices, [None]) if multi_path else \
             dict.fromkeys(graph.vertices, None)
         visited = dict.fromkeys(graph.vertices, False)
-        print dist, paths, visited
         dist[from_vertex] = 0
         for count in graph.vertices:
             vertex = None
@@ -147,18 +146,20 @@ class Algo:
         dist = dict.fromkeys(graph.vertices, float('inf'))
         paths = dict.fromkeys(graph.vertices, None)
         dist[from_vertex] = 0
-        list_vertices = list(graph.vertices)
-
-        for vertice in list_vertices[::-1]:
+        cc = []
+        for count in range(len(graph.vertices)):
             negv = None
-            for edge in graph.get_w_edges():
-                new_wght = dist[edge[0]] + edge[2]
-                if new_wght < dist[edge[1]]:
-                    dist[edge[1]] = new_wght
-                    paths[edge[1]] = edge[0]
-                    negv = edge[1]
+            for edge in graph.connections:
+                if dist[edge[0]] < float('inf'):
+                    new_wght = dist[edge[0]] + edge[2]
+                    if dist[edge[1]] > new_wght:
+                        dist[edge[1]] = new_wght
+                        paths[edge[1]] = edge[0]
+                        negv = edge[1]
+                        if count == len(graph.vertices) -1 :
+                            cc.append(negv)
 
-        return negv, paths
+        return cc, negv, paths
 
     @staticmethod
     def find_flow_path(graph, id_list, flow, source, sink, path):

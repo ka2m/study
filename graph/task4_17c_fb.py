@@ -8,11 +8,9 @@ from graphfau.GraphGenerator import GraphGenerator as gg
 from graphfau.Tasks import Tasks as ts
 
 params = {'directed': True, 'weighted': True}
-adj_list = {1: [(2, -5), (6, 5)],
-            2: [(4, 6), (3, -8)],
-            3: [(1, -4)],
-            4: [(5, 3)],
-            5: [(6, 4)]}
+adj_list = {1: [(2, 3), (4, 2)],
+            2: [(3, 1)],
+            3: [(2, -2)]}
 
 g = gg.create(params=params, adj_list=adj_list)
 
