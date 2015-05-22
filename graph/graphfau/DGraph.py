@@ -15,7 +15,7 @@ class DGraph:
     def __str__(self):
         return 'Graph:\ndirected\nnot weighted\nVertices: %s\n' \
                'Adjcency map:\n%s\n' \
-               'All connecions:\n%s\n' % \
+               'All connections:\n%s\n' % \
                (' '.join([str(x) for x in self.vertices]),
                 '\n'.join(['%s: %s' % (v,
                                        ' '.join([str(x) for x in self.adj[v]]))

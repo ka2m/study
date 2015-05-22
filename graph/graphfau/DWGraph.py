@@ -16,7 +16,7 @@ class DWGraph:
     def __str__(self):
         return 'Graph:%s\nVertices: %s\n' \
                'Adjcency map:\n%s\n' \
-               'All connecions:\n%s\n' % \
+               'All connections:\n%s\n' % \
                ('\nnetwork' if self.is_network else '\ndirected\nweighted',
                 ' '.join([str(x) for x in self.vertices]),
                 '\n'.join(['%s: %s' % (v,
