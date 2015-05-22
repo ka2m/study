@@ -29,6 +29,24 @@ class Algo:
         return distances, paths
 
     @staticmethod
+    def bfs_paths(g, start, goal):
+        queue = [(start, [start])]
+        while queue:
+            (vertex, path) = queue.pop(0)
+            for next in g.adj[vertex] - set(path):
+                if next == goal:
+                    yield path + [next]
+                else:
+                    queue.append((next, path + [next]))
+
+    @staticmethod
+    def short_bfs(g, start, goal):
+        try:
+            return next(Algo.bfs_paths(g, start, goal))
+        except StopIteration:
+            return None
+
+    @staticmethod
     def bfs(g, start):
         visited, queue = set(), [start]
         while queue:
@@ -54,18 +72,28 @@ class Algo:
                         adj_list={x: [] for x in graph.vertices})
         all_edges = graph.get_w_edges()
         print all_edges
-        while mst.count_edges() < (mst.count_vertices() - 1):
-            for edge in all_edges:
-                ccs = Algo.connected_components(mst)
-                print ccs
-                do_add_edge = True
-                for comp in ccs:
-                    if edge[0] in comp and edge[1] in comp:
-                        do_add_edge = False
-                if do_add_edge:
-                    emin = sorted([x for x in all_edges if x[0] == edge[0] and
-                                  x[1] == edge[1]], key=itemgetter(2))[0]
-                    mst.add_edge(*emin)
+        while True:
+            mst_edges = []
+            emin = float('inf')
+            candidate = None
+            ccs = Algo.connected_components(mst)
+            if len(ccs) == 1:
+                break
+            for component in ccs:
+                for vertex in component:
+                    for other_vertex in graph.adj[vertex]:
+                        if other_vertex not in component and graph.has_edge(vertex, other_vertex):
+                            wg = graph.get_connection_weight(vertex, other_vertex)
+                            if wg == -1:  # reverse it
+                                wg = graph.get_connection_weight(other_vertex, vertex)
+                            if wg < emin:
+                                emin = wg
+                                candidate = (vertex, other_vertex, wg)
+                mst_edges.append(candidate)
+
+            for edge in mst_edges:
+                if type(edge) is tuple:
+                    mst.add_edge(*edge)
         return mst
 
     @staticmethod
@@ -156,10 +184,10 @@ class Algo:
                         dist[edge[1]] = new_wght
                         paths[edge[1]] = edge[0]
                         negv = edge[1]
-                        if count == len(graph.vertices) -1 :
+                        if count == len(graph.vertices) - 1:
                             cc.append(negv)
 
-        return cc, negv, paths
+        return cc,  paths
 
     @staticmethod
     def find_flow_path(graph, id_list, flow, source, sink, path):

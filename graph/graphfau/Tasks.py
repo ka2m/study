@@ -138,7 +138,7 @@ class Tasks:
             Graph: directed, weighted
         """
         for vertex in g.vertices:
-            cc, negv, path = func.ford(g, vertex)
+            cc, path = func.ford(g, vertex)
             for to_vertex in path:
                 if to_vertex in cc:
                     if not to_vertex == vertex:
