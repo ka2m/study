@@ -153,8 +153,7 @@ class WGraph:
         return len(self.connections)
 
     def has_edge(self, vfrom, vto):
-        conns = {}
+        conns = []
         for c in self.connections:
-            conns.add((c[0], c[1]))
-        return (vfrom, vto) in self.connections or (vto, vfrom) \
-            in self.connections
+            conns.append((c[0], c[1]))
+        return (vfrom, vto) in conns or (vto, vfrom) in conns
