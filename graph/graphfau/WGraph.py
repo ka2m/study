@@ -100,6 +100,16 @@ class WGraph:
                 res.append(conn)
         return res
 
+    def get_unique_connections(self):
+        unq = []
+        localunq = []
+        for conn in self.connections:
+            pair = (conn[0], conn[1])
+            if pair not in localunq and pair[::-1] not in localunq:
+                unq.append(conn)
+                localunq.append(pair)
+        return unq
+
     def get_connection_weight(self, vfrom, vto):
         vs = self.get_connections(vfrom)
         for v in vs:

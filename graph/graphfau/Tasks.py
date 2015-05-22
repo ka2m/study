@@ -102,6 +102,11 @@ class Tasks:
         return 'Graph'
 
     @staticmethod
+    def boruvka(g):
+        mst = func.boruvka(g)
+        print mst.get_unique_connections()
+
+    @staticmethod
     def floyd_lengths(g):
         """
             Task 4.9b Get connection LENGTHS between all the vertices

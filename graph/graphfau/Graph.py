@@ -96,6 +96,13 @@ class Graph:
             res.remove(vertex)
         return res
 
+    def get_unique_connections(self):
+        unq = []
+        for conn in self.connections:
+            if conn not in unq and conn[::-1] not in unq:
+                unq.append(conn)
+        return unq
+
     def degree(self, vertex):
         return len(self.adj[vertex])
 

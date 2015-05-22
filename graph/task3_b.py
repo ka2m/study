@@ -4,8 +4,7 @@
 """
 
 from graphfau.GraphGenerator import GraphGenerator as gg
-from graphfau.Algo import Algo
-
+from graphfau.Tasks import Tasks as ts
 params = {'directed': False, 'weighted': True}
 adj_list = {1: [(2, 5), (3, 7), (4, 12)],
             2: [(5, 1), (3, 5)],
@@ -15,5 +14,4 @@ adj_list = {1: [(2, 5), (3, 7), (4, 12)],
             6: [(7, 2)]}
 g = gg.create(params=params, adj_list=adj_list)
 
-print g
-print Algo.boruvka(g)
+ts.boruvka(g)
