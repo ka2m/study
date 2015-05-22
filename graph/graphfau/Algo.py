@@ -108,7 +108,7 @@ class Algo:
                                          list(set(vertices) - set(comp)))
 
     @staticmethod
-    def convert_adjmap_to_adjmatrix(g):
+    def convert_adjmap_to_adjmatrix(g, flow=False):
         dist = {}
         for i in g.adj.keys():
             p = {}
@@ -116,11 +116,17 @@ class Algo:
                 try:
                     cw = g.get_connection_weight(i, j)
                     if i == j:
-                        p[j] = 0
+                        if flow:
+                            p[j] = None
+                        else:
+                            p[j] = 0
                     else:
                         p[j] = cw
                 except:
-                    p[j] = float('inf')
+                    if flow:
+                        p[j] = None
+                    else:
+                        p[j] = float('inf')
             dist[i] = p
         return dist
 
@@ -187,32 +193,30 @@ class Algo:
         return cc,  paths
 
     @staticmethod
-    def find_flow_path(graph, id_list, flow, source, sink, path):
-        if source == sink:
-            return path
-        for edge in [e for e in graph.get_connections(source) if e[2]]:
-            edge = tuple(edge)
-            residual = edge[2] - flow[Algo.get_flow_id_from_edge(edge,
-                                                                 id_list,
-                                                                 flow)]
-            chk = True
-            if len(path) >= 1:
-                if edge[0] != path[0][1]:
-                    chk = False
-
-            if residual > 0 and edge not in path and chk:
-                result = Algo.find_flow_path(graph,
-                                             id_list,
-                                             flow,
-                                             edge[1],
-                                             sink,
-                                             [edge] + path)
-
-                if result is not None:
-                    return result[::-1]
+    def bfs_flow(capacities, flow, source, sink):
+        queue = [source]
+        paths = {source: []}
+        while queue:
+            u = queue.pop(0)
+            for v in capacities[u]:
+                if capacities[u][v] is not None:
+                    if capacities[u][v] - flow[u][v] > 0 and v not in paths:
+                        paths[v] = paths[u] + [(u, v)]
+                        if v == sink:
+                            return paths[v]
+                        queue.append(v)
+        return None
 
     @staticmethod
-    def get_flow_id_from_edge(edge, id_list, flow):
-        for _id in id_list:
-            if edge[0] == _id[1][0] and edge[1] == _id[1][1]:
-                return _id[0]
+    def edmonds_karp(capacities, flow, source, sink):
+        while True:
+            path = Algo.bfs_flow(capacities, flow, source, sink)
+            if not path:
+                break
+            fl = min(capacities[u][v] - flow[u][v] for u, v in path)
+            print path
+            for u, v in path:
+                flow[u][v] += fl
+                flow[v][u] -= fl
+        return sum(flow[source][i] for i in capacities[source]
+                   if flow[source][i] is not None)
