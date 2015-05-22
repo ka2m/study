@@ -25,3 +25,5 @@ __pycache__
 autopilot
 venv
 venv/**
+token.file
+uid.file
