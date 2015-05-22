@@ -1,5 +1,4 @@
 import copy
-from operator import itemgetter
 from graphfau.GraphGenerator import GraphGenerator as gg
 
 
@@ -70,8 +69,6 @@ class Algo:
         props = {'directed': False, 'weighted': True}
         mst = gg.create(params=props,
                         adj_list={x: [] for x in graph.vertices})
-        all_edges = graph.get_w_edges()
-        print all_edges
         while True:
             mst_edges = []
             emin = float('inf')
