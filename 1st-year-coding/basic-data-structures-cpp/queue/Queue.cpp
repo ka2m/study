@@ -1,14 +1,15 @@
 #include "Queue.h"
 
 void Queue::push(int item) {
-   if (!this->_size) {
-        this->_queue = (int *)malloc(0);
+    if (!this->_size) {
+        this->_queue = (int *)malloc(sizeof(int));
         this->_size++;
    }
    else {
        this->_size++;
-       this->_queue = (int *)realloc(this->_queue,
+       int *newptr = (int *)realloc(this->_queue,
                                      this->_size * sizeof(int));
+       this->_queue = newptr;
    }
    this->_queue[this->_size-1] = item;
 }

@@ -8,7 +8,7 @@ private:
 public:
     Queue() {
         this->_size = 0;
-        this->_queue = (int *)malloc(0);
+        this->_queue = (int *)malloc(sizeof(int));
         }
     ~Queue() { }
     void push(int item);
