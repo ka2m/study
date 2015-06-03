@@ -1,0 +1,25 @@
+// task3.cpp : main project file.
+
+#include "stdafx.h"
+#include <map>
+#include <fstream>
+#include <sstream>
+#include <vector>
+#include <algorithm>
+#include "Transform.h"
+#include "PClip.h"
+#include "Form1.h"
+
+using namespace task3;
+	
+[STAThreadAttribute]
+int main(array<System::String ^> ^args)
+{
+	// Enabling Windows XP visual effects before any controls are created
+	Application::EnableVisualStyles();
+	Application::SetCompatibleTextRenderingDefault(false); 
+
+	// Create the main window and run it
+	Application::Run(gcnew Form1());
+	return 0;
+}
