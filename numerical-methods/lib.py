@@ -16,3 +16,14 @@ def split_between(rng):
         new_range.append(round((rng[i] + rng[i + 1]) / 2, 5))
     new_range.append(rng[-1])
     return new_range, [x for x in new_range if x not in rng]
+
+
+def join_between_range(original, between):
+    new = []
+    i = 0
+    for x in original:
+        new.append(x)
+        if i < len(between):
+            new.append(between[i])
+        i += 1
+    return new
