@@ -3,6 +3,8 @@
 from math import sin
 from lib import split_range, split_between, join_between_range
 
+# newton
+
 
 def divided_sub(xlist, ylist):
     lyl = len(ylist)
@@ -42,19 +44,20 @@ def test():
 
 def test2():
     print '------ test 2 -----'
-    orig_range = split_range(-1.0, 1.0, 10)
+    orig_range = split_range(-1.0, 1.0, 50)
     orig_results = [sin(x) for x in orig_range]
     new_range, only_new_range = split_between(orig_range)
     orig_full_results = [sin(x) for x in new_range]
 
     new_results = [newton(x, orig_range, orig_results) for x in only_new_range]
     new_results_on_old_range = [newton(x, orig_range, orig_results) for x in orig_range]
-
-    print orig_full_results
+    print '\t'.join([str(x) for x in new_range])
+    print '  '.join([str(round(x, 12)) for x in orig_full_results])
     all_results = join_between_range(new_results_on_old_range, new_results)
-    print all_results
-    print [abs(x[0] - x[1]) for x in zip([round(y, 12) for y in orig_full_results],
-                                         [round(y, 12) for y in all_results])]
+    print '  '.join([str(round(x, 12)) for x in all_results])
+
+    print ' '.join([str(abs(x[0] - x[1])) for x in zip([round(y, 12) for y in orig_full_results],
+                                                       [round(y, 12) for y in all_results])])
 
 
 if __name__ == "__main__":

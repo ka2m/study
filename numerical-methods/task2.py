@@ -1,7 +1,8 @@
 #!/usr/bin/python
 
-from lib import split_range, split_between
-from task1 import calc_result
+from lib import split_between
+
+# lagrange
 
 
 def lagrange(data, x):
