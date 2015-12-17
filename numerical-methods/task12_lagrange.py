@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
-from lib import split_between
-
+from lib import split_between, split_range
+from math import sin
 # lagrange
 
 
@@ -42,14 +42,27 @@ def test():
         i += 1
     print zip(x2_all_dots, new)
 
+
+def task():
+    old_range = split_range(-1.0, 1.0, 10)
+    old_results = [round(sin(x), 8) for x in old_range]
+    new_range, only_new_range = split_between(old_range)
+    print 'x dots: %s' % ' '.join([str(x) for x in old_range])
+    print 'sin(x) values: %s' % ' '.join([str(x) for x in old_results])
+    print 'task 2 dots (in-between): %s' % ' '.join(str(x) for x in only_new_range)
+    L = lagrange(zip(old_range, old_results), only_new_range)
+    print 'task 2 results (la grange): %s' % ' '.join(str(x) for x in L)
+    new = []
+    i = 0
+    for x in old_results:
+        new.append(x)
+        if i < len(L):
+            new.append(L[i])
+        i += 1
+    print 'task 2 all pairs: %s' % ' '.join(str(x) for x in zip(new_range, new))
+
+
 if __name__ == "__main__":
     test()
-    """
-    old_range = split_range(-1.0, 1.0, 10)
-    old_results = [x[0] for x in [calc_result(x) for x in old_range]]
-    new_range, only_new_range = split_between(old_range)
-    print 'task 1 dots: %s' % ' '.join([str(x) for x in old_range])
-    print 'task 1 sin(x) value: %s' % ' '.join([str(x) for x in old_results])
-    print 'task 2 dots (in-between): %s' %  ' '.join(str(x) for x in only_new_range)
-    print 'task 2 results (la grange): %s'%  ' '.join((str(x) for x in lagrange(zip(old_range, old_results), only_new_range)))
-    """
+    print '---------'
+    task()

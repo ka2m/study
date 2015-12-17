@@ -44,7 +44,7 @@ def test():
 
 def test2():
     print '------ test 2 -----'
-    orig_range = split_range(-1.0, 1.0, 50)
+    orig_range = split_range(-1.0, 1.0, 10)
     orig_results = [sin(x) for x in orig_range]
     new_range, only_new_range = split_between(orig_range)
     orig_full_results = [sin(x) for x in new_range]
@@ -61,4 +61,5 @@ def test2():
 
 
 if __name__ == "__main__":
+    test()
     test2()

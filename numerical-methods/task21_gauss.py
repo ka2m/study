@@ -1,7 +1,5 @@
 #!/usr/bin/python
 
-import copy
-
 
 def swap_rows(llist, i, row, count):
     tmp = llist[i]
@@ -44,13 +42,13 @@ def solve(al, bl, verbose=False):
     i = 0
     count = 0
     for i in range(0, size):
-        max_el = -1.0
+        max_el = -10000000.0
         row = -1
         for j in range(i, size):
             if abs(al[j][i]) > max_el:
                 max_el = abs(al[j][i])
                 row = j
-        if not int(max_el):
+        if max_el == 0.0:
             raise ValueError('Column has max element == zero')
 
         if i != row:

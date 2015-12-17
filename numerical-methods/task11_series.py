@@ -1,9 +1,10 @@
 #!/usr/bin/python
 
 from lib import split_range
+import math
 
-V = 11
 EPS = 10**(-8)
+
 
 def calc_result(x):
     item = x
@@ -26,3 +27,4 @@ if __name__ == "__main__":
     print '\t  '.join([str(x[0]) for x in answer])
     print '\t'.join([str(round(x[1][0], 4)) for x in answer])
     print '\t  '.join([str(x[1][1]) for x in answer])
+    print '\t' .join([str(round(math.sin(x), 4)) for x in split_range(-1, 1, 10)])

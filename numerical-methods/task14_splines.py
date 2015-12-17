@@ -46,7 +46,8 @@ def build_spline(x_list, y_list, n):
     for i in reversed(range(0, n - 1)):
         hi = x_list[i] - x_list[i - 1]
         splines[i].d = (splines[i].c - splines[i - 1].c) / hi
-        splines[i].b = hi * (2. * splines[i].c + splines[i - 1].c) / 6. + (y_list[i] - y_list[i - 1]) / hi
+        splines[i].b = hi * (2. * splines[i].c + splines[i - 1].c)\\
+            / 6. + (y_list[i] - y_list[i - 1]) / hi
 
     return splines
 
