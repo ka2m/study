@@ -38,8 +38,8 @@ CREATE TABLE Status (
 CREATE TABLE Progress (
 	id INT IDENTITY(1,1) PRIMARY KEY,
 	status INT NOT NULL,
-	update_date TIMESTAMP NOT NULL,
-	assignee INT NOT NULL,
+	update_date DATETIME NOT NULL,
+	assignee INT,
     CONSTRAINT fk_assignee_id FOREIGN KEY (assignee) REFERENCES Employee(id),
     CONSTRAINT fk_status_id FOREIGN KEY (status) REFERENCES Status(id)
 );
@@ -53,7 +53,7 @@ CREATE TABLE OrderItem (
 	id INT IDENTITY(1,1) PRIMARY KEY,
 	name varchar(80) NOT NULL,
 	device_type_id INT NOT NULL,
-	issue varbinary NOT NULL,
+	issue varchar(1000) NOT NULL,
 	progress_id INT NOT NULL,
 	is_warrinty BIT NOT NULL,
 	serial varchar(60) NOT NULL,
@@ -64,7 +64,7 @@ CREATE TABLE OrderItem (
 CREATE TABLE ServiceOrder (
 	id INT IDENTITY(1,1) PRIMARY KEY,
 	client_id INT NOT NULL,
-	open_date TIMESTAMP NOT NULL,
+	open_date DATETIME NOT NULL,
 	orderitem_id INT NOT NULL,
     CONSTRAINT fk_client_id FOREIGN KEY (client_id) REFERENCES Client(id),
     CONSTRAINT fk_orderitem_id FOREIGN KEY (orderitem_id) REFERENCES OrderItem(id)
