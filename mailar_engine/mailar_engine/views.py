@@ -20,6 +20,15 @@ def example_view(request, format=None):
     }
     return Response(content)
 
+@api_view(['POST'])
+@authentication_classes((BasicAuthentication, ))
+@permission_classes((IsAuthenticated,))
+def login_view(request, format=None):
+    content = {
+        'token': unicode(Token.objects.get(user=request.user))
+    }
+    return Response(content)
+
 
 @api_view(['POST'])
 def register(request):
@@ -28,17 +37,17 @@ def register(request):
         user = decoded_data.split(':')[0]
         password = decoded_data.split(':')[1]
     except KeyError, IndexError:
-        return Response(data={'error': 'Auth data not passed or invalid. Valid: base64(user:password)'},
+        return Response(data={'detail': 'Auth data not passed or invalid. Valid: base64(user:password)'},
                         status=status.HTTP_400_BAD_REQUEST)
 
     user, created = User.objects.get_or_create(username=user)
     if not created:
-        return Response(data={'error': 'User %s already exists' % user}, status=status.HTTP_409_CONFLICT)
+        return Response(data={'detail': 'User %s already exists' % user}, status=status.HTTP_409_CONFLICT)
 
     user.set_password(password)
     user.save()
 
     token = Token.objects.create(user=user)
 
-    return Response(data={'info': 'Created user: %s' % user,
+    return Response(data={'detail': 'Created user: %s' % user,
                           'token': token.key}, status=status.HTTP_201_CREATED)
