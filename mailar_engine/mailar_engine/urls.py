@@ -20,7 +20,6 @@ from mailar_engine import views
 urlpatterns = [
     url(r'^api/view/', views.example_view),
     url(r'^api/register/', views.register),
-    url(r'^api/login/', views.login_view)
-    # url(r'^api/message/{messageId}')
-    # url(r'api/message/',)
+    url(r'^api/login/', views.login_view),
+    url(r'^api/message/(?P<mid>\w+)', views.message)
 ]
