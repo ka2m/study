@@ -2,7 +2,7 @@ USE serviceCenterMain;
 
 -- basic statuses of orders
 INSERT INTO Status
-VALUES('New'), ('Open'), ('In alaysis'), ('In progress'), ('In verification'), ('Done'), ('Closed');
+VALUES('New'), ('Open'), ('In analysis'), ('In progress'), ('In verification'), ('Done'), ('Closed');
 
 -- main departments
 INSERT INTO Team
