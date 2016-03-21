@@ -86,7 +86,7 @@ SELECT p.id,
 FROM Progress as p;
 
 -- if any open tasks, plz work message
-SELECT IIF(SUM(IIF(s.name = 'Done', 0, 1)) != 0, 'Yep, work', 'Nope, relax') As 'Should I work?'
+SELECT IIF(SUM(IIF(s.name = 'Done', 1, 0)) != 0, 'Yep, work', 'Nope, relax') As 'Should I work?'
 FROM Progress as p
 JOIN Status AS s
 ON s.id = p.id

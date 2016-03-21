@@ -37,8 +37,8 @@ CREATE TABLE Status (
 
 CREATE TABLE Progress (
 	id INT IDENTITY(1,1) PRIMARY KEY,
-	status INT NOT NULL,
-	update_date DATETIME NOT NULL,
+	status INT,
+	update_date DATETIME,
 	assignee INT,
     CONSTRAINT fk_assignee_id FOREIGN KEY (assignee) REFERENCES Employee(id),
     CONSTRAINT fk_status_id FOREIGN KEY (status) REFERENCES Status(id)
@@ -54,7 +54,7 @@ CREATE TABLE OrderItem (
 	name varchar(80) NOT NULL,
 	device_type_id INT NOT NULL,
 	issue varchar(1000) NOT NULL,
-	progress_id INT NOT NULL,
+	progress_id INT,
 	is_warrinty BIT NOT NULL,
 	serial varchar(60) NOT NULL,
     CONSTRAINT fk_progress_id FOREIGN KEY (progress_id) REFERENCES Progress(id),
@@ -67,7 +67,7 @@ CREATE TABLE ServiceOrder (
 	open_date DATETIME NOT NULL,
 	orderitem_id INT NOT NULL,
     CONSTRAINT fk_client_id FOREIGN KEY (client_id) REFERENCES Client(id),
-    CONSTRAINT fk_orderitem_id FOREIGN KEY (orderitem_id) REFERENCES OrderItem(id)
+    CONSTRAINT fk_orderitem_id FOREIGN KEY (orderitem_id) REFERENCES OrderItem(id) ON DELETE CASCADE
 );
 
 
