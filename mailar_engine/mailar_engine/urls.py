@@ -18,8 +18,14 @@ from mailar_engine import views
 
 
 urlpatterns = [
-    url(r'^api/view/', views.example_view),
+    url(r'^api/register', views.register),
+    url(r'^api/login', views.login_view),
     url(r'^api/register/', views.register),
     url(r'^api/login/', views.login_view),
-    url(r'^api/message/(?P<mid>\w+)', views.message)
+    url(r'^api/message$', views.create_message),
+    url(r'^api/message/$', views.create_message),
+    url(r'^api/message/(?P<message_id>\w+)', views.message),
+    url(r'^api/message/(?P<message_id>\w+)', views.message),
+    url(r'^api/box', views.box),
+    url(r'^api/box/', views.box)
 ]
