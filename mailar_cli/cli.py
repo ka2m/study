@@ -1,10 +1,17 @@
 from api import APIWrapper as api
 
 
-endpoint = 'http://192.168.99.100:8000/api'
+endpoint = 'http://192.168.99.100:8000'
 user = 'vladique'
 password = 'passw'
 
-#token = b1a7d5b85a9afd9d919d3e011489c9210cff64b
-mc = api.APIWrapper(endpoint, user, password)
-print mc.get_view()
+mc = api.APIWrapper(endpoint, token="b31a89ac167e559861855103dafa7e3964838283")
+#print mc._login()
+
+user2 = 'vladfau'
+password2 = 'pass'
+
+mc2 = api.APIWrapper(endpoint, username=user2, password=password2)
+
+
+print mc._box('out')
