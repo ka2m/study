@@ -1,5 +1,5 @@
 remove(X, [X|Y], Y).
-remove(X, [A, B|C], [A|D]) :- remove(X, [B|C], D).
+remove(X, [A|C], [A|D]) :- remove(X, C, D).
 
 main :- remove( 'Fri'
               , ['Mon', 'Tue', 'Wen', 'Thu', 'Fri', 'Sat', 'Sun']
