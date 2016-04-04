@@ -1,17 +1,16 @@
-from api import APIWrapper as api
-
+from api.FilteringTypes import FilteringTypes as ft
+from interp.InteractiveInterpreter import InteractiveInterpreter as ii
 
 endpoint = 'http://192.168.99.100:8000'
-user = 'vladique'
+
+api2 = ii()
+api2.run()
+
+username = 'vladique'
 password = 'passw'
 
-mc = api.APIWrapper(endpoint, token="b31a89ac167e559861855103dafa7e3964838283")
-#print mc._login()
+# api = bi(endpoint, username, password)
 
-user2 = 'vladfau'
-password2 = 'pass'
+username = 'vladfau'
+password = 'pass'
 
-mc2 = api.APIWrapper(endpoint, username=user2, password=password2)
-
-
-print mc._box('out')

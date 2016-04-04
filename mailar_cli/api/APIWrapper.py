@@ -4,61 +4,59 @@ import json
 
 
 def obligatory_token(func):
-    def check(func):
-        def wrapper(self, *args):
+    def check(_func, *args, **kwargs):
+        def wrapper(self, *args, **kwargs):
             if self.token is None:
-                _, t = self._login()
-            return func(self, *args)
+                _, t = self.login()
+            return _func(self, *args, **kwargs)
         return wrapper
     return check(func)
 
 
 class APIWrapper:
 
-    login = None
+    username = None
     password = None
     api_endpoint = None
     token = None
     token_auth = {'Authorization': 'Token %s' % token}
-    
-    class NoEndpointProvidedError(Exception):
-        pass
 
     class NoAuthError(Exception):
         pass
 
-    def __init__(self, api_endpoint, token=None, username=None, password=None):
-        if api_endpoint is None:
-            raise self.NoEndpointProvidedError
+    def __init__(self, api_endpoint=None, token=None, username=None, password=None):
         self.api_endpoint = api_endpoint
         if token is None:
-            if username is None or password is None:
-                raise self.NoAuthError
-            else:
-                self.login = username
-                self.password = password
+            self.username = username
+            self.password = password
         else:
             self.token = token
             self.token_auth = {'Authorization': 'Token %s' % self.token}
 
-    def _register(self):
+    def set_token(self, value):
+        self.token = value
+        self.token_auth = {'Authorization': 'Token %s' % self.token}
+
+    def register(self):
         url = '%s/api/register' % self.api_endpoint
 
-        r = requests.post(url, json={'auth': base64.b64encode('%s:%s' % (self.login, self.password))})
+        r = requests.post(url, json={'auth': base64.b64encode('%s:%s' % (self.username, self.password))})
         return r.status_code, r.content
 
-    def _login(self):
+    def login(self):
         url = '%s/api/login' % self.api_endpoint
 
-        r = requests.post(url, auth=(self.login, self.password))
-
-        self.token = json.loads(r.content)['token']
-        self.token_auth = {'Authorization': 'Token %s' % self.token}
+        r = requests.post(url, auth=(self.username, self.password))
+        try:
+            self.token = json.loads(r.content)['token']
+            self.token_auth = {'Authorization': 'Token %s' % self.token}
+        except:
+            pass
 
         return r.status_code, r.content
 
     @obligatory_token
-    def _create_message(self, to=None, subject=None, text=None):
+    def create_message(self, to=None, subject=None, text=None):
         url = '%s/api/message' % self.api_endpoint
 
         data = dict(zip(['to', 'subject', 'text'],
@@ -70,7 +68,7 @@ class APIWrapper:
         return r.status_code, r.content
 
     @obligatory_token
-    def _get(self, message_id):
+    def get(self, message_id):
         url = '%s/api/message/%d' % (self.api_endpoint, message_id)
 
         r = requests.get(url,
@@ -78,7 +76,7 @@ class APIWrapper:
         return r.status_code, r.content
 
     @obligatory_token
-    def _send(self, message_id):
+    def send(self, message_id):
         url = '%s/api/message/%d' % (self.api_endpoint, message_id)
 
         r = requests.post(url,
@@ -87,7 +85,7 @@ class APIWrapper:
         return r.status_code, r.content
 
     @obligatory_token
-    def _read(self, message_id):
+    def read(self, message_id):
         url = '%s/api/message/%d' % (self.api_endpoint, message_id)
 
         r = requests.post(url,
@@ -96,7 +94,7 @@ class APIWrapper:
         return r.status_code, r.content
 
     @obligatory_token
-    def _update(self, message_id, to=None, subject=None, text=None):
+    def update(self, message_id, to=None, subject=None, text=None):
         url = '%s/api/message/%d' % (self.api_endpoint, message_id)
 
         data = dict(zip(['to', 'subject', 'text'],
@@ -108,7 +106,7 @@ class APIWrapper:
         return r.status_code, r.content
 
     @obligatory_token
-    def _delete(self, message_id):
+    def delete(self, message_id):
         url = '%s/api/message/%d' % (self.api_endpoint, message_id)
 
         r = requests.delete(url,
@@ -116,7 +114,7 @@ class APIWrapper:
         return r.status_code, r.content
 
     @obligatory_token
-    def _box(self, filter_type=None):
+    def box(self, filter_type=None):
         if filter_type is not None:
             url = '%s/api/box?filter=%s' % (self.api_endpoint, filter_type)
         else:
