@@ -2,7 +2,7 @@ CREATE TABLE Client (
 	id INT IDENTITY(1,1) PRIMARY KEY,
 	first_name varchar(60) NOT NULL,
 	last_name varchar(60) NOT NULL,
-	phone varchar(10) NOT NULL,
+	phone varchar(20) NOT NULL,
 	email varchar(60),
 	password varchar(400) NOT NULL
 );

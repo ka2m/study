@@ -19,11 +19,31 @@ VALUES ('Joe', 'Portier', 'jportier@sc.ru', '1000', 'B4FQINM3IX', 'FALSE');
 INSERT INTO Employee
 VALUES ('Core', 'Fixer', 'cfixer@sc.ru', '2001', 'P5C5MZKUDW', 'TRUE');
 
-INSERT INTO Employee
-VALUES ('Max', 'Fix', 'mfix@sc.ru', '2002', 'DU0QBRHNFW', 'FALSE');
-
-INSERT INTO Employee
-VALUES ('Marie', 'Xif', 'mxif@sc.ru', '2003', '9CKL8RGHAL', 'FALSE');
+insert into Employee (first_name, last_name, email, phone, is_manager, password) values ('Helen', 'Mccoy', 'hmccoy@sc.ru', 2492, 0, '0jbWD0');
+insert into Employee (first_name, last_name, email, phone, is_manager, password) values ('Janice', 'Evans', 'jevans@sc.ru', 2366, 0, 'm5V20YIYpBoj');
+insert into Employee (first_name, last_name, email, phone, is_manager, password) values ('Maria', 'Gonzales', 'mgonzales@sc.ru', 2395, 0, 'hhIyyP');
+insert into Employee (first_name, last_name, email, phone, is_manager, password) values ('Ashley', 'Hawkins', 'ahawkins@sc.ru', 2193, 0, 'c9VTL2A');
+insert into Employee (first_name, last_name, email, phone, is_manager, password) values ('Paul', 'Willis', 'pwillis@sc.ru', 2742, 0, 'HRLDHxq0');
+insert into Employee (first_name, last_name, email, phone, is_manager, password) values ('Mark', 'Scott', 'mscott@sc.ru', 2127, 0, '6Jgm5aHci4vP');
+insert into Employee (first_name, last_name, email, phone, is_manager, password) values ('Justin', 'Lee', 'jlee@sc.ru', 2854, 0, '6nlfAU1cbQ');
+insert into Employee (first_name, last_name, email, phone, is_manager, password) values ('Carlos', 'Harris', 'charris@sc.ru', 2553, 0, 'EP4qXoK0B');
+insert into Employee (first_name, last_name, email, phone, is_manager, password) values ('Melissa', 'Olson', 'molson@sc.ru', 2152, 0, '24tl2kR');
+insert into Employee (first_name, last_name, email, phone, is_manager, password) values ('Joe', 'Hansen', 'jhansen@sc.ru', 2142, 0, 'Ly4wtzq');
+insert into Employee (first_name, last_name, email, phone, is_manager, password) values ('Heather', 'Ford', 'hford@sc.ru', 2272, 0, 'WiebxMT');
+insert into Employee (first_name, last_name, email, phone, is_manager, password) values ('Craig', 'Gibson', 'cgibson@sc.ru', 2123, 0, 'kA8tfBjAH');
+insert into Employee (first_name, last_name, email, phone, is_manager, password) values ('Juan', 'Larson', 'jlarson@sc.ru', 2019, 0, '3f9L0y6NNCQx');
+insert into Employee (first_name, last_name, email, phone, is_manager, password) values ('Patricia', 'Duncan', 'pduncan@sc.ru', 2568, 0, '9TizHVRsbInr');
+insert into Employee (first_name, last_name, email, phone, is_manager, password) values ('Linda', 'Bowman', 'lbowman@sc.ru', 2436, 0, 'q7kR5B');
+insert into Employee (first_name, last_name, email, phone, is_manager, password) values ('Donna', 'Welch', 'dwelch@sc.ru', 2931, 0, 'drtyp90VYG');
+insert into Employee (first_name, last_name, email, phone, is_manager, password) values ('Evelyn', 'Mccoy', 'emccoy@sc.ru', 2349, 0, 'rkjwt6wsQC');
+insert into Employee (first_name, last_name, email, phone, is_manager, password) values ('Evelyn', 'Burton', 'eburton@sc.ru', 2334, 0, 'Pz8lzX');
+insert into Employee (first_name, last_name, email, phone, is_manager, password) values ('Johnny', 'Black', 'jblack@sc.ru', 2052, 0, 'Zp54jGZEQuq');
+insert into Employee (first_name, last_name, email, phone, is_manager, password) values ('Tammy', 'Bowman', 'tbowman@sc.ru', 2623, 0, 'kmnAqrtUCcxd');
+insert into Employee (first_name, last_name, email, phone, is_manager, password) values ('Alan', 'Scott', 'ascott@sc.ru', 2496, 0, 'oLMEb1KA');
+insert into Employee (first_name, last_name, email, phone, is_manager, password) values ('Gregory', 'Wilson', 'gwilson@sc.ru', 2871, 0, 'NFTpjpC0f30');
+insert into Employee (first_name, last_name, email, phone, is_manager, password) values ('Ashley', 'Mcdonald', 'amcdonald@sc.ru', 2343, 0, '8AJE1t2HhE');
+insert into Employee (first_name, last_name, email, phone, is_manager, password) values ('Andrew', 'Hudson', 'ahudson@sc.ru', 2604, 0, 'TRPW2CdiD6u');
+insert into Employee (first_name, last_name, email, phone, is_manager, password) values ('Stephanie', 'Mendoza', 'smendoza@sc.ru', 2645, 0, 'zz3shWf4NW');
 
 INSERT INTO Employee
 VALUES ('Helen', 'Overwelcomed', 'hoverwelcomed@sc.ru', '1001', 'UVWBU6Q87J', 'FALSE');
