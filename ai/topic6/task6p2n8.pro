@@ -13,5 +13,5 @@ collocate(L1, [H | T], [H2 | R]) :- index_wrap(L1, H, H2), collocate(L1, T, R).
 
 main :-
     collocate(['Zero', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine'],
-              [2, 3, 4, 7, 1, 6, 8, 5, 9], L),
+              [2, 3, 0, 4, 7, 1, 6, 8, 5, 9], L),
     write(L).
