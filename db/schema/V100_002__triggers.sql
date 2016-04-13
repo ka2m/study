@@ -50,7 +50,7 @@ DECLARE @id int
 DECLARE @progress_id int
 BEGIN
      INSERT OrderItem
-     SELECT name, device_type_id, issue, progress_id, is_warrinty, serial
+     SELECT name, device_type_id, issue, progress_id, is_warranty, serial
        FROM inserted;
 
      SELECT @id = IDENT_CURRENT('OrderItem')

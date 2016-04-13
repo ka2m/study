@@ -55,7 +55,7 @@ CREATE TABLE OrderItem (
 	device_type_id INT NOT NULL,
 	issue varchar(1000) NOT NULL,
 	progress_id INT,
-	is_warrinty BIT NOT NULL,
+	is_warranty BIT NOT NULL,
 	serial varchar(60) NOT NULL,
     CONSTRAINT fk_progress_id FOREIGN KEY (progress_id) REFERENCES Progress(id),
     CONSTRAINT fk_type_id FOREIGN KEY (device_type_id) REFERENCES DeviceType(id)
