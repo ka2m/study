@@ -207,6 +207,8 @@ def api_message_send(request, message_id):
         return data, status.HTTP_400_BAD_REQUEST
 
     m = Message.objects.get(id=int(message_id))
+    m.date = datetime.datetime.now()
+    m.save()
     recipients = Mail.objects.filter(message=m)
     if not len(recipients) or None in recipients:
         data = {'detail': 'No recipients'}
@@ -278,8 +280,8 @@ def api_message_update(request, message_id):
                                                        message=m)
                     ml.save()
                     Box.objects.create(owner=request.user,
-                           mail=ml,
-                           is_new=False).save()
+                                       mail=ml,
+                                       is_new=False).save()
                 except User.DoesNotExist:
                     data = {'detail': 'User %s does not exist' % u}
                     return data, status.HTTP_400_BAD_REQUEST
