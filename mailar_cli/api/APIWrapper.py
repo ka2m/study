@@ -13,8 +13,17 @@ def obligatory_token(func):
     return check(func)
 
 
-class APIWrapper:
+def mid_to_int(func):
+    def check(_func, *args, **kwargs):
+        def wrapper(self, message_id, *args, **kwargs):
+            if type(message_id) is not int:
+                message_id = int(message_id)
+            return _func(self, message_id, *args, **kwargs)
+        return wrapper
+    return check(func)
 
+
+class APIWrapper:
     username = None
     password = None
     api_endpoint = None
@@ -68,6 +77,7 @@ class APIWrapper:
         return r.status_code, r.content
 
     @obligatory_token
+    @mid_to_int
     def get(self, message_id):
         url = '%s/api/message/%d' % (self.api_endpoint, message_id)
 
@@ -76,6 +86,7 @@ class APIWrapper:
         return r.status_code, r.content
 
     @obligatory_token
+    @mid_to_int
     def send(self, message_id):
         url = '%s/api/message/%d' % (self.api_endpoint, message_id)
 
@@ -85,6 +96,7 @@ class APIWrapper:
         return r.status_code, r.content
 
     @obligatory_token
+    @mid_to_int
     def read(self, message_id):
         url = '%s/api/message/%d' % (self.api_endpoint, message_id)
 
@@ -94,6 +106,7 @@ class APIWrapper:
         return r.status_code, r.content
 
     @obligatory_token
+    @mid_to_int
     def update(self, message_id, to=None, subject=None, text=None):
         url = '%s/api/message/%d' % (self.api_endpoint, message_id)
 
@@ -106,6 +119,7 @@ class APIWrapper:
         return r.status_code, r.content
 
     @obligatory_token
+    @mid_to_int
     def delete(self, message_id):
         url = '%s/api/message/%d' % (self.api_endpoint, message_id)
 

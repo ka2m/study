@@ -47,66 +47,102 @@ class BaseInterpreter:
 
     def register(self):
         try:
-            sc, content = self.api_wrapper.register()
-            if sc == 201:
+            hc, content = self.api_wrapper.register()
+            if hc == 201:
                 self.api_wrapper.set_token(json.loads(content)['token'])
-                return 'Account registered. Your token: %s' % self.api_wrapper.token
-            elif sc == 400:
-                return 'Bad credentials were passed'
-            elif sc == 409:
-                return 'User already exists'
+            return hc, json.loads(content)
         except Exception as e:
-            return e
+            return 0, e
 
     def login(self):
         try:
-            sc, content = self.api_wrapper.login()
-            if sc == 200:
+            hc, content = self.api_wrapper.login()
+            if hc == 200:
                 self.api_wrapper.set_token(json.loads(content)['token'])
-                return 'Token: %s' % self.api_wrapper.token
-            else:
-                return json.loads(content)['detail']
+            return hc, json.loads(content)
         except Exception as e:
-            return e
+            return 0, e
 
     def send(self, to=None, subject=None, text=None):
         try:
             if ',' in to:
                 to = [x for x in to.split(',') if len(x)]
-            sc, content = self.api_wrapper.create_message(to, subject, text)
-            if sc == 201:
+            hc, content = self.api_wrapper.create_message(to, subject, text)
+            if hc == 201 and to is not None and len(to):
                 message_id = json.loads(content)['id']
-                if to is not None and len(to):
-                    _sc, _content = self.api_wrapper.send(message_id)
-                    return json.loads(_content)['detail']
-                else:
-                    return 'Saved as draft. Id: %s' % message_id
+                _hc, _content = self.api_wrapper.send(message_id)
+                return _hc, json.loads(_content)
             else:
-                return json.loads(content)['detail']
+                return hc, json.loads(content)
         except Exception as e:
-            return e
+            return 0, e
+
+    def create_draft(self, to=None, subject=None, text=None):
+        try:
+            if ',' in to:
+                to = [x for x in to.split(',') if len(x)]
+            hc, content = self.api_wrapper.create_message(to, subject, text)
+            return hc, json.loads(content)
+        except Exception as e:
+            return 0, e
+
+    def send_draft(self, message_id=None):
+        try:
+            hc, content = self.api_wrapper.send(message_id)
+            return hc, json.loads(content)
+        except Exception as e:
+            return 0, e
+
+    def delete(self, message_id=None):
+        try:
+            hc, content = self.api_wrapper.delete(message_id)
+            return hc, json.loads(content)
+        except Exception as e:
+            return 0, e
+
+    def get(self, message_id):
+        try:
+            hc, content = self.api_wrapper.get(message_id)
+            return hc, json.loads(content)
+        except Exception as e:
+            return 0, e
+
+    def read(self, message_id):
+        try:
+            hc, content = self.api_wrapper.get(message_id)
+            self.api_wrapper.read(message_id)
+            return hc, json.loads(content)
+        except Exception as e:
+            return 0, e
+
+    def update(self, message_id, to=None, subject=None, text=None):
+        try:
+            hc, content = self.api_wrapper.update(message_id, to, subject, text)
+            return hc, json.loads(content)
+        except Exception as e:
+            return 0, e
 
     def box(self, ft):
         try:
-            sc, content = self.api_wrapper.box(filter_type=ft.value)
-            if sc == 200:
+            hc, content = self.api_wrapper.box(filter_type=ft.value)
+            if hc == 200:
                 parsed_content = json.loads(content)
                 for m in parsed_content:
                     message_id = m['mail']['message']
-                    _sc, _content = self.api_wrapper.get(message_id)
-                    if _sc != 200:
-                        return json.loads(_content)['detail']
+                    _hc, _content = self.api_wrapper.get(message_id)
+                    if _hc != 200:
+                        return _hc, json.loads(_content)
                     m['mail']['message'] = json.loads(_content)
                     m['mail']['message']['id'] = message_id
-                dest = 'from' if ft == FilteringTypes.inbox else 'to'
-                return map(lambda x: {'dest': x['mail']['from_user']['username']
-                                            if ft == FilteringTypes.inbox else
+                dest = 'from_user' if ft == FilteringTypes.inbox else 'to_user'
+                return hc, map(lambda x: {dest: x['mail']['from_user']['username']
+                                                if ft == FilteringTypes.inbox else
                 (x['mail']['to_user']['username'] if x['mail']['to_user'] is not None else ''),
                                       'date': x['mail']['message']['date'],
                                       'id': x['mail']['message']['id'],
                                       'subject': x['mail']['message']['subject'],
                                       'is_new': x['is_new']}, parsed_content)
             else:
-                return json.loads(content)['detail']
+                return hc, json.loads(content)
         except Exception as e:
-            return e
+            return 0, e
