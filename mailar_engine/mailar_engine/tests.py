@@ -343,7 +343,6 @@ class DeleteMessageTest(APITestCase):
         self.assertEqual(len(Message.objects.filter(id=self.mid_sent)), 1)
 
 
-
 class BoxTest(APITestCase):
     def setUp(self):
         self.u, _ = User.objects.get_or_create(username='boxfrom', password='secret')
