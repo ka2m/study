@@ -8,7 +8,7 @@ class Box(models.Model):
     is_new = models.BooleanField(default=True)
 
     class Meta:
-        ordering = ['is_new', 'mail']
+        ordering = ['-is_new', 'mail']
 
 
 class Mail(models.Model):
@@ -27,5 +27,5 @@ class Message(models.Model):
     date = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ['date', 'subject']
+        ordering = ['-date', '-subject']
 
