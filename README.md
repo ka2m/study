@@ -12,6 +12,10 @@ It is:
 * Ogneva's Graphs course.
 * Batraeva's OOP course.
 * Mironov's Computer Graphics course.
+* Batraeva's DB course.
+* Ivanov's AI course.
+* Assembly tasks.
+* Mirantis Python/QA Course.
 
 For more detailed overview address each subdirectory.
 
