@@ -27,3 +27,6 @@ venv
 venv/**
 token.file
 uid.file
+**/static/css/**
+**/static/js/**
+**/static/fonts/**

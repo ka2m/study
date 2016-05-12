@@ -1,0 +1,14 @@
+﻿<?xml version="1.0"?>
+<DTS:ConnectionManager xmlns:DTS="www.microsoft.com/SqlServer/Dts"
+  DTS:ObjectName="ssudb2016.database.windows.net.serviceCenterAnalytics.vladfau"
+  DTS:DTSID="{A9507BE2-58F0-4020-A6CD-080352D38251}"
+  DTS:CreationName="OLEDB">
+  <DTS:ObjectData>
+    <DTS:ConnectionManager
+      DTS:ConnectionString="Data Source=ssudb2016.database.windows.net;User ID=vladfau;Initial Catalog=serviceCenterAnalytics;Provider=SQLNCLI11.1;Persist Security Info=True;Auto Translate=False;">
+      <DTS:Password
+        DTS:Name="Password"
+        Sensitive="1">AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAm7xgWbf2KkKPlFs27jaqegAAAAACAAAAAAAQZgAAAAEAACAAAAAyggUUL8fxBmjUCkGmlqkNIq823ShtPchFDKVwa8spgwAAAAAOgAAAAAIAACAAAAAxocuipk7iLU/lWoXt+34qfLSM1az8fNKJUECvx0qFK4AAAAB2iPRLdaKxsELqHkyAhmPPNaoW5WOad3yvqjJfrt3q6fK9eP6wtS+5l829NwQu2q4kFOjkyHwB4O9D+OAJcglaZ109bclLpwWyyu7rrMzc1djtIPeHOdfUGuZRQTDdXyrjpEBbneG78TwaJqdQDJ8Qa6Zj/FaS7H/YNY550+pTl0AAAAAXIJWjJNpj3IfbaALx6v9T8J5l32bmB86jxo0GxPxiCRlD+grZ5F3doucEy15+gs1CHkTMO2rk+IIIwh3M5qu0</DTS:Password>
+    </DTS:ConnectionManager>
+  </DTS:ObjectData>
+</DTS:ConnectionManager>

@@ -1,0 +1,11 @@
+1;Phone
+2;Tablet
+3;Laptop
+4;Computer
+5;Mac
+6;iPad
+7;Player
+8;Router
+9;TV
+10;Xbox
+11;Playstation
