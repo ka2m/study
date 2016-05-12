@@ -1,0 +1,26 @@
+# Main app manifest
+#
+# How to use:
+#
+# export POSTGRES_PASSWORD=yourPostgresPassword
+# docker-compose -f ./docker-compose.yml
+
+db:
+  image: postgres:latest
+  environment:
+    POSTGRES_PASSWORD: "pass"
+  ports:
+    - "5432:5432"
+  volumes:
+     - ./postgres:/var/lib/postgresql
+
+engine:
+  image: mailar-engine:latest
+  environment:
+    POSTGRES_PASSWORD: "pass"
+  ports:
+    - "8000:8000"
+  links:
+    - db
+  volumes:
+    - ~/Documents/mailar/mailar_engine:/srv
