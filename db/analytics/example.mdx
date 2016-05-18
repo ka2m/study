@@ -1,0 +1,4 @@
+SELECT NON EMPTY { [Measures].[Fact Service Order Count] } ON COLUMNS
+FROM ( SELECT ( { [Dim Device Manifacturer].[Name].&[Apple] } ) ON COLUMNS
+FROM ( SELECT ( { [Dim Date].[Year].&[2016] } ) ON COLUMNS FROM [Service Center Analytics]))
+WHERE ( [Dim Date].[Year].&[2016], [Dim Device Manifacturer].[Name].&[Apple] ) CELL PROPERTIES VALUE, BACK_COLOR, FORE_COLOR, FORMATTED_VALUE, FORMAT_STRING, FONT_NAME, FONT_SIZE, FONT_FLAGS

@@ -1,0 +1,12 @@
+name
+Phone
+Tablet
+Laptop
+Computer
+Mac
+iPad
+Player
+Router
+TV
+Xbox
+Playstation

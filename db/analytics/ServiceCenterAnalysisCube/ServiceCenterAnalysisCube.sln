@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.24720.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{D2ABAB84-BF74-430A-B69E-9DC6D40DDA17}") = "ServiceCenterAnalysisCube", "ServiceCenterAnalysisCube\ServiceCenterAnalysisCube.dwproj", "{FB1B8B45-7FBC-4D38-A3AF-BC8F8788973B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Development|Default = Development|Default
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FB1B8B45-7FBC-4D38-A3AF-BC8F8788973B}.Development|Default.ActiveCfg = Development
+		{FB1B8B45-7FBC-4D38-A3AF-BC8F8788973B}.Development|Default.Build.0 = Development
+		{FB1B8B45-7FBC-4D38-A3AF-BC8F8788973B}.Development|Default.Deploy.0 = Development
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,8 @@
+name
+Apple
+LG
+Lenovo
+Samsung
+Xiaomi
+Microsoft
+Sony

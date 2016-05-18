@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<DTS:ConnectionManager xmlns:DTS="www.microsoft.com/SqlServer/Dts"
+  DTS:ObjectName="WIN-8ONBO06K8SC_ANAYLITCSSRV.serviceCenterAnalytics"
+  DTS:DTSID="{D8A2DE6D-B5A0-4ABB-AA4F-5D9F87E9E511}"
+  DTS:CreationName="OLEDB">
+  <DTS:ObjectData>
+    <DTS:ConnectionManager
+      DTS:ConnectionString="Data Source=WIN-8ONBO06K8SC\ANAYLITCSSRV;Initial Catalog=serviceCenterAnalytics;Provider=SQLNCLI11.1;Integrated Security=SSPI;Auto Translate=False;" />
+  </DTS:ObjectData>
+</DTS:ConnectionManager>

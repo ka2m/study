@@ -1,3 +1,17 @@
+CREATE TABLE dimDate
+( KeyDate BIGINT NOT NULL,
+      [Date] DATE NOT NULL,
+      [Year] INT NOT NULL,
+      [Quarter] INT NOT NULL,
+      [Month] INT NOT NULL,
+      [Week] INT NOT NULL,
+      [Day] INT NOT NULL,
+      [MonthName] NVARCHAR(20) NOT NULL,
+      [DayName] NVARCHAR(20) NOT NULL,
+      CONSTRAINT PKDW_1 PRIMARY KEY (KeyDate)
+      )
+
+
 CREATE TABLE DeviceType (
       id INT IDENTITY(1,1) PRIMARY KEY,
       name varchar(60) NOT NULL
@@ -16,7 +30,7 @@ CREATE TABLE Inventory (
       price INT NOT NULL
 ) ON [Frequently_Requested];
 
-REATE TABLE ServiceOrder (
+CREATE TABLE ServiceOrder (
        id INT IDENTITY(1, 1) PRIMARY KEY,
        dt_id INT NOT NULL,
        dm_id INT NOT NULL,
@@ -37,8 +51,14 @@ AS RANGE RIGHT FOR VALUES (20130101, 20140101, 20150101, 20160101)
 CREATE TABLE FactInventoryUsage (
        id INT IDENTITY(1, 1) PRIMARY KEY,
        ServiceOrder_id INT NOT NULL,
-       InvnetoryAllocation_id INT NOT NULL
+       InventoryAllocation_id INT NOT NULL
 )
+
+ALTER TABLE FactInventoryUsage
+ADD CONSTRAINT FK_IA FOREIGN KEY (InventoryAllocation_id) REFERENCES InventoryAllocation(id)
+
+ALTER TABLE FactInventoryUsage
+ADD CONSTRAINT FK_SO FOREIGN KEY (ServiceOrder_id) REFERENCES ServiceOrder(id)
 
 CREATE TABLE FactInvetoryUsageDenormalized (
        id INT IDENTITY(1, 1) PRIMARY KEY,
@@ -80,4 +100,36 @@ ON InventoryAllocation([id])
 
 CREATE NONCLUSTERED INDEX NOCL_FACT_ALL
 ON FactInventoryUsage([ServiceOrder_id]) INCLUDE ([InvnetoryAllocation_id])
+
+
+CREATE TABLE dimDate
+( KeyDate BIGINT NOT NULL,
+  [Date] DATE NOT NULL,
+  [Year] INT NOT NULL,
+  [Quarter] INT NOT NULL,
+  [Month] INT NOT NULL,
+  [Week] INT NOT NULL,
+  [Day] INT NOT NULL,
+  [MonthName] NVARCHAR(20) NOT NULL,
+  [DayName] NVARCHAR(20) NOT NULL,
+  CONSTRAINT PKDW_1 PRIMARY KEY (KeyDate)
+  )
+
+ALTER TABLE FactInvetoryUsageDenormalized
+DROP COLUMN open_date
+
+ALTER TABLE FactInvetoryUsageDenormalized
+ADD open_date BIGINT NOT NULL
+
+ALTER TABLE FactInvetoryUsageDenormalized
+ADD CONSTRAINT FK_DDATE FOREIGN KEY (open_date) REFERENCES DimDate (KeyDate)
+
+ALTER TABLE FactInventoryUsage
+DROP COLUMN open_date
+
+ALTER TABLE FactInventoryUsage
+ADD open_date BIGINT NOT NULL
+
+ALTER TABLE FactInventoryUsage
+ADD CONSTRAINT FK_DATE2 FOREIGN KEY (open_date) REFERENCES DimDate (KeyDate)
 
