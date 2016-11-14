@@ -44,6 +44,11 @@ class DPRunner {
 
         if (options.r) {
             password = System.console().readPassword 'Password: '
+            def repeat = System.console().readPassword 'Repeat password: '
+            if (password != repeat) {
+                println 'Paswords don\'t match'
+                return
+            }
             def _hd = System.console().readLine 'Home directory (leave empty to use ./<username>): '
             if (!_hd.length()) {
                 _hd = "./${username}"
