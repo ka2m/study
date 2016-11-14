@@ -1,11 +1,17 @@
 #lang racket
+(require racket/trace)
 
 ;;quicksort
-(define (quicksort l gt?)
-    (if (null? l)
-        '()
-        (append (quicksort (filter (lambda (x) (gt? (car l) x)) (cdr l)) gt?)
-                (list (car l))
-                (quicksort (filter (lambda (x) (not (gt? (car l) x))) (cdr l)) gt?))))
+(define (quicksort l)
+    (let quick-acc ((tosort l)
+                    (acc '()))
+      (if (or (null? tosort)
+              (null? (cdr tosort)))
+          (append tosort acc)
+          (let* ((pivot (car tosort))
+                 (tosort (cdr tosort))
+                 (acc (append (list pivot) (quicksort (filter ((curry <=) pivot) tosort)) acc)))
+                (quick-acc (filter ((curry >) pivot) tosort) acc)))))
 
-(quicksort '(1 3 5 7 9 8 6 4 2) >)
+(trace quicksort)
+(quicksort '(1 34 58 21 2 3 80 6))
