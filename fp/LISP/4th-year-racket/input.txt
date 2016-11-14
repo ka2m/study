@@ -1,0 +1,5 @@
+Hello world. This is test file which has some lines to be
+replaced. I want to replace another line.
+Here is more another line to replace
+Bldblah blah blaaah this is a long line without replaces
+which has to be split
