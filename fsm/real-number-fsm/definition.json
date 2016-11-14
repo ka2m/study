@@ -78,10 +78,7 @@
                "state":"q2",
                "alpha":"number"
             },
-            {  
-               "state":"q3",
-               "alpha":"exponent"
-            },
+
             {  
                "state":"q8",
                "alpha":"dot"
@@ -124,6 +121,10 @@
             {
                "state": "q7",
                "alpha": "number"
+            },
+            {
+               "state": "q3",
+               "alpha": "exponent"
             }
          ]
       },
@@ -164,11 +165,7 @@
             {
                "state": "q7",
                "alpha": "number"
-            },
-           {
-             "state": "q3",
-             "alpha": "exponent"
-           }
+            }
          ]
       }
    ]

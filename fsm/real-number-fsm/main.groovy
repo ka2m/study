@@ -1,15 +1,17 @@
-import org.fsm.runner.FSMRunner
+import org.fsm.realnumberrecognition.Runner
 
 /**
  * Created by vslepukhin on 18/09/2016.
  */
 
-def fsmRunner = new FSMRunner("definition.json")
+def fsmRunner = new Runner("definition.json")
+fsmRunner.run("+123.5e-2")
 fsmRunner.run("+123.5e-2")
 fsmRunner.run("+123.5e-")
 fsmRunner.run("+123.5e")
 fsmRunner.run("+123.5")
 fsmRunner.run("+123.")
+fsmRunner.run("+123.e2")
 fsmRunner.run("+123")
 fsmRunner.run("-123")
 fsmRunner.run("123")
@@ -24,3 +26,6 @@ fsmRunner.run("+.e82")
 fsmRunner.run("+.")
 fsmRunner.run(".")
 fsmRunner.run(".+")
+fsmRunner.run("+e8")
+fsmRunner.run("-.e8")
+fsmRunner.run("-.8")
