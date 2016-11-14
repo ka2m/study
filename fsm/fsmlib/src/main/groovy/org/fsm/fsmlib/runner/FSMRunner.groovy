@@ -11,10 +11,11 @@ import org.fsm.fsmlib.machine.FSMachine
 class FSMRunner {
     FSMConfig fsmConfig
 
-    public FSMRunner(String configFile) {
+    public FSMRunner(String configFile, boolean quiet = false) {
         def data = new JsonSlurper().parse(new File(configFile))
         this.fsmConfig = new FSMConfig(data)
-        this.fsmConfig.describe()
+        if (!quiet)
+            this.fsmConfig.describe()
     }
 
     public void run(String inputString) {
