@@ -15,6 +15,9 @@ class Runner extends FSMRunner {
 
 
     public void run(inputString, startNum) {
+        def resLine = inputString.drop(startNum)
+        println "resLine: ${resLine}"
+
         Tuple2 exit = new Tuple2(false, null)
         List<FSMachine> machineList = []
         this.fsmConfig.stateList.findAll { it.isStarting }.each { machineList << ([it, this.fsmConfig] as FSMachine) }
@@ -25,12 +28,12 @@ class Runner extends FSMRunner {
 
         machineList.each { println it.currentState }
 
-        inputString.drop(startNum == 0? 0:startNum - 1).eachWithIndex { aChar, charIdx ->
+        resLine.eachWithIndex { aChar, charIdx ->
             def newStates = tickMachine(machineList, aChar).collect { TransitionRule tr -> tr.to }
             println newStates
             println "finals: ${newStates.findAll { it.isFinal }}"
-            if (newStates.find { it.isFinal } != null) {
-                exit = ([true, charIdx] as Tuple2)
+            if (newStates.count { it.isFinal } != 0) {
+                exit = ([true, charIdx + 1] as Tuple2)
             }
 
             machineList.clear()

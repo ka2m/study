@@ -6,4 +6,4 @@ import org.fsm.stringfinalstate.Runner
 
 def fsmRunner = new Runner("definition.json")
 fsmRunner.run('abcca', 1)
-fsmRunner.run('babac', 2)
+//fsmRunner.run('babac', 2)
