@@ -1,0 +1,74 @@
+{
+  "alphabet": [
+    {
+      "name": "space",
+      "validChars": " "
+    },
+    {
+      "name": "newline",
+      "validChars": "\n"
+    },
+    {
+      "name": "tab",
+      "validChars": "\t"
+    },
+    {
+      "name": "cr",
+      "validChars": "\r"
+    }
+  ],
+  "states": [
+    {
+      "name": "nulls",
+      "starting": true
+    },
+    {
+      "name": "q1",
+      "final": true
+    }
+  ],
+  "transitions": [
+    {
+      "from": "nulls",
+      "to": [
+        {
+          "state": "q1",
+          "alpha": "space"
+        },
+        {
+          "state": "q1",
+          "alpha": "newline"
+        },
+        {
+          "state": "q1",
+          "alpha": "tab"
+        },
+        {
+          "state": "q1",
+          "alpha": "cr"
+        }
+      ]
+    },
+    {
+      "from": "q1",
+      "to": [
+        {
+          "state": "q1",
+          "alpha": "space"
+        },
+        {
+          "state": "q1",
+          "alpha": "newline"
+        },
+        {
+          "state": "q1",
+          "alpha": "tab"
+        },
+        {
+          "state": "q1",
+          "alpha": "cr"
+        }
+      ]
+    }
+  ]
+}

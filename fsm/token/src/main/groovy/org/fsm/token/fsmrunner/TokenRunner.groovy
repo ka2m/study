@@ -10,12 +10,14 @@ import org.fsm.fsmlib.runner.FSMRunner
 class TokenRunner extends FSMRunner {
 
     String tokenClass
+    int priority
     boolean quietMode
 
-    public TokenRunner(String configFile, String tokenClass, boolean quiet) {
+    public TokenRunner(String configFile, String tokenClass, int priority=0, boolean quiet=false) {
         super(configFile, quiet)
         this.quietMode = quiet
         this.tokenClass = tokenClass
+        this.priority = priority
     }
 
     public Tuple2 readToken(String inputString) {
@@ -35,13 +37,12 @@ class TokenRunner extends FSMRunner {
                     machineList << ([it, this.fsmConfig] as FSMachine)
                 }
             }
-            if (!quietMode)
-                println "This string: ${inputString} ------ ${(exit.first) ? "" : "NOT"} valid for this FSM"
         } catch (Exception ex) {
             if (!quietMode)
                 println ex.toString()
-            exit = ([false, 0] as Tuple2)
         }
+        if (!quietMode)
+            println "This string: ${inputString} ------ ${(exit.first) ? "" : "NOT"} valid for this FSM"
         return exit
     }
 }

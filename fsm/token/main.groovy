@@ -1,7 +1,8 @@
 import org.fsm.token.fsmrunner.TokenRunner
+import org.fsm.token.recognition.TokenSplitter
 
 def testNumberFSM() {
-    def fsmRunner = new TokenRunner("src/main/resources/realNumber.json", "number", false)
+    def fsmRunner = new TokenRunner("src/main/resources/realNumber.json", "number")
     def tests = ["+123.5e-2",
                  "+123.5e-",
                  "+123.5e",
@@ -32,7 +33,7 @@ def testNumberFSM() {
 }
 
 def testKeywordFSM() {
-    def fsmRunner = new TokenRunner("src/main/resources/keyword.json", "keyword", false)
+    def fsmRunner = new TokenRunner("src/main/resources/keyword.json", "keyword")
     def positiveTests = ["while", "do", "if", "then", "else", "begin", "end"]
     def negativeTests = ["whil", "od", "blabl", "tenh", "superstring", "notvalid", "eee"]
 
@@ -47,8 +48,8 @@ def testKeywordFSM() {
     }
 }
 
-def testOps() {
-    def fsmRunner = new TokenRunner("src/main/resources/operations.json", "op", false)
+def testOpsFSM() {
+    def fsmRunner = new TokenRunner("src/main/resources/operations.json", "op")
     def positiveTests = [":=", "*", "-", "/", "+"]
     def negativeTests= ["=",":", "(", "while", "123.5e-", ")", "++++"]
     positiveTests.each { test ->
@@ -62,10 +63,71 @@ def testOps() {
     }
 }
 
-def testId() {
-    def fsmRunner = new TokenRunner("src/main/resources/id.json", "id", false)
+def testIdFSM() {
+    def fsmRunner = new TokenRunner("src/main/resources/id.json", "id")
     def positiveTests = ["a", "bcd", "a1", "hey123", "a1b2c3"]
     def negativeTests= ["1", "123", "()()()"]
+    positiveTests.each { test ->
+        Tuple2 res = fsmRunner.readToken(test)
+        println res
+    }
+
+    negativeTests.each { test ->
+        Tuple2 res = fsmRunner.readToken(test)
+        println res
+    }
+}
+
+def testEmptyFSM() {
+    def fsmRunner = new TokenRunner("src/main/resources/emptySpace.json", "id")
+    def positiveTests = [" ", "  ", "   ", """
+"""]
+    def negativeTests = ["1", "abcd", ";", ""]
+    positiveTests.each { test ->
+        Tuple2 res = fsmRunner.readToken(test)
+        println res
+    }
+
+    negativeTests.each { test ->
+        Tuple2 res = fsmRunner.readToken(test)
+        println res
+    }
+}
+
+def testOpenParFSM() {
+    def fsmRunner = new TokenRunner("src/main/resources/openParanthesis.json", "id")
+    def positiveTests = [")"]
+    def negativeTests = ["1", "abcd", ";", "    "]
+    positiveTests.each { test ->
+        Tuple2 res = fsmRunner.readToken(test)
+        println res
+    }
+
+    negativeTests.each { test ->
+        Tuple2 res = fsmRunner.readToken(test)
+        println res
+    }
+}
+
+def testCloseParFSM() {
+    def fsmRunner = new TokenRunner("src/main/resources/closeParanthesis.json", "id")
+    def positiveTests = [")"]
+    def negativeTests = ["1", "abcd", ";", "    "]
+    positiveTests.each { test ->
+        Tuple2 res = fsmRunner.readToken(test)
+        println res
+    }
+
+    negativeTests.each { test ->
+        Tuple2 res = fsmRunner.readToken(test)
+        println res
+    }
+}
+
+def testSemiColonFSM() {
+    def fsmRunner = new TokenRunner("src/main/resources/semicolon.json", "id")
+    def positiveTests = [";"]
+    def negativeTests = ["1", "abcd", ";", "    "]
     positiveTests.each { test ->
         Tuple2 res = fsmRunner.readToken(test)
         println res
@@ -80,9 +142,16 @@ def testId() {
 def runTests() {
     testNumberFSM()
     testKeywordFSM()
-    testOps()
-    testId()
+    testOpsFSM()
+    testIdFSM()
+    testCloseParFSM()
+    testOpenParFSM()
+    testSemiColonFSM()
+    testEmptyFSM()
 }
 
-testKeywordFSM()
-testId()
+//runTests()
+def ts = new TokenSplitter("src/main/resources/globalConfig.json")
+//ts.split("c:=34/2.0")
+//ts.split("1bc")
+ts.split(new File("exampleProgram.code").text)

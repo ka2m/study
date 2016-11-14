@@ -1,0 +1,45 @@
+{
+  "relativeConfigFilePath": "src/main/resources",
+  "configs": [
+    {
+      "fileName": "closeParanthesis",
+      "tokenClassName": "closePar",
+      "priority": 6
+    },
+    {
+      "fileName": "openParanthesis",
+      "tokenClassName": "openPar",
+      "priority": 7
+    },
+    {
+      "fileName": "emptySpace",
+      "tokenClassName": "delimeter",
+      "priority": 8
+    },
+    {
+      "fileName": "id",
+      "tokenClassName": "id",
+      "priority": 2
+    },
+    {
+      "fileName": "keyword",
+      "tokenClassName": "kw",
+      "priority": 1
+    },
+    {
+      "fileName": "operations",
+      "tokenClassName": "op",
+      "priority": 4
+    },
+    {
+      "fileName": "realNumber",
+      "tokenClassName": "num",
+      "priority": 3
+    },
+    {
+      "fileName": "semicolon",
+      "tokenClassName": "semicolon",
+      "priority": 5
+    }
+  ]
+}
