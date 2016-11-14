@@ -61,20 +61,17 @@ class FSMConfig {
 
 
 
-        this.transitionList.sort { it.from.name }.sort { !it.from.isStarting }.each {  s ->
+        this.transitionList.sort { it.from.name }.each {  s ->
             at.addRule()
             def displayRow = []
             displayRow << s.from.transitionTableStateDescription()
 
             this.alphabet.alphaList.each { a->
-                def search = s.possibleMoves.findAll { a == it.alpha }
+                def search = s.possibleMoves.findAll { a == it.alpha }.collect { it.to.name}.join(",")
                 if (!search.size()) {
                     displayRow << "x"
-                }
-                else {
-                    search.each { fs ->
-                        displayRow << fs.to.name
-                    }
+                } else {
+                    displayRow << search
                 }
             }
             at.addRow(*displayRow)

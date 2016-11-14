@@ -15,7 +15,7 @@ class State {
 
     @Override
     public String toString() {
-        return "${name}${isStarting ? ':start' : ''}${isStarting ? ':fin' : ''}"
+        return "${name}${isStarting ? ':start' : ''}${isFinal ? ':fin' : ''}"
     }
 
     public String transitionTableStateDescription() {
