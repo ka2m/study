@@ -1,0 +1,95 @@
+{
+  "alphabet": [
+    {
+      "name": "assign-colon",
+      "validChars": ":"
+    },
+    {
+      "name": "assign-eq",
+      "validChars": "="
+    },
+    {
+      "name": "mult",
+      "validChars": "*"
+    },
+    {
+      "name": "div",
+      "validChars": "/"
+    },
+    {
+      "name": "sub",
+      "validChars": "-"
+    },
+    {
+      "name": "add",
+      "validChars": "+"
+    }
+  ],
+  "states": [
+    {
+      "name": "nulls",
+      "starting": true
+    },
+    {
+      "name": "q1"
+    },
+    {
+      "name": "q2",
+      "final": true
+    },
+    {
+      "name": "q3",
+      "final": true
+    },
+    {
+      "name": "q4",
+      "final": true
+    },
+    {
+      "name": "q5",
+      "final": true
+    },
+    {
+      "name": "q6",
+      "final": true
+    }
+  ],
+  "transitions": [
+    {
+      "from": "nulls",
+      "to": [
+        {
+          "state": "q1",
+          "alpha": "assign-colon"
+        },
+        {
+          "state": "q3",
+          "alpha": "mult"
+        },
+        {
+          "state": "q4",
+          "alpha": "div"
+        },
+        {
+          "state": "q5",
+          "alpha": "sub"
+        },
+        {
+          "state": "q6",
+          "alpha": "add"
+        }
+      ]
+    },
+    {
+      "from": "q1",
+      "to": [
+        {
+          "state": "q2",
+          "alpha": "assign-eq"
+        }
+      ]
+    }
+  ]
+}
+
+

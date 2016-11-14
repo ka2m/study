@@ -1,0 +1,29 @@
+{
+  "alphabet": [
+    {
+      "name": "op",
+      "validChars": "("
+    }
+  ],
+  "states": [
+    {
+      "name": "nulls",
+      "starting": true
+    },
+    {
+      "name": "q1",
+      "final": true
+    }
+  ],
+  "transitions": [
+    {
+      "from": "nulls",
+      "to": [
+        {
+          "state": "q1",
+          "alpha": "op"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "alphabet": [
+    {
+      "name": "number",
+      "validChars": "0123456789"
+    },
+    {
+      "name": "character",
+      "validChars": "qazwsxedcrfvtgbyhnujmikolpQAZWSXEDCRFVTGBYHNUJMIKOLP"
+    }
+  ],
+  "states": [
+    {
+      "name": "nulls",
+      "starting": true
+    },
+    {
+      "name": "q1",
+      "final": true
+    }
+  ],
+  "transitions": [
+    {
+      "from": "nulls",
+      "to": [
+        {
+          "state": "q1",
+          "alpha": "character"
+        }
+      ]
+    },
+    {
+      "from": "q1",
+      "to": [
+        {
+          "state": "q1",
+          "alpha": "number"
+        },
+        {
+          "state": "q1",
+          "alpha": "character"
+        }
+      ]
+    }
+  ]
+}
