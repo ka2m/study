@@ -18,13 +18,14 @@ class FSMachine {
         this.fsm = config
     }
 
-    public List feedChar(CharSequence aChar) {
+    public List feedChar(CharSequence aChar, boolean quiet) {
         try {
             Alpha a = this.fsm.alphabet.converCharToAlpha(aChar)
             this.lastConsumedCharcter = a
             return this.fsm.transitionList.find { it.from == this.currentState }.possibleMoves.findAll { it.alpha == a }
         } catch(Exception ex) {
-            println ex.toString()
+            if (!quiet)
+                println ex.toString()
         }
     }
 }

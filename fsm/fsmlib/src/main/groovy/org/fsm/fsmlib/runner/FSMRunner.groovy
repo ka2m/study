@@ -11,9 +11,12 @@ import org.fsm.fsmlib.machine.FSMachine
 class FSMRunner {
     FSMConfig fsmConfig
 
+    boolean quiet = false
+
     public FSMRunner(String configFile, boolean quiet = false) {
         def data = new JsonSlurper().parse(new File(configFile))
         this.fsmConfig = new FSMConfig(data)
+        this.quiet = quiet
         if (!quiet)
             this.fsmConfig.describe()
     }
@@ -24,7 +27,7 @@ class FSMRunner {
 
     public  List tickMachine(List<FSMachine> currentMachineList, CharSequence aChar) {
         def newStates = []
-        currentMachineList.each { FSMachine m -> newStates << m.feedChar(aChar) }
+        currentMachineList.each { FSMachine m -> newStates << m.feedChar(aChar, this.quiet) }
         return newStates.flatten().unique()
     }
 }
