@@ -1,13 +1,11 @@
 #lang racket
 
 ;;quicksort
-(define (quicksort < l)
-    (match l
-           ['() '()]
-           [(cons x xs)
-            (let-values ([(xs-gte xs-lt) (partition (curry < x) xs)])
-               (append (quicksort < xs-lt)
-                       (list x)
-                       (quicksort < xs-gte)))]))
+(define (quicksort l gt?)
+    (if (null? l)
+        '()
+        (append (quicksort (filter (lambda (x) (gt? (car l) x)) (cdr l)) gt?)
+                (list (car l))
+                (quicksort (filter (lambda (x) (not (gt? (car l) x))) (cdr l)) gt?))))
 
-(quicksort < '(1 2 4 5 765 8 12 48 98 123))
+(quicksort '(1 3 5 7 9 8 6 4 2) >)
