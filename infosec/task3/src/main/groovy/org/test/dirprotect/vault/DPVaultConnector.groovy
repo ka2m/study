@@ -4,6 +4,8 @@ import com.gmongo.GMongo
 import org.test.dirprotect.exceptions.DPVaultException
 import org.test.dirprotect.helper.DPCommonHelper
 
+import java.security.MessageDigest
+
 /**
  * Created by vslepukhin on 10/11/2016.
  */
@@ -32,8 +34,11 @@ class DPVaultConnector {
             throw new DPVaultException("DPUser with same home directory already exists")
         }
 
+        MessageDigest sha1 = MessageDigest.getInstance("SHA1")
+        byte[] digest  = sha1.digest(password.getBytes())
+
         db.dirProtect << ["user"    : username,
-                          "password": password,
+                          "password": new  BigInteger(1, digest).toString(16),
                           "home"    : homeDir,
                           "hash"    : DPCommonHelper.generateHash(username, password),
                           "loggedIn": false]
@@ -92,7 +97,11 @@ class DPVaultConnector {
 
     static private def checkPassword(db, username, password) {
         println 'Checking password'
-        if (db.dirProtect.findOne(user: username).password != password) {
+        MessageDigest sha1 = MessageDigest.getInstance("SHA1")
+        byte[] digest  = sha1.digest(password.getBytes())
+        def incStr = new  BigInteger(1, digest).toString(16)
+
+        if (db.dirProtect.findOne(user: username).password != incStr) {
             throw new DPVaultException("Wrong password")
         }
     }
