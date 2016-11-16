@@ -1,22 +1,26 @@
-def encrypt(alpha, x, key1, key2) {
-    def lowercase = (x.toUpperCase() != x)
-    def pos = (lowercase) ? alpha.indexOf(x.toUpperCase()) : alpha.indexOf(x)
+def gcd(int i, int j) {
+    if (Math.min(i, j) == 0) return Math.max(i, j)
+    else return gcd(Math.min(i,j), Math.abs(i - j))
+}
+
+def encryptAlpha(String alphabet, String x, int key1, int key2) {
+    def pos = alphabet.indexOf(x)
     if (pos != -1) {
-        def alphaSize = alpha.length()
+        def alphaSize = alphabet.length()
         def newPos = (pos * key1 + key2) % alphaSize
         if (newPos >= alphaSize) {
             newPos -= alphaSize
         }
-        return [true, ((lowercase) ? alpha[newPos].toLowerCase(): alpha[newPos])]
+        return alphabet[newPos]
     }
-    return [false, null]
+    return x
 }
 
-def decrypt(alpha, x, key1, key2) {
-    def lowercase = (x.toUpperCase() != x)
-    def pos = (lowercase) ? alpha.indexOf(x.toUpperCase()) : alpha.indexOf(x)
+def decryptAlpha(String alphabet, String x, int key1, int key2) {
+    def pos = alphabet.indexOf(x)
+
     if (pos != -1) {
-        def alphaSize = alpha.length()
+        def alphaSize = alphabet.length()
         int cnt = 0;
         int inverse = 0;
 
@@ -29,67 +33,61 @@ def decrypt(alpha, x, key1, key2) {
         }
 
         def newPos = (cnt * (pos - key2) % alphaSize)
-        if (newPos < 0) {
-            newPos = alphaSize + newPos
-        }
-        if (newPos >= alphaSize) {
-            newPos -= alphaSize
-        }
-
-        return [true, ((lowercase) ? alpha[newPos].toLowerCase(): alpha[newPos])]
+        return alphabet[newPos]
     }
-    return [false, null]
+    return x
+}
+
+def encrypt(originalFileName, key1, key2, alphabet) {
+    def res = []
+    new File(originalFileName).eachLine { myLine ->
+        def encLine = ''
+        myLine.each { x ->
+            encLine += encryptAlpha(alphabet, x, key1, key2)
+        }
+        res << encLine
+    }
+    return res
+}
+
+def decrypt(encLines, key1, key2, alphabet) {
+    def res = []
+    encLines.each { myLine ->
+        def decLine = ''
+        myLine.each { x ->
+            decLine += decryptAlpha(alphabet, x, key1, key2)
+        }
+        res << decLine
+    }
+    return res
 }
 
 
-def eng = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-def rus = 'АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ'
-def num = '0123456789'
-def special = '.,-;:'
+def alphabet = 'АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдеёжзийклмнопрстуфхцчшщъыьэюя0123456789.,-;:'
 
 
-def n = 17
-def k = 20
+def fileName = System.console().readLine("Read from file: ")
+println "Alphabet size: ${alphabet.length()}"
+def n = Integer.parseInt(System.console().readLine("First key (n): "))
+def k = Integer.parseInt(System.console().readLine("Second key (k): "))
 
+if (gcd(alphabet.length(), n) != 1) {
+    println("Key1 (n) and alphabet size (m) are not relatively prime, affine cipher won't work correctly")
+    return
+}
 
-def encLines = []
 println "--------- ORIGINAL ---------"
-new File('orig').eachLine { println it}
+new File(fileName).eachLine { println it }
 
 
 println "--------- ENCRYPTED ---------"
-new File('orig').eachLine { myLine ->
-    def encLine = ''
-    myLine.each { x ->
-        itm = x
-        def vars = [encrypt(eng, x, n, k),
-                    encrypt(rus, x, n, k),
-                    encrypt(special, x, n, k),
-                    encrypt(num, x, n, k)].findAll { takeThis, _ -> takeThis == true }.collect { _, val -> val }
-        if (vars.size() != 0) {
-            itm = vars[0]
-        }
-
-        encLine += itm
-    }
-    encLines << encLine
-    println encLine
+def encLines = encrypt(fileName, n, k, alphabet)
+encLines.each {
+    println it
 }
+
 println "--------- DECRYPTED ---------"
-encLines.each { myLine ->
-    def decLine = ''
-    myLine.each { x ->
-        itm = x
-        def vars = [decrypt(eng, x, n, k),
-                    decrypt(rus, x, n, k),
-                    decrypt(special, x, n, k),
-                    decrypt(num, x, n, k)].findAll { takeThis, _ -> takeThis == true }.collect { _, val -> val }
-        if (vars.size() != 0) {
-            itm = vars[0]
-        }
-
-        decLine += itm
-    }
-//    encLines << encLine
-    println decLine
+decrypt(encLines, n, k, alphabet).each {
+    println it
 }
+
