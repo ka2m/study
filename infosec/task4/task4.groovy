@@ -1,39 +1,36 @@
-def container = "somefile"
-def openText = "openfile"
+import java.nio.file.Files
+import java.nio.file.Paths
+
+def container = "container"
 def resultFile = "result"
 
+def openText = "sometext"
+def extractedFile = "extract"
+
+//def openText = "somepic.png"
+//def extractedFile = "extract.png"
+
+
 def hide(String container, String openText, String resultFile) {
+    println "Reading file to hide"
     def bits = []
-    new File(openText).text.getBytes('UTF-8').each { aByte ->
-        String.format("%8s", Integer.toBinaryString(aByte & 0xFF)).replace(' ', '0').each {bit -> bits << bit}
-    }
-    def lines = []
-    new File(container).text.eachLine {
-        lines << it.trim()
-    }
+    new File(openText).getBytes().collect {it & 0xFF}.each { aByte ->
+        String.format("%8s", Integer.toBinaryString(aByte)).replace(' ', '0').each {bit -> bits << bit}
 
-    if (bits.size() > lines.size()) {
-        println "Container is too small for opentext"
-        return
     }
-
-    def resText = []
-    bits.eachWithIndex { def aBit, int bitIdx ->
-        if (aBit == "1") {
-            resText << lines[bitIdx] + " " + "\n"
-        } else {
-            resText << lines[bitIdx] + "\n"
+    int bitIdx = 0
+    println "Bulding new container with the file data"
+    new File(container).eachLine {
+        if (bitIdx < bits.size()) {
+            new File(resultFile) << "${it.trim()}${(bits[bitIdx] == "1") ? " " : ""}\n"
+            bitIdx++;
         }
     }
-
-    lines.drop(bits.size()).each { resText << it + "\n" }
-
-    resText.each {
-        new File(resultFile) << it
-    }
+    println "Done"
 }
 
-def extract(resultFile) {
+def extract(resultFile, extractedFile) {
+    println "Reading container"
     def bits = []
     new File(resultFile).eachLine { line ->
         if (line.length() > 0 && line[-1] == ' ') {
@@ -43,17 +40,31 @@ def extract(resultFile) {
         }
     }
 
-    def hiddenStr = ""
+    println "Converting bits into bytes"
+    def bytes = []
     while(bits.size() != 0) {
-
-        def data = Integer.parseInt(bits.take(8).join(''), 2)
-        hiddenStr += Character.toString ((char) data.byteValue());
-        bits = bits.drop(8)
+          def decByteRepr = 0
+          def newByte = bits.take(8)
+          newByte.eachWithIndex { bit, idx ->
+              if (bit == 1) {
+                  decByteRepr |= (1 << (7 - idx))
+              }
+          }
+          bytes << decByteRepr
+          bits = bits.drop(8)
     }
 
-    println hiddenStr
+    println "Writing out extracted file"
+    byte[] finalResult = new byte[bytes.size()];
+    for (int i = 0; i < finalResult.length; i++) {
+        finalResult[i] = bytes.get(i);
+    }
+
+    Files.write(Paths.get(extractedFile), finalResult);
+    println "Done"
 }
 
 
-//hide(container, openText, resultFile)
-extract(resultFile)
+
+hide(container, openText, resultFile)
+extract(resultFile, extractedFile)
