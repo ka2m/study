@@ -25,4 +25,27 @@ class State {
 
         return statePrintName
     }
+
+    @Override
+    boolean equals(o) {
+        if (this.is(o)) return true
+        if (getClass() != o.class) return false
+
+        State state = (State) o
+
+        if (isFinal != state.isFinal) return false
+        if (isStarting != state.isStarting) return false
+        if (name != state.name) return false
+
+        return true
+    }
+
+    @Override
+    int hashCode() {
+        int result
+        result = (name != null ? name.hashCode() : 0)
+        result = 31 * result + (isStarting ? 1 : 0)
+        result = 31 * result + (isFinal ? 1 : 0)
+        return result
+    }
 }

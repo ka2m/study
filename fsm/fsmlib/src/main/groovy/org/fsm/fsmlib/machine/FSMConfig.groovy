@@ -1,13 +1,10 @@
 package org.fsm.fsmlib.machine
 
-import de.vandermeer.asciitable.v2.RenderedTable
-import de.vandermeer.asciitable.v2.V2_AsciiTable
-import de.vandermeer.asciitable.v2.render.V2_AsciiTableRenderer
-import de.vandermeer.asciitable.v2.render.WidthAbsoluteEven
-import de.vandermeer.asciitable.v2.themes.V2_E_TableThemes
+import org.fsm.fsmlib.entity.Alpha
 import org.fsm.fsmlib.entity.Alphabet
 import org.fsm.fsmlib.entity.State
 import org.fsm.fsmlib.entity.Transition
+import org.fsm.fsmlib.generator.ReadRegex
 
 /**
  * Created by vslepukhin on 18/09/2016.
@@ -17,21 +14,29 @@ class FSMConfig {
     List<State> stateList = []
     List<Transition> transitionList
 
-    public FSMConfig(config) {
+    FSMConfig(Alphabet alphabet, List<State> stateList, List<Transition> transitionList) {
+        this.alphabet = alphabet
+        this.stateList = stateList
+        this.transitionList = transitionList
+    }
+
+    public FSMConfig(Map config) {
         this.alphabet = new Alphabet(config.alphabet)
         this.transitionList = []
         config.states.each { stateList << ([it.name, it.starting, it.final] as State)}
         config.transitions.each { t ->
-            def state = stateList.find { s -> s.name == t.from }
-            def moves = []
-            t.to.each { toState ->
-                moves << ["state": stateList.find { s -> s.name == toState.state },
-                          "alpha": alphabet.alphaList.find { a -> a.name == toState.alpha } ]
-            }
-
-            this.transitionList << ([state, moves] as Transition)
+            State fromState = stateList.find { it.name == t.from }
+            State toState = stateList.find { it.name == t.to }
+            Alpha a = alphabet.alphaList.find { it.name == t.by}
+            this.transitionList << ([fromState, toState, a] as Transition)
         }
+    }
 
+    public FSMConfig(String regex) {
+        def fsmFromRegex = ReadRegex.readRegexString(regex)
+        this.alphabet = fsmFromRegex.alphabet
+        this.stateList = fsmFromRegex.stateList
+        this.transitionList = fsmFromRegex.transitionList
     }
 
 
@@ -52,35 +57,18 @@ class FSMConfig {
 
         println "\n\n"
 
-        V2_AsciiTable at = new V2_AsciiTable()
-        at.addRule()
-        at.addRow('', *this.alphabet.alphaList.collect { it.name })
-        V2_AsciiTableRenderer rend = new V2_AsciiTableRenderer();
-        rend.setTheme(V2_E_TableThemes.UTF_LIGHT.get())
-        rend.setWidth(new WidthAbsoluteEven(76))
-
-
-
-        this.transitionList.sort { it.from.name }.each {  s ->
-            at.addRule()
-            def displayRow = []
-            displayRow << s.from.transitionTableStateDescription()
-
-            this.alphabet.alphaList.each { a->
-                def search = s.possibleMoves.findAll { a == it.alpha }.collect { it.to.name}.join(",")
-                if (!search.size()) {
-                    displayRow << "x"
-                } else {
-                    displayRow << search
-                }
-            }
-            at.addRow(*displayRow)
+        this.transitionList.each {
+            println "${it.from} -> ${it.to} by ${it.by}"
         }
-        at.addRule()
-        RenderedTable rt = rend.render(at)
-        println rt
 
+    }
 
-
+    @Override
+    public String toString() {
+        return "FSMConfig{" +
+                "alphabet=" + alphabet +
+                ", stateList=" + stateList +
+                ", transitionList=" + transitionList +
+                '}';
     }
 }
