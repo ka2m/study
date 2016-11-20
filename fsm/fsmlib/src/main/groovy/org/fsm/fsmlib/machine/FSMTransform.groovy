@@ -80,6 +80,58 @@ abstract class FSMTransform {
         return new FSMConfig(newAlphabet, newStates, newTransitions.unique())
     }
 
+    static def exists(FSMConfig a) {
+        def newAlphabet = new Alphabet()
+        a.alphabet.alphaList.each { Alpha al ->
+            newAlphabet.addAlpha(al)
+        }
+
+        def newStates = [a.stateList.find {State s -> s.isStarting }]
+        a.stateList.findAll { State s -> !s.isStarting }.each {
+            newStates << it
+        }
+
+        def newTransitions = []
+        a.transitionList.each { newTransitions << it}
+
+        for(Transition t: a.transitionList) {
+            if (t.to.isFinal && t.by.isEmptySymbol) {
+                State s = t.from
+                List<Transition> foundSame = a.transitionList.findAll { it.from.isStarting }
+                foundSame.each {
+                    newTransitions << new Transition(s, it.to, it.by)
+                }
+            }
+        }
+
+        return new FSMConfig(newAlphabet, newStates, newTransitions.unique())
+    }
+
+    static def iterateOnce(FSMConfig a) {
+        def newAlphabet = new Alphabet()
+        a.alphabet.alphaList.each { Alpha al ->
+            newAlphabet.addAlpha(al)
+        }
+
+        def newStates = [a.stateList.find {State s -> s.isStarting }]
+        a.stateList.findAll { State s -> !s.isStarting }.each {
+            newStates << it
+        }
+
+        def newTransitions = []
+        a.transitionList.each { newTransitions << it}
+
+        def emptySymbol = newAlphabet.alphaList.find { it.isEmptySymbol }
+
+        newStates.findAll { it.isStarting }.each { ss->
+            newStates.findAll { State t -> t.isFinal }.each { fs ->
+                newTransitions << new Transition(ss, fs, emptySymbol)
+            }
+        }
+
+        return new FSMConfig(newAlphabet, newStates, newTransitions.unique())
+    }
+
     static def concat(FSMConfig a, FSMConfig b) {
         def newAlphabet = getNewAlphabet(a.alphabet, b.alphabet)
         def newStates = getNewStates(a.stateList, b.stateList)
@@ -146,6 +198,32 @@ abstract class FSMTransform {
         return actionItems
     }
 
+    static def reduceIterateOnce(List actionItems) {
+        for (int i = 0; i < actionItems.size() - 1; i++) {
+            if (actionItems[i] instanceof FSMConfig && actionItems[i + 1] == RegexSymbol.IterateOnce) {
+                FSMConfig newFSM = iterateOnce(actionItems[i] as FSMConfig)
+                actionItems[i] = null
+                actionItems[i + 1] = newFSM
+            }
+
+        }
+        actionItems.removeIf { it == null }
+        return actionItems
+    }
+
+    static def reduceExists(List actionItems) {
+        for (int i = 0; i < actionItems.size() - 1; i++) {
+            if (actionItems[i] instanceof FSMConfig && actionItems[i + 1] == RegexSymbol.Exists) {
+                FSMConfig newFSM = exists(actionItems[i] as FSMConfig)
+                actionItems[i] = null
+                actionItems[i + 1] = newFSM
+            }
+
+        }
+        actionItems.removeIf { it == null }
+        return actionItems
+    }
+
     static def reduceUnite(List actionItems) {
         for (int i = 0; i < actionItems.size() - 2; i++) {
             if (actionItems[i] instanceof FSMConfig && actionItems[i + 1] == RegexSymbol.Unite && actionItems[i + 2] instanceof FSMConfig) {
@@ -179,6 +257,8 @@ abstract class FSMTransform {
         }
 
         while(actionItems.find { it == RegexSymbol.Iterate } != null) actionItems = reduceIterate(actionItems)
+        while(actionItems.find { it == RegexSymbol.IterateOnce } != null) actionItems = reduceIterateOnce(actionItems)
+        while(actionItems.find { it == RegexSymbol.Exists } != null) actionItems = reduceExists(actionItems)
         while(hasUnDoneConcat(actionItems)) actionItems = reduceConcat(actionItems)
 
 

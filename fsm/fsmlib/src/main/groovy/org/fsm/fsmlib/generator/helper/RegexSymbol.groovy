@@ -10,5 +10,7 @@ enum RegexSymbol {
     AnySymbol,
     AnyNumber,
     Iterate,
+    IterateOnce,
+    Exists,
     Unite
 }

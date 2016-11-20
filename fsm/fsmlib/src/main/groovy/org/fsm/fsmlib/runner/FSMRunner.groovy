@@ -22,6 +22,7 @@ class FSMRunner {
 
     public FSMRunner(String regexString, boolean quiet = false) {
         this.fsmConfig = new FSMConfig(regexString)
+        this.quiet = quiet
         if (!quiet)
             this.fsmConfig.describe()
     }

@@ -19,25 +19,31 @@ class ReadRegex {
 
         for (int i = 0; i < strSize; i++) {
             buf += str[i];
-            if (buf == "~w") {
+            if (buf == "%w") {
                 actionItems << FSMTransform.generateBasicFSM(RegexSymbol.AnySymbol)
                 buf = ""
-            } else if (buf == "~(") {
+            } else if (buf == "%(") {
                 actionItems << RegexSymbol.OpenParenthesis
                 buf = ""
-            } else if (buf == "~)") {
+            } else if (buf == "%)") {
                 actionItems << RegexSymbol.CloseParenthesis
                 buf = ""
-            } else if (buf == "~d") {
+            } else if (buf == "%d") {
                 actionItems << FSMTransform.generateBasicFSM(RegexSymbol.AnyNumber)
                 buf = ""
-            } else if (buf == "~+") {
+            } else if (buf == "|") {
                 actionItems << RegexSymbol.Unite
                 buf = ""
-            } else if (buf == "~*") {
+            } else if (buf == "%*") {
                 actionItems << RegexSymbol.Iterate
                 buf = ""
-            } else if (buf != "~") {
+            } else if (buf == "%?") {
+                actionItems << RegexSymbol.IterateOnce
+                buf = ""
+            } else if (buf == "%+") {
+                actionItems << RegexSymbol.Exists
+                buf = ""
+            } else if (buf != "%") {
                 actionItems << FSMTransform.generateBasicFSM(RegexSymbol.ExactSymbol, buf)
                 buf = ""
             }
