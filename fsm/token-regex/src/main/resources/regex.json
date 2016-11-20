@@ -1,0 +1,41 @@
+[
+  {"tokenName": "kw",
+   "regex": "while|do|begin|end|if|then|else|program",
+   "priority": 1
+  },
+  {
+    "tokenName": "id",
+    "regex": "%w(%w%*%d%*%)%*",
+    "priority": 2
+  },
+  {
+    "tokenName": "openParenthesis",
+    "regex": "(",
+    "priority": 3
+  },
+  {
+    "tokenName": "closeParenthesis",
+    "regex": ")",
+    "priority": 4
+  },
+  {
+    "tokenName": "semicolon",
+    "regex": ";",
+    "priority":5
+  },
+  {
+    "tokenName": "op",
+    "regex": "%(:=%)|%(+|-|*|/%)",
+    "priority": 6
+  },
+  {
+    "tokenName": "delim",
+    "regex": " %*|\n%*",
+    "priority": 7
+  },
+  {
+    "tokenName": "number",
+    "regex": "%(+|-%)%?%(%d%+.|.%d%+|%d%+.%d%+|%d%+%)%(%(e|E%)%(+|-%)%?%(%d%+%)%)%?",
+    "priority": 8
+  }
+]
