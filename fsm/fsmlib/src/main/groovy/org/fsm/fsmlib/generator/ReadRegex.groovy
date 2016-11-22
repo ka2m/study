@@ -50,6 +50,12 @@ class ReadRegex {
         }
 
         while (actionItems.size() != 1) {
+            int countOpP = actionItems.findAll { it == RegexSymbol.OpenParenthesis }.size()
+            int countCloseP = actionItems.findAll { it == RegexSymbol.CloseParenthesis }.size()
+
+            if (countOpP != countCloseP) {
+                throw new Exception("Can't parse regex as opened parenthesis count doesnt match closing ones")
+            }
             while (actionItems.find { it == RegexSymbol.OpenParenthesis } != null) {
                 int idxLastOpen = actionItems.findLastIndexOf { it == RegexSymbol.OpenParenthesis }
                 int idxFirstClose = actionItems.findIndexOf(idxLastOpen, { it == RegexSymbol.CloseParenthesis })
