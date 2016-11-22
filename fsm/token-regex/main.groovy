@@ -2,6 +2,17 @@ import groovy.json.JsonSlurper
 import org.fsm.token.fsmrunner.TokenRunner
 import org.fsm.token.recognition.TokenSplitter
 
+//def myTest() {
+//    def fsmRunner = new TokenRunner("%(00|11%)%*%(%(01|10%)%(00|11%)%*%(01|10%)%(00|11%)%*%)%*", "number", 1, true)
+//    def tests = ["0011000101"]
+//    tests.each { test ->
+//        Tuple2 res = fsmRunner.readToken(test)
+//        println "Test length: ${test.length()}"
+//        println res
+//    }
+//}
+//myTest()
+
 def testNumberFSM(regex) {
     def fsmRunner = new TokenRunner(regex, "number", 1, false)
     def tests = ["+123.5e-2",

@@ -27,7 +27,7 @@ class TokenRunner extends FSMRunner {
         List<FSMachine> machineList = []
         def exit = ([false, 0] as Tuple2)
         this.fsmConfig.stateList.findAll { it.isStarting }.each { machineList << ([it, this.fsmConfig] as FSMachine) }
-        if (machineList.collect { it.currentState}.count { it.isFinal } != 0) {
+        if (this.collectInitialStates().count { it.isFinal } != 0) {
             exit = ([true, 0] as Tuple2)
         }
 
