@@ -4,11 +4,13 @@ import java.nio.file.Paths
 def container = "container"
 def resultFile = "result"
 
-def openText = "sometext"
-def extractedFile = "extract"
+//def openText = "sometext"
+//def extractedFile = "extract"
 
-//def openText = "somepic.png"
-//def extractedFile = "extract.png"
+
+//def openText = "somedata.png"
+def openText = "pic1.png"
+def extractedFile = "extract.png"
 
 
 def hide(String container, String openText, String resultFile) {
@@ -19,7 +21,7 @@ def hide(String container, String openText, String resultFile) {
 
     }
     int bitIdx = 0
-    println "Bulding new container with the file data"
+    println "Building new container with the file data"
     new File(container).eachLine {
         if (bitIdx < bits.size()) {
             new File(resultFile) << "${it.trim()}${(bits[bitIdx] == "1") ? " " : ""}\n"

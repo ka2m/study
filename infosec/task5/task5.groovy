@@ -4,7 +4,7 @@ def gcd(int i, int j) {
 }
 
 def encryptAlpha(String alphabet, String x, int key1, int key2) {
-    def pos = alphabet.indexOf(x)
+    def pos = alphabet.indexOf(x.toLowerCase())
     if (pos != -1) {
         def alphaSize = alphabet.length()
         def newPos = (pos * key1 + key2) % alphaSize
@@ -63,7 +63,7 @@ def decrypt(encLines, key1, key2, alphabet) {
 }
 
 
-def alphabet = 'АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдеёжзийклмнопрстуфхцчшщъыьэюя0123456789.,-;:'
+def alphabet = 'абвгдеёжзийклмнопрстуфхцчшщъыьэюя0123456789.,-;:'
 
 
 def fileName = System.console().readLine("Read from file: ")
