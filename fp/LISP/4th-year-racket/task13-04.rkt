@@ -6,43 +6,19 @@
 #lang racket
 (require racket/trace)
 
-;; FSM definition
-
-;; fsm format
-;; (alphabet states transitions)
-;; where
-;; alphabet is ( (alphaName validChars) ... )
-;; states is ( (starting #t #f) (s2 #f #f) (s3 #f #f) (final #f #t))
-;; each state represented by (state-name is-starting is-final)
-;; transitions is ( (state-name-from state-name-to  transition-by))
-;; each FSM contains 2 default states (starting and final) and empty symbol eps
-
-(define (alpha name allowed-chars) (list name allowed-chars))
-(define (get-alpha-name alpha) (first alpha))
-(define empty-symbol (alpha "eps" null))
-
+(define ns (variable-reference->namespace (#%variable-reference)))
+;; FSM entities
+;; STATES
 (define (state name is-starting is-final) (list name is-starting is-final))
 (define (state-ff name) (state name #f #f))
 
-(define initial-state (state "begin" #t #f))
-(define final-state (state "end" #f #t))
+(define state-name-length 5)
+(define initial-state (state "BEGIN" #t #f))
+(define final-state (state "END" #f #t))
 
 (define (get-state-name state) (first state))
 (define (begin? state) (second state))
 (define (end? state) (third state))
-
-(define state-name-length 10)
-
-(define (transition from-state to-state by-alpha) (list from-state to-state by-alpha))
-(define (get-from t) (first t))
-(define (get-to t) (second t))
-(define (get-by t) (third t))
-
-
-(define (make-fsm alphabet states transitions) (list alphabet states transitions))
-(define (get-alphabet t) (first t))
-(define (get-states t) (second t))
-(define (get-transistions t) (third t))
 
 (define (random-string a b n)
   (let* ([aint (char->integer a)]
@@ -56,84 +32,63 @@
 
 (define (get-rnd-state-name) (random-string #\A #\Z state-name-length))
 
-(define (generate-simple-fsm my-alpha)
-    (let* ((eps empty-symbol)
-           (is initial-state)
-           (fs final-state)
-           (alphabet (list eps my-alpha))
-           (post-is (state-ff (get-rnd-state-name)))
-           (states (list is post-is fs))
-           (transitions (list (transition is post-is my-alpha)
-                              (transition post-is fs eps))))
-          (make-fsm alphabet states transitions)))
-
-(define (describe-fsm fsm)
-    (fprintf (current-output-port)
-             "alphabet: ~a\nstates: ~a\ntransitions:\n~a\n\n"
-             (get-alphabet fsm)
-             (get-states fsm)
-             (string-join (map (lambda (x) (format "~s->~s by ~s"
-                                                   (get-state-name (get-from x))
-                                                   (get-state-name (get-to x))
-                                                   (get-alpha-name (get-by x))))
-                               (third fsm))
-                          "\n")))
+;; TRANSITION (actually the only fsm definition we preserve)
+(define (transition from-state to-state by-alpha) (list from-state to-state by-alpha))
+(define (get-from t) (first t))
+(define (get-to t) (second t))
+(define (get-by t) (third t))
 
 ;; FSM Operations
+;; Create new one, simple, with one alpha
+(define (simplefsm my-alpha)
+    (let* ((is initial-state)
+           (fs final-state)
+           (post-is (state-ff (get-rnd-state-name))))
+       (list (transition is post-is my-alpha)
+             (transition post-is fs 'eps))))
+
+;; Utility to merge two lists
 (define (merge-list-unique a b) (remove-duplicates (append a b)))
 
-(define (union fsm-a fsm-b)
-    (make-fsm (merge-list-unique (get-alphabet fsm-a) (get-alphabet fsm-b))
-              (merge-list-unique (get-states fsm-a) (get-states fsm-b))
-              (merge-list-unique (get-transistions fsm-a) (get-transistions fsm-b))))
+(define (unite fsm-a fsm-b) (merge-list-unique fsm-a fsm-b))
 
 (define (get-pre-final-states transitions)
-    (map (lambda (x) (get-from x))
-         (filter (lambda (x) (end? (get-to x))) transitions)))
+   (map (lambda (x) (get-from x))
+        (filter (lambda (x) (end? (get-to x))) transitions)))
 
 (define (get-post-start-states transitions)
-    (map (lambda (x) (get-to x))
-      (filter (lambda (x) (begin? (get-from x))) transitions)))
+   (map (lambda (x) (get-to x))
+     (filter (lambda (x) (begin? (get-from x))) transitions)))
 
 (define (get-post-start-state-and-alphas transitions)
-          (map (lambda (x) (list (get-to x) (get-by x)))
-            (filter (lambda (x) (begin? (get-from x))) transitions)))
+         (map (lambda (x) (list (get-to x) (get-by x)))
+           (filter (lambda (x) (begin? (get-from x))) transitions)))
 
 (define (cartesian-product . lists)
-  (foldr (lambda (a b)
-           (append-map (compose1 (curryr map b) (curry cons))
-                       a))
-         '(())
-         lists))
+ (foldr (lambda (a b)
+          (append-map (compose1 (curryr map b) (curry cons))
+                      a))
+        '(())
+        lists))
 
-(define (iterate-transitions trans)
-  (append trans
-          (list (list initial-state final-state empty-symbol))
-          (let* ((pre-final-states (get-pre-final-states trans))
-                 (psa (get-post-start-state-and-alphas trans)))
-              ; flatten cartesian product
-              (map (lambda (x) (list (first x) (first (second x)) (second (second x))))
-                (cartesian-product pre-final-states psa)))))
+(define (iterate trans)
+ (append trans
+         (list (transition initial-state final-state 'eps))
+         (let* ((pre-final-states (get-pre-final-states trans))
+                (psa (get-post-start-state-and-alphas trans)))
+             ; flatten cartesian product
+             (map (lambda (x) (list (first x) (first (second x)) (second (second x))))
+               (cartesian-product pre-final-states psa)))))
 
-(define (positive-iterate-transitions trans)
-  (append trans
-          (let* ((pre-final-states (get-pre-final-states trans))
-                 (psa (get-post-start-state-and-alphas trans)))
-              ; flatten cartesian product
-              (map (lambda (x) (list (first x) (first (second x)) (second (second x))))
-                (cartesian-product pre-final-states psa)))))
+(define (piterate trans)
+ (append trans
+         (let* ((pre-final-states (get-pre-final-states trans))
+                (psa (get-post-start-state-and-alphas trans)))
+             ; flatten cartesian product
+             (map (lambda (x) (list (first x) (first (second x)) (second (second x))))
+               (cartesian-product pre-final-states psa)))))
 
-(define (iterate fsm)
-    (make-fsm (get-alphabet fsm)
-              (get-states fsm)
-              (iterate-transitions (get-transistions fsm))))
-
-(define (positive-iterate fsm)
-    (make-fsm (get-alphabet fsm)
-              (get-states fsm)
-              (positive-iterate-transitions (get-transistions fsm))))
-
-(define (concat-transitions t-a t-b)
+(define (concat t-a t-b)
   (append (filter (lambda (x) (not (end? (get-to x)))) t-a)
           (filter (lambda (x) (not (begin? (get-from x)))) t-b)
     (let* ((pre-final-states (get-pre-final-states t-a))
@@ -141,41 +96,155 @@
            (map (lambda (x) (list (first x) (first (second x)) (second (second x))))
              (cartesian-product pre-final-states psa)))))
 
-(define (concat fsm-a fsm-b)
-    (make-fsm (merge-list-unique (get-alphabet fsm-a) (get-alphabet fsm-b))
-              (merge-list-unique (get-states fsm-a) (get-states fsm-b))
-              (concat-transitions (get-transistions fsm-a) (get-transistions fsm-b))))
+(define (eliminite-eps fsm)
+  (let* ((new-finals (map get-state-name
+                        (map get-from
+                          (filter (lambda (x) (and (eq? (get-state-name (get-to x)) "END")
+                                              (eq? (get-by x) 'eps))) fsm))))
+         (shrinked-trans (filter (lambda (x) (not (eq? (get-state-name (get-to x)) "END"))) fsm)))
+   (map (lambda (x) (if (not (member (get-state-name (get-from x)) new-finals))
+                        x
+                        (transition (state (get-state-name (get-from x))
+                                           (begin? (get-from x))
+                                           #t)
+                                    (get-to x)
+                                    (get-by x))))
+      (map (lambda (x) (if (not (member (get-state-name (get-to x)) new-finals))
+                           x
+                           (transition (get-from x)
+                                       (state (get-state-name (get-to x))
+                                              (begin? (get-to x))
+                                              #t)
+                                        (get-by x))))
+                        shrinked-trans))))
+
+(define (describe-fsm fsm)
+   (fprintf (current-output-port)
+            "transitions:\n~a\n"
+            (string-join (map (lambda (x) (format "~s->~s by ~s"
+                                                  (get-state-name (get-from x))
+                                                  (get-state-name (get-to x))
+                                                  (get-by x)))
+                              fsm)
+                         "\n")))
+
+(define (regex->fsm reg)
+    (define (proc rest fsm)
+        (if (null? rest)
+            fsm
+            (let ((symbol (car rest))
+                  (rr (cdr rest)))
+              (cond
+                ((eq? symbol '+) (proc rr (append fsm (list 'unite))))
+                ((eq? symbol '*) (proc rr (append fsm (list 'iterate))))
+                ((eq? symbol '?) (proc rr (append fsm (list 'piterate))))
+                ((list? symbol)
+                  (if (null? fsm)
+                        (proc rr
+                              (append fsm
+                                      (list 'concat
+                                            (proc symbol '()))))
+                        (proc rr
+                              (append fsm
+                                      (list (proc symbol '()))))))
+                (else
+                  (if (null? fsm)
+                          (proc rr
+                                (append fsm
+                                        (list 'concat
+                                              (list 'simplefsm symbol))))
+                          (proc rr
+                                (append fsm
+                                        (list (list 'simplefsm symbol))))))))))
+  ;(trace proc)
+   (proc reg '()))
 
 
-(define (get-new-final-states transitions)
-  (map get-state-name
-    (map get-from
-      (filter (lambda (x) (eq? (get-alpha-name (get-by x)) "eps")) transitions))))
+(define (process-char cur ch rfsm)
+  (map get-to
+    (filter (lambda (x) (let* ((f (get-state-name (get-from x)))
+                               (a (get-by x)))
+                            (and (eq? cur f) (eq? ch a) ))) rfsm)))
 
-(define (fsm-to-grammar fsm)
+(define (begin-final? rfsm)
+  (not
+    (null?
+      (filter (lambda (x) (and (begin? x) (end? x)))
+        (remove-duplicates (append (map get-from rfsm) (map get-to rfsm)))))))
+
+(define (get-begin-states rfsm)
+  (remove-duplicates
+    (map get-state-name
+      (map get-from
+        (filter (lambda (x) (begin? (get-from x))) rfsm)))))
+
+(define (flatten1 l) (foldl append '() l))
+
+(define (check-string str rfsm)
+  (define (go-thru rest cur-states idx cnt valid?)
+    (if (null? rest)
+        (list valid? cnt)
+        (let* ((next (car rest))
+               (new-states
+                 (remove-duplicates
+                   (flatten1 (map (lambda (x) (process-char x next rfsm)) cur-states))))
+               (only-names (map get-state-name new-states)))
+          (if (null? (filter end? new-states))
+              (go-thru (cdr rest) only-names (+ idx 1) cnt valid?)
+              (go-thru (cdr rest) only-names (+ idx 1) (+ idx 1) #t)))))
+    (go-thru (string->list str) (get-begin-states rfsm) 0 0 (begin-final? rfsm)))
+
+(define (collect-nonterminals rfsm)
+  (remove-duplicates (map get-state-name
+                          (append (map get-from rfsm) (map get-to rfsm)))))
+
+(define (get-terminals rfsm)
+  (string-join (map (lambda (x) (string x #\ )) (remove-duplicates (map get-by rfsm))) ""))
+
+(define (get-rules rfsm)
+  (filter (lambda (rrr) (not (null? rrr)))
+    (map
+      (lambda (nt) (let ((aRule (string-join
+                                  (map (lambda (y) (format "~a ~a" (get-by y) (get-state-name (get-to y))))
+                                    (filter (lambda (x) (eq? (get-state-name (get-from x)) nt))
+                                        rfsm)) "|")))
+                  (if (eq? (string-length aRule) 0)
+                      null
+                      (format "~a->~a" nt aRule))))
+       (collect-nonterminals pregex))))
+
+(define (get-final-rules rfsm)
+  (map (lambda (x) (format "~a->eps" (get-state-name x)))
+    (filter end?
+      (remove-duplicates (append (map get-from rfsm) (map get-to rfsm))))))
+
+(define (describe-grammar rfsm)
   (fprintf (current-output-port)
-         "begin non-term: S\n,non-terms: S,~a\nterms: ~a\nproductions:\nS->begin\n~a\n~a\n"
-         (string-join (map get-state-name (filter (lambda (x) (not (end? x))) (get-states fsm))) ",")
-         (string-join (map get-alpha-name (filter (lambda (x) (not (eq? (get-alpha-name x) "eps"))) (get-alphabet fsm))) ",")
-         (string-join (map (lambda (x) (format "~s->~s~s"
-                                               (get-state-name (get-from x))
-                                               (get-alpha-name (get-by x))
-                                               (get-state-name (get-to x))))
-                           (filter (lambda (x) (not(eq? (get-alpha-name (get-by x)) "eps"))) (get-transistions fsm)))
-                      "\n")
-        (string-join (map (lambda (x) (format "~s->eps" x)) (get-new-final-states (get-transistions fsm))) "\n")))
+    "Terminals: ~a\nNon-Terminals:~a\nProductions:~a\n~a\nStartSymbol:BEGIN\n"
+    (get-terminals rfsm)
+    (string-join (collect-nonterminals rfsm) " ")
+    (string-join (get-rules rfsm) "\n")
+    (string-join (get-final-rules rfsm) "\n")))
 
-(define aFsm (generate-simple-fsm (alpha "myAlpha" '('a))))
-(define bFsm (generate-simple-fsm (alpha "myBeta" '('b))))
-(define cFsm (generate-simple-fsm (alpha "myCharlie" '('c))))
-(define uFsm (union aFsm bFsm))
 
-(describe-fsm aFsm)
-(describe-fsm bFsm)
-(describe-fsm cFsm)
-(describe-fsm uFsm)
-(describe-fsm (iterate uFsm))
-(describe-fsm (iterate cFsm))
-(define fFsm (concat (iterate uFsm) (iterate cFsm)))
-(describe-fsm fFsm)
-(fsm-to-grammar fFsm)
+;; (a|b)c
+;(define pregex (eliminite-eps (eval (regex->fsm '((+ #\a #\b) #\c)) ns)))
+;(print pregex)
+;(describe-fsm pregex)
+;(check-string "ac" pregex)
+
+;; ((00|11)* ( (01|10) (00|11)* (01|10) (00|11)*)*)
+(define rfsm
+  (regex->fsm
+  '(  (* (+ (#\0 #\0) (#\1 #\1)))
+      (* (((
+            (+ (#\0 #\1) (#\1 #\0))
+            (* (+ (#\0 #\0) (#\1 #\1))))
+          (+ (#\0 #\1) (#\1 #\0)))
+         (* (+ (#\0 #\0) (#\1 #\1)))))) ))
+
+(define pregex (eliminite-eps (eval rfsm ns)))
+;(get-rules pregex)
+(describe-grammar pregex)
+
+;(check-string "010101" pregex)
