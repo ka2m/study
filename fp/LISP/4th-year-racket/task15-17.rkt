@@ -1,9 +1,12 @@
 #lang racket
 (require racket/trace)
 
-(define routes (list (list 'a1 (list 'a 'b 'd))
-                     (list 'a2 (list 'a 'c 'e 'f))
-                     (list 'a3 (list 'd 'g 'h 'j))))
+;(define routes (list (list 'r1 (list 'a 'b 'c))
+;                     (list 'r2 (list 'b 'd 'e))))
+(define routes (list (list 'r1 (list 'm 'z 'x 'a 'b 'c 'd 'g))
+                     (list 'r2 (list 'b 'a 'e 'l 'm))
+                     (list 'r3 (list 'j 'i 'h 'g 'f 'b))
+                     (list 'r4 (list 'l 'k 'e 'b))))
 
 (define (route->graph route)
   (define (rtg stop-list r-name from res)
@@ -24,93 +27,107 @@
   (impl routes '()))
 
 (define graph (routes->graph routes))
+(define total-stops
+        (remove-duplicates
+            (foldl append '()
+                (map (lambda (x) (list (first x) (second x))) graph))))
+(define total-stops-count (length total-stops))
 
 (define from 'a)
 (define to 'b)
 
-(define (backtrack-board)
-  (map (lambda (x) (list x null))
+(define (flatten1 l) (foldl append '() l))
+(define (uflatten1 l) (remove-duplicates (flatten1 l)))
+
+(define (get-adjacent-edges v)
+  (filter (lambda (x) (or (eq? (first x) v) (eq? (second x) v))) graph))
+
+(define (get-other e v)
+  (if (eq? (first e) v)
+      (second e)
+      (first e)))
+
+(define (filter-old-paths oldp new-adjs)
+  (filter (lambda (x) (eq? (member x oldp) #f)) new-adjs))
+
+(define (get-next-edges traversal)
+  (let* ((last-v (last (second traversal)))
+         (adjacents (get-adjacent-edges last-v))
+         (ft (if (list? (first (first traversal))) (first traversal) (list (first traversal))))
+         (new-adjs (filter-old-paths ft adjacents)))
+    (if (null? new-adjs)
+        (list traversal)
+        (map (lambda (x) (list (append ft (list x))
+                                         (append (second traversal) (list (get-other x last-v))))) new-adjs))))
+
+(define (inital-traversal from)
+  (let* ((adjacents (get-adjacent-edges from)))
+    (map (lambda (x) (list x (list from (get-other x from)))) adjacents)))
+
+(define (check-incompleteness traversal)
+  (let* ((last-v (last (second traversal)))
+        (adjacents-count (length (filter (lambda (x) (eq? (member (get-other x last-v) (second traversal)) #f)) (get-adjacent-edges last-v)))))
+    (not (eq? adjacents-count 0))))
+
+(define (get-all-paths from)
+  (define (impl paths)
+      (if (null? (filter check-incompleteness paths))
+          paths
+          (impl (flatten1 (map get-next-edges paths)))))
+  (impl (inital-traversal from)))
+
+(define (normalize-path path from)
+
+  (define (do-normal p res)
+    (if (null? p)
+        res
+        (do-normal (cdr p)
+                   (append res
+                           (if (eq? (second (last res)) (first (car p)))
+                               (list (car p))
+                               (list (list (second (car p))
+                                                 (first (car p))
+                                                 (third (car p)))))))))
+    (if (<= (length path) 1)
+        path
+        (do-normal (cdr path) (if (eq? from (first (car path)))
+                                  (list (car path))
+                                  (list (list (second (car path))
+                                              (first (car path))
+                                              (third (car path))))))))
+
+(define (stopAt path at)
+  (define (impl path at res)
+    (if (or (eq? (second (car path)) at)
+            (eq? (first (car path)) at))
+        (append res (list (car path)))
+        (impl (cdr path) at (append res (list (car path))))))
+  (impl path at '()))
+
+(define (off-on? path)
+  (define (impl p prev used-r)
+    (if (null? p)
+        #f
+        (if (and (member (third (car p)) used-r)
+                 (and (not (null? prev)) (not (eq? prev (third (car p))))))
+            #t
+            (impl (cdr p) (third (car p)) (append used-r (list (third (car p))))))))
+  (trace impl)
+  (impl path null '()))
+
+
+(define (get-possible-paths from to)
+  (filter (lambda (x) (not (off-on? x)))
+  (map (lambda (x) (normalize-path x from))
     (remove-duplicates
-      (apply append
-        (map (lambda (x) (list (first x) (second x))) graph)))))
+      (map (lambda (x) (stopAt x to))
+        (map first
+          (filter (lambda (x) (and (member from (second x))
+                                (member to (second x)))) (get-all-paths from))))))))
 
-(define (set-parent board child parent by)
-  (define (impl board res)
-    (if (null? board)
-      res
-      (if (eq? (caar board) child)
-          (impl (cdr board) (append res (list (list child (list parent by)))))
-          (impl (cdr board) (append res (list (car board)))))))
-  (impl board '()))
-
-(define (get-parent board child)
-  (let ((r (filter (lambda (x) (eq? (car x) child)) board)))
-    (if (null? r) null (cadar r))))
-
-(define (update-board board new-children parent)
-  (define (impl children res)
-    (if (null? children)
-      res
-      (impl (cdr children)
-            (set-parent res
-                        (first (car children))
-                        parent
-                        (second (car children))
-                        ))))
-  (impl new-children board))
-
-(define (get-adjacent el)
-  (append
-    (map (lambda (x) (list (second x) (third x)))
-            (filter (lambda (x) (eq? (first x) el)) graph))
-          (map (lambda (x) (list (first x) (third x)))
-            (filter (lambda (x) (eq? (second x) el)) graph))))
-
-(define (bfs start)
-  (define (bfs-impl queue board)
-      (if (null? queue)
-          board
-          (let* ((elem (last queue))
-                 (drop-q (drop-right queue 1))
-                 (adj (get-adjacent elem))
-                 (q-tail (filter (lambda (x) (null? (get-parent board x)))
-                            (map first adj))))
-            (if (null? q-tail)
-                (bfs-impl drop-q board)
-                (bfs-impl (append drop-q q-tail)
-                          (update-board board
-                                        (filter (lambda (x) (or (member (first x) q-tail)
-                                                                (member (second x) q-tail)))
-                                                adj)
-                                         elem))))))
-  (bfs-impl (list start) (set-parent (backtrack-board) start 'root null)))
-
-(define (restore board start finish)
-  (define (build-path cur res)
-    (let ((parent (get-parent board (first cur))))
-      (if (eq? (first parent) 'root)
-          res
-          (build-path parent (append res (list parent))))))
-  (build-path (list start null) (list (list start null))))
-
-
-(define (minify path)
-  (define (do-min path stop-buf r-name res)
-    (if (null? path)
-        (append res (list (list stop-buf r-name)))
-        (let* ((itm (car path)) (rest (cdr path)) (rr (second itm)))
-          (if (or (null? r-name) (null? rr) (eq? rr r-name))
-            (do-min rest
-                    (append stop-buf (list (first itm)))
-                    rr
-                    res)
-            (do-min rest
-                    (list (last stop-buf) (first itm))
-                    rr
-                    (append res (list (list stop-buf r-name))))))))
-  (do-min path '() null '()))
-
-(define (create-path from to)
-  (minify (restore (bfs to) from to)))
-
-(create-path 'j 'f)
+(fprintf (current-output-port)
+       "~a\n\n"
+       (string-join
+         (map (lambda (z) (string-join z ""))
+              (map (lambda (x) (map (lambda (y) (format "~s -> ~s by ~s\n" (first y) (second y) (third y))) x))
+        (get-possible-paths 'm 'a))) "\n"))
