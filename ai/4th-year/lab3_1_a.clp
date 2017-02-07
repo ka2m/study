@@ -1,0 +1,23 @@
+(reset)
+(deftemplate client
+    (slot name)
+    (slot in)
+    (slot citi (default Saratov)))
+(load-facts lab3_1.facts.clp)
+
+(facts)
+(modify 1 (citi SPB))
+(modify 2 (name Popov))
+(duplicate 3 (in 999))
+(facts)
+(save-facts lab31a_out.clp)
+
+(reset)
+(load-facts lab31a_out.clp)
+(facts)
+(assert (client (name User1) (in 1000)))
+(assert (client (name User2) (in 1001) (citi Kiev)))
+(retract 1)
+(retract 2)
+(facts)
+(save-facts lab31b_out.clp)
