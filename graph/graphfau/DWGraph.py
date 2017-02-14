@@ -4,7 +4,6 @@
 
 import copy
 
-
 class DWGraph:
     def __init__(self, vertices, adj_list, network=False):
         self.vertices = vertices  # set
@@ -142,6 +141,9 @@ class DWGraph:
                 unique_conns.append(pair)
                 ucw.append(conn)
         return ucw
+
+    def get_unique_connections_from_vertex(self, vertex):
+        return self.get_connections(vertex)
 
     def count_edges(self):
         return len(self.get_edges())
