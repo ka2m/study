@@ -16,9 +16,9 @@ for _ in range(all_tries):
         first_won += 1
 
 print("число игр: {0}".format(all_tries))
-print("победа игрока с шестерками: {0}".format(first_won))
-print("вероятность победы игрока с шестерками: {0}".format(round(first_won / all_tries, 2)))
+print("побед игрока с шестерками: {0}".format(first_won))
 print("побед другого игрока: {0}".format(all_tries - first_won))
+print("вероятность победы игрока с шестерками: {0}".format(round(first_won / all_tries, 4)))
 
 allItems = []
 k = 0
@@ -30,4 +30,4 @@ for a in range(1, 7):
                 if 6 in [a, b, c, d]:
                     k += 1
 
-print(k/ len(allItems))
+print("Статическая проверка полученных результатов (вероятность выпадения 6 на 4 кубиках): {0}".format(k/ len(allItems)))
