@@ -1,6 +1,6 @@
 #include <iostream>
 #include <sys/time.h>
-#define N 1024
+#define N 2048
 double a[N][N], b[N][N], c[N][N];
 using namespace std;
 int main()
