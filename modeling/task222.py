@@ -15,22 +15,17 @@ real_sigma = 0.03
 
 customer_sigma = 0.1
 
-real_bags = [rand_normal(real_mu, real_sigma)
-             for _ in range(max_bags)]
-
-real_max_wght = max(real_bags)
-
-print("Реальные веса мешков (кг): ", real_bags)
-print("Реальный максимальный вес (кг): ", real_max_wght)
-
-count_wins = 0
 all_customer_choices = []
+count_wins = 0
 
 for _ in range(max_tries):
+    real_bags = [rand_normal(real_mu, real_sigma)
+                 for _ in range(max_bags)]
+
     customer_choice = max([rand_normal(rbw, customer_sigma)
                            for rbw in real_bags])
     all_customer_choices.append(customer_choice)
-    if customer_choice >= real_max_wght:
+    if customer_choice >= max(real_bags):
         count_wins += 1
 
 answer = round(reduce(lambda x, y: x + y, all_customer_choices) / max_tries, 3)
