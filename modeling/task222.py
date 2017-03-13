@@ -30,7 +30,7 @@ for _ in range(max_tries):
 
 answer = round(reduce(lambda x, y: x + y, all_customer_choices) / max_tries, 3)
 
-print("Мат. ожидание веса <<тяжелого>> мешка: ", answer)
+print("Оценка мат. ожидания веса <<тяжелого>> мешка: ", answer)
 
 print("Вероятность выбора самого тяжелого мешка: ",
       round(count_wins / max_tries, 2))

@@ -18,4 +18,4 @@ answer = round(reduce(lambda x, y: x + y,
                [2 * min(rand_normal(mu, sigma), rand_normal(mu, sigma))
                 for _ in range(max_tests)]) / max_tests, 3)
 
-print("Мат. ожидание веса смеси: {0} кг".format(answer))
+print("Оценка мат. ожидания веса смеси: {0} кг".format(answer))
